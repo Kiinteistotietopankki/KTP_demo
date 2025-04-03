@@ -1,0 +1,39 @@
+/* src/components/Sidebar.css */
+.sidebar {
+    width: 150px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #333;
+    padding-top: 20px;
+  }
+  
+  .sidebar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .sidebar ul li {
+    padding: 10px;
+  }
+  
+  .sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .sidebar ul li a:hover {
+    background-color: #575757;
+  }
+  
+  /* src/App.css */
+  .app-container {
+    display: flex;
+  }
+  
+  .main-content {
+    margin-left: 250px;
+    padding: 20px;
+  }
