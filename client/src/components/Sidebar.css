@@ -7,11 +7,13 @@
     left: 0;
     background-color: #333;
     padding-top: 20px;
+    transition: all 0.3s ease;
   }
   
   .sidebar ul {
     list-style-type: none;
     padding: 0;
+    margin: 0;
   }
   
   .sidebar ul li {
@@ -37,3 +39,32 @@
     margin-left: 250px;
     padding: 20px;
   }
+  
+  /* Mobile friendly styles */
+  @media (max-width: 768px) {
+    /* Convert sidebar to a top navigation bar */
+    .sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+      padding: 10px 0;
+    }
+    
+    /* Display list items inline for a horizontal menu */
+    .sidebar ul li {
+      display: inline-block;
+      padding: 10px 15px;
+    }
+    
+    /* Adjust the main content margin when sidebar is on top */
+    .main-content {
+      margin-left: 0;
+      padding: 20px 10px;
+    }
+    
+    /* Optionally stack the app container vertically */
+    .app-container {
+      flex-direction: column;
+    }
+  }
+  
