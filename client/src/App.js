@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import './App.css';
+import Home from './pages/Home';
 
 function App() {
   return (
@@ -21,9 +22,6 @@ function App() {
   );
 }
 
-function Home() {
-  return <h2>Home Page</h2>;
-}
 
 function About() {
   return <h2>About Page</h2>;
