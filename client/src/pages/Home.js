@@ -1,21 +1,16 @@
 import React from 'react';
-import './Home.css';
+import Badge from 'react-bootstrap/Badge';
+import '../App.css';
 
-function TestBoostrap() {
+
+function Home() {
   return (
     <div className="container">
-      <h1 className="text-primary">Kiinteistötietopankki DEMO</h1>
-      <button className="btn btn-success">Btn</button>
+      <h1 className='text-primary'>Kiinteistötietopankki <Badge bg="secondary">DEMO</Badge></h1>
     </div>
   );
 }
 
-function Home() {
-  return (
-    <>
-    <TestBoostrap />
-    </>
-  );
-}
 
 export default Home;
+
