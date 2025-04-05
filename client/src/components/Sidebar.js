@@ -13,7 +13,7 @@ function Sidebar() {
             // expand="lg"
         >
 
-                <Nav className="flex-sm-column flex-row">
+                <Nav className="flex-md-column flex-row">
                     <Nav.Link as={Link} to="/" className="nav-item">Home</Nav.Link>
                     <Nav.Link as={Link} to="/about" className="nav-item">About</Nav.Link>
                     <Nav.Link as={Link} to="/services" className="nav-item">Services</Nav.Link>
