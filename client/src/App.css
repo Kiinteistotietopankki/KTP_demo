@@ -13,8 +13,17 @@
     flex-direction: column;
   }
 
-  .nav-names{
+  .sidebar{
+    display: flex;
     flex-direction: row;
+    position: fixed;
+    min-width: 100vw;
+    flex-wrap: wrap;
+  }
+
+
+  .app-container{
+    margin-top: 10vh;
   }
 }
 
@@ -36,6 +45,8 @@
   flex-direction: column;
   display: flex;
   flex-wrap: wrap;
+  padding: 2vw;
+  /* position: fixed; */
 }
 
 .nav-names{
@@ -48,7 +59,6 @@
 .container{
   outline: 2px dashed green;
   min-height: 100vh;
-  text-align: center;
 }
 
 /* ====== */
