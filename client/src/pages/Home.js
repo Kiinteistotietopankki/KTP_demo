@@ -7,6 +7,7 @@ function Home() {
   return (
     <div className="container">
       <h1 className='text-primary'>Kiinteistötietopankki <Badge bg="secondary">DEMO</Badge></h1>
+      <h2 className='text-secondary'>Kiinteistöhaku</h2>
     </div>
   );
 }

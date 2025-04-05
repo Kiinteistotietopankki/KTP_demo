@@ -7,15 +7,15 @@ import Home from './pages/Home';
 function App() {
   return (
     <Router>
-      <div className="app-container">
+      <div className="layout">
         <Sidebar />
-        <div className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
+        <div className="app-container">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
         </div>
       </div>
     </Router>
