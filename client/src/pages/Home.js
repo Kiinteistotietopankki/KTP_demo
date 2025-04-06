@@ -13,8 +13,7 @@ function Home() {
   const [error, setError] = useState(null);
 
   const handleSearch = async (searchQuery) => {
-    setLoading(true);
-    setError(null);
+
 
     try {
       const response = await axios.get(`https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&CQL_FILTER=property_identifier='${searchQuery}'&SRSNAME=EPSG:4326`);

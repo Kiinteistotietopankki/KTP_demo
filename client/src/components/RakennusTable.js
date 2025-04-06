@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 // import Table from 'react-bootstrap/Table';
 import Tabletemplate from './Tabletemplate';
+import { Accordion } from 'react-bootstrap';
 
 
 function Rakennustable({data}) {
@@ -28,6 +29,8 @@ function Rakennustable({data}) {
 
                     // General table headers
                     const generalTableHeaders = [
+                        { key: 'permanent_building_identifier', label: 'Rakennustunnus' },
+                        { key: 'property_identifier', label: 'Kiinteistötunnus' },
                         { key: 'name', label: 'Kohteen nimi' },
                         { key: 'address', label: 'Kohteen osoite' },
                         { key: 'postcode', label: 'Postinumero' },
@@ -49,9 +52,12 @@ function Rakennustable({data}) {
                         { key: 'heating_method', label: 'Lämmitystapa' },
                         { key: 'heating_energy_source', label: 'Lämmitysenergianlähde' },
                         { key: 'material_of_load_bearing_structures', label: 'Kantavanrakenteen rakennusaine' },
+                    ];
+
+                    const aluetiedot = [
                         { key: 'exact_location', label: 'Tarkka sijainti' },
                         { key: 'flood_risk', label: 'Tulvariski' },
-                        { key: 'groundwater_area', label: 'Pohjavesialueella' },
+                        { key: 'groundwater_area', label: 'Pohjavesialueella' }
                     ];
 
                     // Get the permanent building identifier to be used as the header for the feature
@@ -64,8 +70,31 @@ function Rakennustable({data}) {
                             
                             {/* General Table */}
                             <div className="tablecontainer card-body">
-                                <Tabletemplate headers={generalTableHeaders} properties={properties} />
-                                <Tabletemplate headers={luokitukset} properties={properties} />
+                                
+                                
+
+                                <Accordion defaultActiveKey={['0']} alwaysOpen='true'>
+                                    <Accordion.Item eventKey="0">
+                                        <Accordion.Header>Yleistiedot</Accordion.Header>
+                                        <Accordion.Body>
+                                            <Tabletemplate headers={generalTableHeaders} properties={properties} />
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+
+                                    <Accordion.Item eventKey="1">
+                                        <Accordion.Header>Luokitukset</Accordion.Header>
+                                            <Accordion.Body>
+                                                <Tabletemplate headers={luokitukset} properties={properties} />
+                                            </Accordion.Body>
+                                    </Accordion.Item>
+
+                                    <Accordion.Item eventKey="2">
+                                        <Accordion.Header>Aluetiedot</Accordion.Header>
+                                            <Accordion.Body>
+                                                <Tabletemplate headers={aluetiedot} properties={properties} />
+                                            </Accordion.Body>
+                                    </Accordion.Item>
+                                    </Accordion>
                             </div>
                         </div>
                     );
