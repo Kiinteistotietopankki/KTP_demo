@@ -10,7 +10,7 @@ function App() {
     <Router>
       <ScrollToTop />
 
-      <div className="layout bg-dark text-white">
+      <div className="layout">
         <Sidebar />
         
         <div className="app-container">
