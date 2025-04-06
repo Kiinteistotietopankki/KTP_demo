@@ -9,9 +9,12 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <div className="layout">
+
+      <div className="layout bg-dark text-white">
         <Sidebar />
+        
         <div className="app-container">
+          
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
