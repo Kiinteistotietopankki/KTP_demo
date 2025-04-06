@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Table } from 'react-bootstrap';
 // import Table from 'react-bootstrap/Table';
 import Tabletemplate from './Tabletemplate';
 
@@ -34,14 +33,15 @@ function Rakennustable({data}) {
                         { key: 'postcode', label: 'Postinumero' },
                         { key: 'municipality', label: 'Toimipaikka' },
                         { key: 'completion_date', label: 'Rakennusvuosi' },
-                        { key: 'total_area', label: 'Kokonaisala' },
-                        { key: 'floor_area', label: 'Kerrosala' },
-                        { key: 'volume', label: 'Tilavuus' },
+                        { key: 'total_area', label: 'Kokonaisala (m²)' },
+                        { key: 'gross_floor_area', label: 'Kerrosala (m²)' },
+                        { key: 'floor_area', label: 'Huoneistoala (m²)' },
+                        { key: 'volume', label: 'Tilavuus (m³)' },
                         { key: 'number_of_storeys', label: 'Kerroksia' },
                     ];
 
                     // Special table headers (separate for specific properties)
-                    const specialTableHeaders = [
+                    const luokitukset = [
                         { key: 'main_purpose', label: 'Rakennusluokitus' },
                         { key: 'construction_method', label: 'Runkotapa' },
                         { key: 'usage_status', label: 'Käytössäolotilanne' },
@@ -63,9 +63,9 @@ function Rakennustable({data}) {
                             
                             
                             {/* General Table */}
-                            <div className="card-body">
-                            <Tabletemplate headers={generalTableHeaders} properties={properties} />
-                            <Tabletemplate headers={specialTableHeaders} properties={properties} />
+                            <div className="tablecontainer card-body">
+                                <Tabletemplate headers={generalTableHeaders} properties={properties} />
+                                <Tabletemplate headers={luokitukset} properties={properties} />
                             </div>
                         </div>
                     );

@@ -25,7 +25,7 @@ const Tabletemplate = ({ headers, properties, tableTitle }) => {
                             <td>
                                 {properties[`source_${key}`] !== undefined && properties[`source_${key}`] !== null
                                     ? properties[`source_${key}`]
-                                    : 'Ei lähdetietoa'}
+                                    : '-'}
                             </td>
                         </tr>
                     ))}
