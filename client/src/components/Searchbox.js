@@ -4,17 +4,20 @@ import axios from 'axios';
 import '../App.css';
 import { Tabs } from 'react-bootstrap';
 import { Tab } from 'react-bootstrap';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // Hakulogiikka on tässä
 
 function Searchbox({ afterSearch }) {
 
   const [searchQuery, setSearchQuery] = useState("");
-  // const [resultsSearchbox, setResultsSearchbox] = useState([]);
   const [rawResults, setRawResults] = useState([]);
   const [results, setResults] = useState([]);  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchType, setSearchType] = useState('kiinteistötunnuksella') // kiinteistotunnus, rakennustunnus, osoite 
 
@@ -32,6 +35,27 @@ function Searchbox({ afterSearch }) {
       setLoading(false); // Reset loading after fetching data
     }
   };
+
+  
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search); // Parse the query string from the URL
+
+    const queryQuery = queryParams.get('searchQuery');  // Extract 'searchQuery' from the URL
+    const queryType = queryParams.get('searchType');    // Extract 'searchType' from the URL
+
+    if (queryQuery) {
+      setSearchQuery(queryQuery);  // Set state for searchQuery
+    }
+    if (queryType) {
+      setSearchType(queryType);    // Set state for searchType
+    }
+
+    // Optionally, trigger the search when the page loads
+    if (queryQuery && queryType) {
+      handleSearch();
+    }
+  }, [location.search]);  // Runs on URL change (including search params)
 
   useEffect(() => {
     if (rawResults?.features?.length > 0) {
@@ -95,6 +119,10 @@ function Searchbox({ afterSearch }) {
       handleSearch(); // Trigger search on Enter key
     }
   };
+
+  useEffect(() => {
+    navigate(`?searchQuery=${searchQuery}&searchType=${searchType}`);
+  }, [searchType, searchQuery]);
 
   const handleTabChange = (newSearchType) => {
     setSearchType(newSearchType);
