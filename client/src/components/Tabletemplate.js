@@ -26,7 +26,7 @@ const Tabletemplate = ({ properties, tableTitle }) => {
                             <td>
                                 {properties[key] !== undefined && properties[key] !== null
                                     ? properties[key]
-                                    : 'Data not available'}
+                                    : 'Ei tiedossa'}
                             </td>
                             <td>
                                 {properties[`source_${key}`] !== undefined && properties[`source_${key}`] !== null
