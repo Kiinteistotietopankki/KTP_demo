@@ -43,11 +43,11 @@ function App() {
               <Route
                 path="/*"
                 element={
-                  <ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on */}
+                  <ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on kirjautunut sisään */}
                     
-            <Routes>
+                      <Routes>
                         <Route path="/" element={<Home />} />
-                      <Route path="/Profile" element={<Profile />} />
+                        <Route path="/profile" element={<Profile />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/services" element={<Services />} />
                         <Route path="/contact" element={<Contact />} />

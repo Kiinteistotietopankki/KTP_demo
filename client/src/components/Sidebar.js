@@ -26,12 +26,13 @@ function Sidebar() {
                     <Nav.Link as={Link} to="/services" className="nav-item">Services</Nav.Link>
                     <Nav.Link as={Link} to="/contact" className="nav-item">Contact</Nav.Link>
                     <Nav.Link as={Link} to="/Profile" className="nav-item">Profile</Nav.Link>
-                </Nav>
+                
                 {!isAuthenticated ? (
-         <li><Link to="/login">Login</Link></li>
+          <Nav.Link as={Link} to="/login" className="nav-item">Login</Nav.Link>
         ): (
-          <li><Link to="/logout">Logout</Link></li> 
+          <Nav.Link as={Link} to="/logout" className="nav-item">Logout</Nav.Link> 
         )}
+                </Nav>
         </Navbar>
   );
 }
