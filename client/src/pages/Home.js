@@ -1,15 +1,36 @@
-// src/pages/Home/Home.js
-import React from 'react';
-import './Home.css';
+import React, { useState } from 'react';
+import Badge from 'react-bootstrap/Badge';
+import '../App.css';
+import Searchbox from '../components/Searchbox';
+import Resultdisplay from '../components/Resultsdisplay';
+
+
 
 function Home() {
+  const [searchResults, setSearchResults] = useState([]);
+
+
+  const afterSearch = (results) => {
+    setSearchResults(results)
+  };
+
   return (
-    <div className="home-page">
-      <h2>Kiinteistötietopankki</h2>
-      <p>This is the content of the home page.</p>
-      <button className="custom-button">Click Me</button>
+    <div className="container mt-4">
+      <h1 className="text-primary">
+        Kiinteistötietopankki <Badge bg="secondary">DEMO</Badge>
+      </h1>
+
+      <Searchbox afterSearch={afterSearch} />
+      
+      {searchResults && searchResults.length > 0 ? (
+        <Resultdisplay data={searchResults}></Resultdisplay>
+          ):(
+          <></>
+          )}
+      
     </div>
   );
 }
 
 export default Home;
+
