@@ -1,104 +1,71 @@
 import React, { useEffect, useState } from 'react';
-// import Table from 'react-bootstrap/Table';
 import Tabletemplate from './Tabletemplate';
-import { Accordion } from 'react-bootstrap';
 
 
-function Rakennustable({data}) {
+function Rakennustable({ data }) {
+    const [rakennukset, setRakennukset] = useState([]);
+    
 
-    const [rakennus, setRakennus] = useState([]);
 
     useEffect(() => {
-        // If data is passed as a prop, set it to the state
         if (data) {
-            setRakennus(data.features);
-            console.log(data.features)
+            const transformedData = data.features.map(feature => ({
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: feature.geometry.coordinates
+                },
+                properties: {
+                    basicInformation: {
+                        "Rakennustunnus": feature.properties.permanent_building_identifier || null,
+                        "Kiinteistötunnus": feature.properties.property_identifier || null,
+                        "Kohteen nimi": null,
+                        "Kohteen osoite": null, 
+                        "Postinumero" : null, 
+                        "Toimipaikka": null,
+                    },
+                    buildingSpecifications: {
+                        "Rakennusvuosi": feature.properties.completion_date ? feature.properties.completion_date.split("-")[0] : null,
+                        "Kokonaisala (m²)": feature.properties.total_area || null,
+                        "Kerrosala (m²)": feature.properties.gross_floor_area || null,
+                        "Huoneistoala (m²)": feature.properties.floor_area || null,
+                        "Tilavuus (m³)": feature.properties.volume || null,
+                        "Kerroksia": feature.properties.number_of_storeys || null,
+                    },
+                    constructionDetails: {
+                        "Rakennusluokitus": feature.properties.main_purpose || null,
+                        "Runkotapa": feature.properties.construction_method || null,
+                        "Käytössäolotilanne": feature.properties.usage_status || null,
+                        "Julkisivunrakennusaine": feature.properties.facade_material || null,
+                        "Lämmitystapa": feature.properties.heating_method || null,
+                        "Lämmitysenergianlähde": feature.properties.heating_energy_source || null,
+                        "Kantavanrakenteen rakennusaine": feature.properties.material_of_load_bearing_structures || null,
+                    },
+                    environmentalInformation: {
+                        "Tulvariski": null, 
+                        "Pohjavesialueella": null
+                    }
+                }
+            }));
+
+            setRakennukset(transformedData);
         }
-
-    }, [data]); 
-
-    useEffect(() => {
-        console.log('rakennukset: ' + rakennus)
-    }, [rakennus]);
+    }, [data]);
 
     return (
         <div className="mt-4">
-            {rakennus.length > 0 ? (
-                rakennus.map((feature, index) => {
-                    const properties = feature.properties; // Extract properties for each feature
-
-                    // General table headers
-                    const generalTableHeaders = [
-                        { key: 'permanent_building_identifier', label: 'Rakennustunnus' },
-                        { key: 'property_identifier', label: 'Kiinteistötunnus' },
-                        { key: 'name', label: 'Kohteen nimi' },
-                        { key: 'address', label: 'Kohteen osoite' },
-                        { key: 'postcode', label: 'Postinumero' },
-                        { key: 'municipality', label: 'Toimipaikka' },
-                        { key: 'completion_date', label: 'Rakennusvuosi' },
-                        { key: 'total_area', label: 'Kokonaisala (m²)' },
-                        { key: 'gross_floor_area', label: 'Kerrosala (m²)' },
-                        { key: 'floor_area', label: 'Huoneistoala (m²)' },
-                        { key: 'volume', label: 'Tilavuus (m³)' },
-                        { key: 'number_of_storeys', label: 'Kerroksia' },
-                    ];
-
-                    // Special table headers (separate for specific properties)
-                    const luokitukset = [
-                        { key: 'main_purpose', label: 'Rakennusluokitus' },
-                        { key: 'construction_method', label: 'Runkotapa' },
-                        { key: 'usage_status', label: 'Käytössäolotilanne' },
-                        { key: 'facade_material', label: 'Julkisivunrakennusaine' },
-                        { key: 'heating_method', label: 'Lämmitystapa' },
-                        { key: 'heating_energy_source', label: 'Lämmitysenergianlähde' },
-                        { key: 'material_of_load_bearing_structures', label: 'Kantavanrakenteen rakennusaine' },
-                    ];
-
-                    const aluetiedot = [
-                        { key: 'exact_location', label: 'Tarkka sijainti' },
-                        { key: 'flood_risk', label: 'Tulvariski' },
-                        { key: 'groundwater_area', label: 'Pohjavesialueella' }
-                    ];
-
-                    // Get the permanent building identifier to be used as the header for the feature
-                    const buildingId = properties.permanent_building_identifier || 'ID not available';
-
-                    return (
-                        <div key={index} className="card mb-4">
-                            <div className="card-header">Rakennus {buildingId}</div>
-                            
-                            
-                            {/* General Table */}
-                            <div className="tablecontainer card-body">
-                                
-                                
-
-                                <Accordion defaultActiveKey={['0']} alwaysOpen='true'>
-                                    <Accordion.Item eventKey="0">
-                                        <Accordion.Header>Yleistiedot</Accordion.Header>
-                                        <Accordion.Body>
-                                            <Tabletemplate headers={generalTableHeaders} properties={properties} />
-                                        </Accordion.Body>
-                                    </Accordion.Item>
-
-                                    <Accordion.Item eventKey="1">
-                                        <Accordion.Header>Luokitukset</Accordion.Header>
-                                            <Accordion.Body>
-                                                <Tabletemplate headers={luokitukset} properties={properties} />
-                                            </Accordion.Body>
-                                    </Accordion.Item>
-
-                                    <Accordion.Item eventKey="2">
-                                        <Accordion.Header>Aluetiedot</Accordion.Header>
-                                            <Accordion.Body>
-                                                <Tabletemplate headers={aluetiedot} properties={properties} />
-                                            </Accordion.Body>
-                                    </Accordion.Item>
-                                    </Accordion>
-                            </div>
+            {rakennukset.length > 0 ? (
+                <>
+                    {rakennukset.map((rakennus, index) => (
+                        <div key={index}>
+                            {/* Pass the entire basicInformation object */}
+                            <Tabletemplate 
+                                properties={rakennus.properties.basicInformation} 
+                                tableTitle={''} 
+                            />
                         </div>
-                    );
-                })
+                    ))}
+                </>
             ) : (
                 <p>No data available</p>
             )}

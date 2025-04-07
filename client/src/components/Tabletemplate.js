@@ -1,7 +1,13 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-const Tabletemplate = ({ headers, properties, tableTitle }) => {
+const Tabletemplate = ({ properties, tableTitle }) => {
+    // Dynamically generate headers from properties keys
+    const headers = Object.keys(properties).map((key) => ({
+        key,
+        label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())  // Convert camelCase to human-readable text
+    }));
+
     return (
         <div className="mb-3">
             {tableTitle && <h6>{tableTitle}</h6>}

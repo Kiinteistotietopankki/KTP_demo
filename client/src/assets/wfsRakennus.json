@@ -1,0 +1,35 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+    {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [24.9355, 60.1695]
+        },
+        "properties": {
+            "Rakennustunnus": null,
+            "Kiinteistötunnus": null,
+            "Kohteen nimi": null,
+            "Kohteen osoite": null,
+            "Postinumero": null,
+            "Toimipaikka": null,
+            "Rakennusvuosi": null,
+            "Kokonaisala (m²)": null,
+            "Kerrosala (m²)": null,
+            "Huoneistoala (m²)": null,
+            "Tilavuus (m³)": null,
+            "Kerroksia": null,
+            "Rakennusluokitus": null,
+            "Runkotapa": null,
+            "Käytössäolotilanne": null,
+            "Julkisivunrakennusaine": null,
+            "Lämmitystapa": null,
+            "Lämmitysenergianlähde": null,
+            "Kantavanrakenteen rakennusaine": null,
+            "Tulvariski": null,
+            "Pohjavesialueella": null
+        }
+      }
+    ]
+  }
