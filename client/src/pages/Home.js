@@ -1,21 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import './Home.css';
-import { useMsal } from '@azure/msal-react'
+import React, { useState } from 'react';
+import Badge from 'react-bootstrap/Badge';
+import '../App.css';
+import Searchbox from '../components/Searchbox';
+import Resultdisplay from '../components/Resultsdisplay';
+
+
 
 function Home() {
-  
-  const { accounts } = useMsal();
+  const [searchResults, setSearchResults] = useState([]);
 
-  
-  const userName = accounts.length > 0 ? accounts[0].name : 'vieras';
+
+  const afterSearch = (results) => {
+    setSearchResults(results)
+  };
 
   return (
-    <div className="home-page">
-      <h2>Kiinteistötietopankki</h2>
-      <p>Tervetuloa, {userName}</p> 
-      <button className="custom-button">Click Me</button>
+    <div className="container mt-4">
+      <h1 className="text-primary">
+        Kiinteistötietopankki <Badge bg="secondary">DEMO</Badge>
+      </h1>
+
+      <Searchbox afterSearch={afterSearch} />
+      
+      {searchResults && searchResults.length > 0 ? (
+        <Resultdisplay data={searchResults}></Resultdisplay>
+          ):(
+          <></>
+          )}
+      
     </div>
   );
 }
 
 export default Home;
+
