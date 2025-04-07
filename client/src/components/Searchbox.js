@@ -16,19 +16,23 @@ function Searchbox({ afterSearch }) {
   const [loading, setLoading] = useState(false); //todo snipper when loading
   const [error, setError] = useState(null);
 
+  const kiinteistotunnusHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=property_identifier='
+  const osoiteKoordinaateillaHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&CQL_FILTER=INTERSECTS(location_geometry_data,'
+
+
   const navigate = useNavigate();
   const location = useLocation();
 
   const [searchType, setSearchType] = useState('kiinteistötunnuksella') // kiinteistotunnus, rakennustunnus, osoite 
 
   const handleSearch = async () => {
-    setLoading(true); // Add this to show loading state
+    setLoading(true); 
     console.log("Searching for:", searchQuery);
   
     try {
-      const response = await axios.get(`https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&CQL_FILTER=property_identifier='${searchQuery}'&SRSNAME=EPSG:3067`);
+      const response = await axios.get(`${kiinteistotunnusHakuUrl}${searchQuery}`);
+
       setRawResults(response.data);
-      console.log("async handlesearch", response.data);
     } catch (err) {
       setError("An error occurred during the search.");
     } finally {
@@ -36,6 +40,23 @@ function Searchbox({ afterSearch }) {
     }
   };
 
+
+  const searchAddressCoordinates = async (easting, northing) => {
+    setLoading(true);
+  
+    try {
+      const response = await axios.get(`${osoiteKoordinaateillaHakuUrl}POINT(${easting} ${northing}))`);
+      
+      console.log('searchAddressCoordinates',  response.data.features[0].properties)
+      return response.data.features[0]?.properties || {};
+
+    } catch (err) {
+      setError("An error occurred during the search.");
+    } finally {
+      setLoading(false); // Reset loading after fetching data
+      
+    }
+  };
   
 
   useEffect(() => {
@@ -80,7 +101,7 @@ function Searchbox({ afterSearch }) {
                 "Rakennustunnus": feature.properties.permanent_building_identifier || null,
                 "Kiinteistötunnus": feature.properties.property_identifier || null,
                 "Kohteen nimi": null,
-                "Kohteen osoite": null, 
+                "Kohteen osoite": searchAddressCoordinates(feature.geometry.coordinates[0], feature.geometry.coordinates[1]).address_fin || null, 
                 "Postinumero" : null, 
                 "Toimipaikka": null,
             },
