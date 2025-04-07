@@ -63,6 +63,8 @@ function Searchbox({ afterSearch }) {
         setResults(transformedData);
         console.log("Transformed data - uef[rawResults]",transformedData)
 
+    } else{
+      setResults([])
     }
   }, [rawResults]);
 

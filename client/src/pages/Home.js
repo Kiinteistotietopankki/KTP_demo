@@ -12,6 +12,8 @@ function Home() {
 
   const afterSearch = (results) => {
     setSearchResults(results)
+    console.log('search results HOME', searchResults)
+    console.log('search results HOME pituus', searchResults.length)
   };
 
   return (
@@ -21,12 +23,14 @@ function Home() {
       </h1>
 
       <Searchbox afterSearch={afterSearch} />
-      
-      {searchResults && searchResults.length > 0 ? (
+    
+      {searchResults.length > 0 ? (
         <Resultdisplay data={searchResults}></Resultdisplay>
-          ):(
-          <></>
-          )}
+      ):(
+        <div></div>
+      )}
+      
+
       
     </div>
   );
