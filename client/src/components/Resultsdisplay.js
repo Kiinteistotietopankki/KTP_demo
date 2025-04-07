@@ -68,6 +68,7 @@ function Resultdisplay({ data }) {
 
                         </div>
 
+
                     ))}
                 </>
             ) : (
