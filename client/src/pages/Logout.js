@@ -9,7 +9,11 @@ function Logout() {
   useEffect(() => {
     const logout = async () => {
       try {
+        localStorage.clear();
+        sessionStorage.clear();
         await instance.logoutRedirect(); 
+        // If using MSAL.js, clear the MSAL cache
+        
         navigate('/login'); 
       } catch (error) {
         console.error('Logout failed: ', error);

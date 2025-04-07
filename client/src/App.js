@@ -4,6 +4,7 @@ import './App.css';
 import Home from './pages/Home';
 import Login from './pages/Login'; // Import Login page
 import Logout from './pages/Logout';
+import Profile from './pages/profile';
 import { config } from './Config';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider, useMsal } from '@azure/msal-react';
@@ -14,6 +15,7 @@ const msalInstance = new PublicClientApplication({
     authority: config.authority,
     redirectUri: config.redirectUri,
   },
+  
 });
 
 // suojattu reitti
@@ -36,9 +38,10 @@ function App() {
               <Route
                 path="/*"
                 element={
-                  <ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun kirjautuu sisään */}
+                  <ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on */}
                     <Routes>
                       <Route path="/" element={<Home />} />
+                      <Route path="/Profile" element={<Profile />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/services" element={<Services />} />
                       <Route path="/contact" element={<Contact />} />
