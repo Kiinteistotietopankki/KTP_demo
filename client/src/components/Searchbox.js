@@ -1,6 +1,7 @@
 // Searchbox.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios'; 
+import '../App.css';
 
 // Hakulogiikka on tässä
 
@@ -87,27 +88,39 @@ function Searchbox({ afterSearch }) {
   };
 
   return (
-    <div className="mt-4">
-      <div className="input-group mb-3">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Hae kiinteistötunnuksella..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          aria-label="Search"
-          aria-describedby="button-addon2"
-        />
-        <button
-          className="btn btn-outline-secondary"
-          onClick={handleSearch}
-          id="button-addon2"
-        >
-          Hae
-        </button>
+    <div className='search-container'>
+      <div className="mt-4">
+        <div className="input-group mb-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Hae kiinteistötunnuksella..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            aria-label="Search"
+            aria-describedby="button-addon2"
+          />
+          <button
+            className="btn btn-outline-secondary"
+            onClick={handleSearch}
+            id="button-addon2"
+          >
+            Hae
+          </button>
+        </div>
       </div>
-    </div>
+    
+        <div className='featureAmount-container'>
+          {rawResults?.features?.length > 0 ? (
+              <span className="badge bg-success">
+                Tuloksia: {rawResults.totalFeatures}
+              </span>
+            ) : (
+              <span className="badge bg-secondary">Ei tuloksia</span>
+            )}
+        </div>
+      </div>
   );
 }
 

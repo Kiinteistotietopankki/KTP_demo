@@ -58,6 +58,19 @@
 
 /* ====== */
 
+.search-container{
+  /* outline: 2px dashed blue; */
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+.featureAmount-container{
+  /* outline: 2px dashed blue; */
+
+  margin: 0 auto
+}
+
 .nav-item{
 
 }
