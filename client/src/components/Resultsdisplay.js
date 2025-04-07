@@ -72,7 +72,7 @@ function Resultdisplay({ data }) {
                     ))}
                 </>
             ) : (
-                <p>No data available</p>
+                <p>Ei tuloksia --</p>
             )}
         </div>
     );

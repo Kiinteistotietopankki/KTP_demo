@@ -13,7 +13,7 @@ function Searchbox({ afterSearch }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [rawResults, setRawResults] = useState([]);
   const [results, setResults] = useState([]);  
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); //todo snipper when loading
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
@@ -51,10 +51,9 @@ function Searchbox({ afterSearch }) {
       setSearchType(queryType);    // Set state for searchType
     }
 
-    // Optionally, trigger the search when the page loads
-    if (queryQuery && queryType) {
-      handleSearch();
-    }
+    // if (queryQuery && queryType) { <----- autom. haku
+    //   handleSearch();
+    // }
   }, [location.search]);  // Runs on URL change (including search params)
 
   useEffect(() => {
