@@ -55,6 +55,34 @@ function Searchbox({ afterSearch }) {
       
     }
   };
+
+  const getKunta = async (feature) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${osoiteKoordinaateillaHakuUrl}POINT(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]}))`);
+      return response.data.features[0]?.properties.postal_office_fin || {};
+
+    } catch (err) {
+      setError("An error occurred during the search.");
+    } finally {
+      setLoading(false); // Reset loading after fetching data
+      
+    }
+  };
+
+  const getPostalcode = async (feature) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${osoiteKoordinaateillaHakuUrl}POINT(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]}))`);
+      return response.data.features[0]?.properties.postal_code || {};
+
+    } catch (err) {
+      setError("An error occurred during the search.");
+    } finally {
+      setLoading(false); // Reset loading after fetching data
+      
+    }
+  };
   
 
   useEffect(() => {
@@ -79,15 +107,17 @@ function Searchbox({ afterSearch }) {
 
   useEffect(() => {
     if (rawResults?.features?.length > 0) {
-      const transformedData = buildrakennusData(rawResults.features);
+      const data = buildrakennusData(rawResults.features);
 
-      const transformedDataWithAddress = transformedData.map(feature => {
+      const transformedData = data.map(feature => {
         feature.properties.yleistiedot["Kohteen osoite"] = getAddress(feature);
+        feature.properties.yleistiedot["Toimipaikka"] = getKunta(feature);
+        feature.properties.yleistiedot["Postinumero"] = getPostalcode(feature);
         return feature; // Important to return it!
       });
 
-      setResults(transformedDataWithAddress);
-      console.log("Transformed data - uef[rawResults]", transformedDataWithAddress);
+      setResults(transformedData);
+      console.log("Transformed data - uef[rawResults]", transformedData);
     } else {
       setResults([]);
     }
