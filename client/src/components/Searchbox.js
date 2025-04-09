@@ -163,7 +163,8 @@ function Searchbox({ afterSearch }) {
             },
             aluetiedot: {
                 "Tulvariski": null, 
-                "Pohjavesialueella": null
+                "Pohjavesialueella": null,
+                "radon arvo": null
             }
         }
     })

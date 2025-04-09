@@ -90,4 +90,59 @@
 
 .text-secondary{
 
+}/* Profile.css */
+.profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.profile-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.profile-card h3 {
+  text-align: center;
+  color: #333;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-info p {
+  font-size: 1.2em;
+  color: #444;
+}
+
+.profile-info strong {
+  font-weight: bold;
+}
+
+.profile-info p:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+.export-button {
+  font-size: 0.7rem;
+  padding: 5px 8px;
+  border: 1px solid #28a745;
+  background-color: white;
+  color: #28a745;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.export-button:hover {
+  background-color: #e6f5ea;
 }
