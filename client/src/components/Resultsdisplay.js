@@ -10,6 +10,8 @@ function Resultdisplay({ data }) {
     const [selectedRakennukset, setSelectedRakennukset] = useState({}); 
 
     useEffect(() => {
+        console.log("Data on result displayssa: ",)
+        setRakennukset(data);
         if (data.length > 0) {
             setRakennukset(data);
         }
@@ -63,7 +65,7 @@ function Resultdisplay({ data }) {
 
     return (
         <div className="mt-4">
-            {rakennukset.length > 0 ? (
+            {rakennukset?.length > 0 ? (
                 <>
                     <div className="d-flex justify-content-between mb-3">
                         <label >
@@ -91,7 +93,7 @@ function Resultdisplay({ data }) {
                                 checked={!!selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]}
                                     onChange={() => handleCheckboxChange(rakennus.properties.yleistiedot.Rakennustunnus)}
                                     />
-                                <span>Rakennus {rakennus.properties.yleistiedot.Rakennustunnus}</span>
+                                <span>{rakennus.properties.yleistiedot["Kohteen osoite"]} {rakennus.properties.yleistiedot["Toimipaikka"]} / {rakennus.properties.yleistiedot.Rakennustunnus}</span>
                                     </label>
 
                             </div>
@@ -139,10 +141,12 @@ function Resultdisplay({ data }) {
                             </Accordion>
 
                         </div>
+
+
                     ))}
                 </>
             ) : (
-                <p>No data available</p>
+                <div>0 results</div>
             )}
         </div>
     );
