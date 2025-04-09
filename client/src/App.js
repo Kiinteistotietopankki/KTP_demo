@@ -9,6 +9,7 @@ import { config } from './Config';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider, useMsal } from '@azure/msal-react';
 import { useEffect } from 'react';
+import Badge from 'react-bootstrap/Badge';
 
 const msalInstance = new PublicClientApplication({
   auth: {
@@ -49,7 +50,6 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/about" element={<About />} />
-                        <Route path="/services" element={<Services />} />
                         <Route path="/contact" element={<Contact />} />
                       <Route path="/logout" element={<Logout />} />
                     </Routes>
@@ -78,15 +78,12 @@ function ScrollToTop() {
 
 
 function About() {
-  return <h2 className='text-primary'>Tulossa...</h2>;
+  return <h2 className='text-primary'>Ohjeet <Badge bg="secondary">Tulossa</Badge></h2>;
 }
 
-function Services() {
-  return <h2 className='text-primary'>Tulossa...</h2>;
-}
 
 function Contact() {
-  return <h2 className='text-primary'>Tulossa...</h2>;
+  return <h2 className='text-primary'>Ota yhteyttä <Badge bg="secondary">Tulossa</Badge></h2>;
 }
 
 

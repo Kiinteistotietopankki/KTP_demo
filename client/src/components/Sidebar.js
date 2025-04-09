@@ -21,10 +21,10 @@ function Sidebar() {
         >
 
                 <Nav className="flex-md-column flex-row">
-                    <Nav.Link as={Link} to="/" className="nav-item">Haku</Nav.Link>
-                    <Nav.Link as={Link} to="/about" className="nav-item">Ohjeet</Nav.Link>
-                    <Nav.Link as={Link} to="/contact" className="nav-item">Ota yhteyttä</Nav.Link>
-                    <Nav.Link as={Link} to="/Profile" className="nav-item">Omat tiedot</Nav.Link>
+                    <Nav.Link as={Link} to="/" className="nav-item mt-md-3">Haku</Nav.Link>
+                    <Nav.Link as={Link} to="/about" className="nav-item mt-md-1">Ohjeet</Nav.Link>
+                    <Nav.Link as={Link} to="/contact" className="nav-item mt-md-1">Ota yhteyttä</Nav.Link>
+                    <Nav.Link as={Link} to="/Profile" className="nav-item mt-md-1">Omat tiedot</Nav.Link>
                 
                  {/*!isAuthenticated ? (
           <Nav.Link as={Link} to="/login" className="nav-item">Login</Nav.Link>
