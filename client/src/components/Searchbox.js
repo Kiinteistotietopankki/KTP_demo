@@ -19,8 +19,13 @@ function Searchbox({ afterSearch }) {
   const [error, setError] = useState(null);
 
   const kiinteistotunnusHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=property_identifier='
+  const rakennusKoordinaateillaHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=INTERSECTS(location_geometry_data'
+
   const rakennustunnusHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=permanent_building_identifier='
-  const osoiteKoordinaateillaHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&CQL_FILTER=INTERSECTS(location_geometry_data,'
+  const osoiteHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:3067&CQL_FILTER=address_fin='
+
+  const rakennusBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=building_key='
+  const osoiteBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&CQL_FILTER=building_key='
 
 
   const navigate = useNavigate();
@@ -34,12 +39,16 @@ function Searchbox({ afterSearch }) {
   
     try {
       let response;
+      let responseAddress;
   
       if (searchType === 'kiinteistötunnuksella') {
         response = await axios.get(`${kiinteistotunnusHakuUrl}${searchQuery}`);
-      } else {
+      } else if (searchType === 'rakennustunnuksella') {
         response = await axios.get(`${rakennustunnusHakuUrl}${searchQuery}`);
+      } else if (searchType === 'osoitteella'){
+        response = await axios.get(`${osoiteHakuUrl}'${searchQuery}'`);
       }
+
   
       setRawResults(response.data);
     } catch (err) {
@@ -50,48 +59,24 @@ function Searchbox({ afterSearch }) {
   };
 
 
-  const getAddress = async (feature) => {
+  const getAddressInfo = async (feature) => {
     setLoading(true);
     try {
-      const response = await axios.get(`${osoiteKoordinaateillaHakuUrl}POINT(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]}))`);
-      return response.data.features[0]?.properties.address_fin || {};
-
-    } catch (err) {
-      setError("An error occurred during the search.");
-    } finally {
-      setLoading(false); // Reset loading after fetching data
-      
-    }
-  };
-
-  const getKunta = async (feature) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${osoiteKoordinaateillaHakuUrl}POINT(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]}))`);
-      return response.data.features[0]?.properties.postal_office_fin || {};
-
-    } catch (err) {
-      setError("An error occurred during the search.");
-    } finally {
-      setLoading(false); // Reset loading after fetching data
-      
-    }
-  };
-
-  const getPostalcode = async (feature) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${osoiteKoordinaateillaHakuUrl}POINT(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]}))`);
-      return response.data.features[0]?.properties.postal_code || {};
-
-    } catch (err) {
-      setError("An error occurred during the search.");
-    } finally {
-      setLoading(false); // Reset loading after fetching data
-      
-    }
-  };
+      // Extract only the UUID part of the ID
+      const idKey = feature.id.split(".")[1];
+    
+      const response = await axios.get(`${osoiteBuildingkeyHakuUrl}'${idKey}'`);
   
+      // Return the whole first feature (with full .properties etc.)
+      return response.data.features[0] || {};
+  
+    } catch (err) {
+      setError("An error occurred during the address fetch.");
+      return {}; // Return empty object if error
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search); // Parse the query string from the URL
@@ -114,21 +99,30 @@ function Searchbox({ afterSearch }) {
 
 
   useEffect(() => {
-    if (rawResults?.features?.length > 0) {
-      const data = buildrakennusData(rawResults.features);
-
-      const transformedData = data.map(feature => {
-        feature.properties.yleistiedot["Kohteen osoite"] = getAddress(feature);
-        feature.properties.yleistiedot["Toimipaikka"] = getKunta(feature);
-        feature.properties.yleistiedot["Postinumero"] = getPostalcode(feature);
-        return feature; // Important to return it!
-      });
-
-      setResults(transformedData);
-      console.log("Transformed data - uef[rawResults]", transformedData);
-    } else {
-      setResults([]);
-    }
+    const fetchData = async () => {
+      if (rawResults?.features?.length > 0) {
+        const data = buildrakennusData(rawResults.features);
+  
+        const transformedData = await Promise.all(
+          data.map(async (feature) => {
+            const addressResponse = await getAddressInfo(feature);
+  
+            feature.properties.yleistiedot["Kohteen osoite"] = addressResponse.properties['address_fin'];
+            feature.properties.yleistiedot["Postinumero"] = addressResponse.properties['postal_code'];
+            feature.properties.yleistiedot["Toimipaikka"] = addressResponse.properties['postal_office_fin'];
+  
+            return feature;
+          })
+        );
+  
+        setResults(transformedData);
+        console.log("Transformed data - uef[rawResults]", transformedData);
+      } else {
+        setResults([]);
+      }
+    };
+  
+    fetchData(); // Call the async function
   }, [rawResults]);
 
   // searchAddressCoordinates(feature.geometry.coordinates[0], feature.geometry.coordinates[1]).address_fin 
@@ -136,6 +130,7 @@ function Searchbox({ afterSearch }) {
   const buildrakennusData = (features) => {
       const transformedData = features.map(feature => ({
         type: "Feature",
+        id: feature.id || null,
         geometry: {
             type: "Point",
             coordinates: feature.geometry.coordinates
@@ -145,9 +140,9 @@ function Searchbox({ afterSearch }) {
                 "Rakennustunnus": feature.properties.permanent_building_identifier || null,
                 "Kiinteistötunnus": feature.properties.property_identifier || null,
                 "Kohteen nimi": null,
-                "Kohteen osoite": null, 
-                "Postinumero" : null, 
-                "Toimipaikka": null,
+                "Kohteen osoite": feature.properties.address_fin || null, 
+                "Postinumero" : feature.properties.postal_code || null, 
+                "Toimipaikka": feature.properties.postal_office_fin || null, 
             },
             teknisettiedot: {
                 "Rakennusvuosi": feature.properties.completion_date ? feature.properties.completion_date.split("-")[0] : null,
