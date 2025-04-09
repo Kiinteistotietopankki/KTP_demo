@@ -127,46 +127,46 @@ function Searchbox({ afterSearch }) {
 
   // searchAddressCoordinates(feature.geometry.coordinates[0], feature.geometry.coordinates[1]).address_fin 
 
-  const buildrakennusData = (features) => {
-      const transformedData = features.map(feature => ({
+  const buildrakennusData = (buildingFeature, addressFeature ) => {
+      const transformedData =({
         type: "Feature",
-        id: feature.id || null,
+        id: buildingFeature.id || null,
         geometry: {
             type: "Point",
-            coordinates: feature.geometry.coordinates
+            coordinates: buildingFeature.geometry.coordinates
         },
         properties: {
             yleistiedot: {
-                "Rakennustunnus": feature.properties.permanent_building_identifier || null,
-                "Kiinteistötunnus": feature.properties.property_identifier || null,
+                "Rakennustunnus": buildingFeature.properties.permanent_building_identifier || null,
+                "Kiinteistötunnus": buildingFeature.properties.property_identifier || null,
                 "Kohteen nimi": null,
-                "Kohteen osoite": feature.properties.address_fin || null, 
-                "Postinumero" : feature.properties.postal_code || null, 
-                "Toimipaikka": feature.properties.postal_office_fin || null, 
+                "Kohteen osoite": addressFeature.properties.address_fin || null, 
+                "Postinumero" : addressFeature.properties.postal_code || null, 
+                "Toimipaikka": addressFeature.properties.postal_office_fin || null, 
             },
             teknisettiedot: {
-                "Rakennusvuosi": feature.properties.completion_date ? feature.properties.completion_date.split("-")[0] : null,
-                "Kokonaisala (m²)": feature.properties.total_area || null,
-                "Kerrosala (m²)": feature.properties.gross_floor_area || null,
-                "Huoneistoala (m²)": feature.properties.floor_area || null,
-                "Tilavuus (m³)": feature.properties.volume || null,
-                "Kerroksia": feature.properties.number_of_storeys || null,
+                "Rakennusvuosi": buildingFeature.properties.completion_date ? buildingFeature.properties.completion_date.split("-")[0] : null,
+                "Kokonaisala (m²)": buildingFeature.properties.total_area || null,
+                "Kerrosala (m²)": buildingFeature.properties.gross_floor_area || null,
+                "Huoneistoala (m²)": buildingFeature.properties.floor_area || null,
+                "Tilavuus (m³)": buildingFeature.properties.volume || null,
+                "Kerroksia": buildingFeature.properties.number_of_storeys || null,
             },
             rakennustiedot: {
-                "Rakennusluokitus": feature.properties.main_purpose || null,
-                "Runkotapa": feature.properties.construction_method || null,
-                "Käytössäolotilanne": feature.properties.usage_status || null,
-                "Julkisivun rakennusaine": feature.properties.facade_material || null,
-                "Lämmitystapa": feature.properties.heating_method || null,
-                "Lämmitysenergianlähde": feature.properties.heating_energy_source || null,
-                "Kantavanrakenteen rakennusaine": feature.properties.material_of_load_bearing_structures || null,
+                "Rakennusluokitus": buildingFeature.properties.main_purpose || null,
+                "Runkotapa": buildingFeature.properties.construction_method || null,
+                "Käytössäolotilanne": buildingFeature.properties.usage_status || null,
+                "Julkisivun rakennusaine": buildingFeature.properties.facade_material || null,
+                "Lämmitystapa": buildingFeature.properties.heating_method || null,
+                "Lämmitysenergianlähde": buildingFeature.properties.heating_energy_source || null,
+                "Kantavanrakenteen rakennusaine": buildingFeature.properties.material_of_load_bearing_structures || null,
             },
             aluetiedot: {
                 "Tulvariski": null, 
                 "Pohjavesialueella": null
             }
         }
-    }));
+    })
     return transformedData;
   };
 
