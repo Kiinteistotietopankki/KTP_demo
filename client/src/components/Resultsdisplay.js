@@ -95,7 +95,7 @@ function Resultdisplay({ data }) {
 
                             </div>
 
-                            <Accordion defaultActiveKey={['0']} alwaysOpen='true'>
+                            <Accordion defaultActiveKey={['0']}>
                                 <Accordion.Item eventKey="0">
                                     <Accordion.Header>Yleistiedot</Accordion.Header>
                                     <Accordion.Body>
