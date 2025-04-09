@@ -78,15 +78,15 @@ function ScrollToTop() {
 
 
 function About() {
-  return <h2>About Page</h2>;
+  return <h2 className='text-primary'>Tulossa...</h2>;
 }
 
 function Services() {
-  return <h2>Services Page</h2>;
+  return <h2 className='text-primary'>Tulossa...</h2>;
 }
 
 function Contact() {
-  return <h2>Contact Page</h2>;
+  return <h2 className='text-primary'>Tulossa...</h2>;
 }
 
 
