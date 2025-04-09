@@ -12,8 +12,6 @@ function Home() {
 
   const afterSearch = (results) => {
     setSearchResults(results)
-    console.log('search results HOME', searchResults)
-    console.log('search results HOME pituus', searchResults.length)
   };
 
   return (

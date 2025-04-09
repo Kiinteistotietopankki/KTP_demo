@@ -32,6 +32,7 @@ function Searchbox({ afterSearch }) {
     try {
       const response = await axios.get(`${kiinteistotunnusHakuUrl}${searchQuery}`);
 
+
       setRawResults(response.data);
     } catch (err) {
       setError("An error occurred during the search.");
@@ -41,14 +42,11 @@ function Searchbox({ afterSearch }) {
   };
 
 
-  const searchAddressCoordinates = async (easting, northing) => {
+  const getAddress = async (feature) => {
     setLoading(true);
-  
     try {
-      const response = await axios.get(`${osoiteKoordinaateillaHakuUrl}POINT(${easting} ${northing}))`);
-      
-      console.log('searchAddressCoordinates',  response.data.features[0].properties)
-      return response.data.features[0]?.properties || {};
+      const response = await axios.get(`${osoiteKoordinaateillaHakuUrl}POINT(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]}))`);
+      return response.data.features[0]?.properties.address_fin || {};
 
     } catch (err) {
       setError("An error occurred during the search.");
@@ -77,17 +75,25 @@ function Searchbox({ afterSearch }) {
     // }
   }, [location.search]);  // Runs on URL change (including search params)
 
+
+
   useEffect(() => {
     if (rawResults?.features?.length > 0) {
-        const transformedData = buildrakennusData(rawResults.features)
+      const transformedData = buildrakennusData(rawResults.features);
 
-        setResults(transformedData);
-        console.log("Transformed data - uef[rawResults]",transformedData)
+      const transformedDataWithAddress = transformedData.map(feature => {
+        feature.properties.yleistiedot["Kohteen osoite"] = getAddress(feature);
+        return feature; // Important to return it!
+      });
 
-    } else{
-      setResults([])
+      setResults(transformedDataWithAddress);
+      console.log("Transformed data - uef[rawResults]", transformedDataWithAddress);
+    } else {
+      setResults([]);
     }
   }, [rawResults]);
+
+  // searchAddressCoordinates(feature.geometry.coordinates[0], feature.geometry.coordinates[1]).address_fin 
 
   const buildrakennusData = (features) => {
       const transformedData = features.map(feature => ({
@@ -101,7 +107,7 @@ function Searchbox({ afterSearch }) {
                 "Rakennustunnus": feature.properties.permanent_building_identifier || null,
                 "Kiinteistötunnus": feature.properties.property_identifier || null,
                 "Kohteen nimi": null,
-                "Kohteen osoite": searchAddressCoordinates(feature.geometry.coordinates[0], feature.geometry.coordinates[1]).address_fin || null, 
+                "Kohteen osoite": null, 
                 "Postinumero" : null, 
                 "Toimipaikka": null,
             },
