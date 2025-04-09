@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+/*import React, { useEffect } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -28,3 +28,4 @@ function Logout() {
 }
 
 export default Logout;
+*/

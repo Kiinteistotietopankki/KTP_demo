@@ -1,4 +1,4 @@
-import React from 'react';
+/*import React from 'react';
 import { useMsal } from '@azure/msal-react';
 import { useNavigate } from 'react-router-dom';
 import { saveToken } from '../Token';
@@ -27,14 +27,14 @@ function Login() {
       } catch (error) {
         console.error('Silent token acquisition failed, trying interactive login', error);
         
-        // If silent token acquisition fails (e.g., token expired), fall back to interactive login
+        
         tokenResponse = await instance.acquireTokenPopup({
           scopes: ['user.read'],
         });
         console.log('Token acquired via popup');
       }
 
-      // 3. Save the token in localStorage
+      
       saveToken(tokenResponse.accessToken);
       console.log('Token stored in localStorage');
 
@@ -55,3 +55,4 @@ function Login() {
 }
 
 export default Login;
+*/
