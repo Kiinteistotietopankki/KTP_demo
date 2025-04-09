@@ -44,6 +44,7 @@ function Searchbox({ afterSearch }) {
                     "Kohteen osoite": null, 
                     "Postinumero" : null, 
                     "Toimipaikka": null,
+                    "kuntanumero": feature.properties.municipality_number || null
                 },
                 teknisettiedot: {
                     "Rakennusvuosi": feature.properties.completion_date ? feature.properties.completion_date.split("-")[0] : null,
@@ -64,7 +65,8 @@ function Searchbox({ afterSearch }) {
                 },
                 aluetiedot: {
                     "Tulvariski": null, 
-                    "Pohjavesialueella": null
+                    "Pohjavesialueella": null,
+                    "Radon arvo": null
                 }
             }
         }));

@@ -8,14 +8,14 @@ function Profile() {
     <div className="profile-container">
     <Profiledata setUserData={setUserData} />
 
-    {/* Render user data if available */}
+    
     {userData && (
       <div className="profile-card">
         <h3>Käyttäjätiedot</h3>
         <div className="profile-info">
           <p><strong>Nimi:</strong> {userData.displayName}</p>
           <p><strong>Sähköposti:</strong> {userData.mail || 'Ei sähköpostia'}</p>
-          <p><strong>Puhelinumero:</strong> {userData.mobilePhone || 'Ei puhelinnumeroa'}</p>
+          <p><strong>Puh.num:</strong> {userData.mobilePhone || 'Ei puhelinnumeroa'}</p>
         </div>
       </div>
     )}

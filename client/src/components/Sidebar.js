@@ -10,8 +10,8 @@ import '../App.css';
 function Sidebar() {
   const { instance, accounts } = useMsal();
   const navigate = useNavigate();
- 
-  const isAuthenticated = accounts.length > 0;
+  const accessToken = localStorage.getItem('accessToken')
+  const isAuthenticated = !!accessToken;
   return (
         <Navbar
             bg="dark"

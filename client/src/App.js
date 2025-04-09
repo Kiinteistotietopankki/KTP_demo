@@ -43,7 +43,7 @@ function App() {
               <Route
                 path="/*"
                 element={
-                  <ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on kirjautunut sisään */}
+                  //<ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on kirjautunut sisään */}
                     
                       <Routes>
                         <Route path="/" element={<Home />} />
@@ -53,7 +53,7 @@ function App() {
                         <Route path="/contact" element={<Contact />} />
                       <Route path="/logout" element={<Logout />} />
                     </Routes>
-                  </ProtectedRoute>
+                  //</ProtectedRoute>
                 }
               />
               </Routes>

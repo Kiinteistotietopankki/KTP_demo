@@ -9,6 +9,7 @@ function Logout() {
   useEffect(() => {
     const logout = async () => {
       try {
+        localStorage.removeItem('accessToken');
         localStorage.clear();
         sessionStorage.clear();
         await instance.logoutRedirect(); 
