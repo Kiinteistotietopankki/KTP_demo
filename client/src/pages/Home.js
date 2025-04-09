@@ -15,18 +15,20 @@ function Home() {
   };
 
   return (
-    <div className="container mt-4">
-      <h1 className="text-primary">
+    <div className="container mt-3">
+      <h1 className="otsikko text-primary mb-5">
         Kiinteistötietopankki <Badge bg="secondary">DEMO</Badge>
       </h1>
 
       <Searchbox afterSearch={afterSearch} />
-      
-      {searchResults && searchResults.length > 0 ? (
+    
+      {searchResults.length > 0 ? (
         <Resultdisplay data={searchResults}></Resultdisplay>
-          ):(
-          <></>
-          )}
+      ):(
+        <div></div>
+      )}
+      
+
       
     </div>
   );

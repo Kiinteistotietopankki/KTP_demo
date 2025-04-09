@@ -10,19 +10,18 @@ function Resultdisplay({ data }) {
 
 
     useEffect(() => {
-        if (data.length > 0){
-            setRakennukset(data)
-        }
+        console.log("Data on result displayssa: ",)
+        setRakennukset(data);
     }, [data]);
 
     return (
         <div className="mt-4">
-            {rakennukset.length > 0 ? (
+            {rakennukset?.length > 0 ? (
                 <>
                     {rakennukset.map((rakennus, index) => (
                         <div key={index} className="card mb-4">
                             {/* Pass the entire basicInformation object */}
-                            <div className="card-header">Rakennus {rakennus.properties.yleistiedot.Rakennustunnus}</div>
+                            <div className="card-header">{rakennus.properties.yleistiedot["Kohteen osoite"]} {rakennus.properties.yleistiedot["Toimipaikka"]} / {rakennus.properties.yleistiedot.Rakennustunnus}</div>
 
                                 <Accordion defaultActiveKey={['0']} alwaysOpen='true'>
                                     <Accordion.Item eventKey="0">
@@ -68,10 +67,11 @@ function Resultdisplay({ data }) {
 
                         </div>
 
+
                     ))}
                 </>
             ) : (
-                <p>No data available</p>
+                <div>0 results</div>
             )}
         </div>
     );
