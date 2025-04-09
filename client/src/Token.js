@@ -1,4 +1,4 @@
-const TOKEN_KEY = 'accessToken'; // Key to store in localStorage
+/*const TOKEN_KEY = 'accessToken'; // Key to store in localStorage
 
 
 export const saveToken = (token) => {
@@ -15,4 +15,4 @@ return localStorage.getItem(TOKEN_KEY);
 
 export const removeToken = () => {
 localStorage.removeItem(TOKEN_KEY);
-};
+};*/

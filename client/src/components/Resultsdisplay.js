@@ -12,9 +12,6 @@ function Resultdisplay({ data }) {
     useEffect(() => {
         console.log("Data on result displayssa: ",)
         setRakennukset(data);
-        if (data.length > 0) {
-            setRakennukset(data);
-        }
     }, [data]);
 
     // individual selection
