@@ -39,17 +39,22 @@ function Searchbox({ afterSearch }) {
   
     try {
       let response;
-      let responseAddress;
+      let query = searchQuery.trim();
   
       if (searchType === 'kiinteistötunnuksella') {
-        response = await axios.get(`${kiinteistotunnusHakuUrl}${searchQuery}`);
+        response = await axios.get(`${kiinteistotunnusHakuUrl}${query}`);
       } else if (searchType === 'rakennustunnuksella') {
-        response = await axios.get(`${rakennustunnusHakuUrl}${searchQuery}`);
-      } else if (searchType === 'osoitteella'){
-        response = await axios.get(`${osoiteHakuUrl}'${searchQuery}'`);
-      }
+        response = await axios.get(`${rakennustunnusHakuUrl}'${query}'`);
+        // console.log('Rakennustunnus haku:',`${rakennustunnusHakuUrl}${query}`)
 
-  
+      } else if (searchType === 'osoitteella'){
+        if (query.length > 0) {
+          query = query.charAt(0).toUpperCase() + query.slice(1);
+        }
+
+        response = await axios.get(`${osoiteHakuUrl}'${query}'`);
+
+      }
       setRawResults(response.data);
     } catch (err) {
       setError("An error occurred during the search.");
@@ -105,12 +110,34 @@ function Searchbox({ afterSearch }) {
   
         const transformedData = await Promise.all(
           data.map(async (feature) => {
-            const addressResponse = await getAddressInfo(feature);
-  
-            feature.properties.yleistiedot["Kohteen osoite"] = addressResponse.properties['address_fin'];
-            feature.properties.yleistiedot["Postinumero"] = addressResponse.properties['postal_code'];
-            feature.properties.yleistiedot["Toimipaikka"] = addressResponse.properties['postal_office_fin'];
-  
+
+            if (searchType!=='osoitteella'){
+              const addressResponse = await getAddressInfo(feature);  
+              feature.properties.yleistiedot["Kohteen osoite"] = addressResponse.properties['address_fin'];
+              feature.properties.yleistiedot["Postinumero"] = addressResponse.properties['postal_code'];
+              feature.properties.yleistiedot["Toimipaikka"] = addressResponse.properties['postal_office_fin'];
+
+            } else{
+              const buildingResponse = await getBuildingInfo(feature);
+              feature.properties.yleistiedot["Rakennustunnus"] = buildingResponse.properties['permanent_building_identifier'];
+              feature.properties.yleistiedot["Kiinteistötunnus"] = buildingResponse.properties['property_identifier'];
+
+              feature.properties.teknisettiedot["Rakennusvuosi"] = buildingResponse.properties['completion_date'];
+              feature.properties.teknisettiedot["Kokonaisala (m²)"] = buildingResponse.properties['total_area'];
+              feature.properties.teknisettiedot["Kerrosala (m²)"] = buildingResponse.properties['gross_floor_area'];
+              feature.properties.teknisettiedot["Huoneistoala (m²)"] = buildingResponse.properties['floor_area'];
+              feature.properties.teknisettiedot["Tilavuus (m³)"] = buildingResponse.properties['volume'];
+              feature.properties.teknisettiedot["Kerroksia"] = buildingResponse.properties['number_of_storeys'];
+
+              feature.properties.rakennustiedot["Rakennusluokitus"] = buildingResponse.properties['main_purpose'];
+              feature.properties.rakennustiedot["Runkotapa"] = buildingResponse.properties['construction_method'];
+              feature.properties.rakennustiedot["Käytössäolotilanne"] = buildingResponse.properties['usage_status'];
+              feature.properties.rakennustiedot["Julkisivun rakennusaine"] = buildingResponse.properties['facade_material'];
+              feature.properties.rakennustiedot["Lämmitystapa"] = buildingResponse.properties['heating_method'];
+              feature.properties.rakennustiedot["Lämmitysenergianlähde"] = buildingResponse.properties['heating_energy_source'];
+              feature.properties.rakennustiedot["Kantavanrakenteen rakennusaine"] = buildingResponse.properties['material_of_load_bearing_structures'];
+
+            }  
             return feature;
           })
         );
