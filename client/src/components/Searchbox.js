@@ -39,16 +39,20 @@ function Searchbox({ afterSearch }) {
   
     try {
       let response;
-
+      let query = searchQuery.trim();
   
       if (searchType === 'kiinteistötunnuksella') {
-        response = await axios.get(`${kiinteistotunnusHakuUrl}${searchQuery}`);
+        response = await axios.get(`${kiinteistotunnusHakuUrl}${query}`);
       } else if (searchType === 'rakennustunnuksella') {
-        response = await axios.get(`${rakennustunnusHakuUrl}'${searchQuery}'`);
-        console.log('Rakennustunnus haku:',`${rakennustunnusHakuUrl}${searchQuery}`)
+        response = await axios.get(`${rakennustunnusHakuUrl}'${query}'`);
+        // console.log('Rakennustunnus haku:',`${rakennustunnusHakuUrl}${query}`)
 
       } else if (searchType === 'osoitteella'){
-        response = await axios.get(`${osoiteHakuUrl}'${searchQuery}'`);
+        if (query.length > 0) {
+          query = query.charAt(0).toUpperCase() + query.slice(1);
+        }
+
+        response = await axios.get(`${osoiteHakuUrl}'${query}'`);
 
       }
       setRawResults(response.data);
