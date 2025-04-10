@@ -39,14 +39,13 @@ function Searchbox({ afterSearch }) {
   
     try {
       let response;
-      let responseAddress;
-      let featureCollection
+
   
       if (searchType === 'kiinteistötunnuksella') {
         response = await axios.get(`${kiinteistotunnusHakuUrl}${searchQuery}`);
       } else if (searchType === 'rakennustunnuksella') {
-        response = await axios.get(`${rakennustunnusHakuUrl}${searchQuery}`);
-        console.log('Rakennustunnus haku:',`${rakennustunnusHakuUrl}'${searchQuery}'`)
+        response = await axios.get(`${rakennustunnusHakuUrl}'${searchQuery}'`);
+        console.log('Rakennustunnus haku:',`${rakennustunnusHakuUrl}${searchQuery}`)
 
       } else if (searchType === 'osoitteella'){
         response = await axios.get(`${osoiteHakuUrl}'${searchQuery}'`);
