@@ -46,16 +46,12 @@ function Searchbox({ afterSearch }) {
         response = await axios.get(`${kiinteistotunnusHakuUrl}${searchQuery}`);
       } else if (searchType === 'rakennustunnuksella') {
         response = await axios.get(`${rakennustunnusHakuUrl}${searchQuery}`);
+        console.log('Rakennustunnus haku:',`${rakennustunnusHakuUrl}'${searchQuery}'`)
+
       } else if (searchType === 'osoitteella'){
         response = await axios.get(`${osoiteHakuUrl}'${searchQuery}'`);
-        // console.log('QUERY IS: ',`${osoiteHakuUrl}'${searchQuery}'`)
-        // console.log('RESULTS ARE: ', responseAddress.data)
-        // for (featureCollection in responseAddress.data){
 
-        // }
       }
-
-  
       setRawResults(response.data);
     } catch (err) {
       setError("An error occurred during the search.");
@@ -140,6 +136,7 @@ function Searchbox({ afterSearch }) {
               feature.properties.yleistiedot["Kohteen osoite"] = addressResponse.properties['address_fin'];
               feature.properties.yleistiedot["Postinumero"] = addressResponse.properties['postal_code'];
               feature.properties.yleistiedot["Toimipaikka"] = addressResponse.properties['postal_office_fin'];
+
             } else{
               const buildingResponse = await getBuildingInfo(feature);
               feature.properties.yleistiedot["Rakennustunnus"] = buildingResponse.properties['permanent_building_identifier'];
@@ -150,7 +147,7 @@ function Searchbox({ afterSearch }) {
               feature.properties.teknisettiedot["Kerrosala (m²)"] = buildingResponse.properties['gross_floor_area'];
               feature.properties.teknisettiedot["Huoneistoala (m²)"] = buildingResponse.properties['floor_area'];
               feature.properties.teknisettiedot["Tilavuus (m³)"] = buildingResponse.properties['volume'];
-              feature.properties.teknisettiedot["Kerroksia (m²)"] = buildingResponse.properties['number_of_storeys'];
+              feature.properties.teknisettiedot["Kerroksia"] = buildingResponse.properties['number_of_storeys'];
 
               feature.properties.rakennustiedot["Rakennusluokitus"] = buildingResponse.properties['main_purpose'];
               feature.properties.rakennustiedot["Runkotapa"] = buildingResponse.properties['construction_method'];
