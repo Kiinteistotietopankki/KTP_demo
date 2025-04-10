@@ -49,9 +49,8 @@ function Searchbox({ afterSearch }) {
 
       } else if (searchType === 'osoitteella'){
         if (query.length > 0) {
-          query = query.charAt(0).toUpperCase() + query.slice(1);
+          query = query.charAt(0).toUpperCase() + query.slice(1).toLowerCase();
         }
-
         response = await axios.get(`${osoiteHakuUrl}'${query}'`);
 
       }
