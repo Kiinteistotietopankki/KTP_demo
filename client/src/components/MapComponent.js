@@ -1,38 +1,39 @@
-import { MapContainer, WMSTileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { CRS } from "leaflet";
-
 const MapComponent = () => {
-  // Define center and zoom level
-  const center = [7393037, 374003]; // Replace with your coordinates
-  const zoom = 13;
 
-  // WMS URL and BBOX
-  const wmsUrl = "https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/ows";
-  const bbox = "373953,7392987,374053,7393087"; // Replace with dynamic BBOX from WFS or your needs
+  const position = [427421,7210249]
+  const vectorTileURL = 'https://avoinkarttakuva.maanmittauslaitos.fi/vectortiles/taustakartta/wmts/1.0.0/taustakartta/default/v20/WGS84_Pseudo-Mercator/{z}/{x}/{y}.pbf?api-key=d427e2b3-e5c1-43fd-b431-a16ba26df92f';
 
   return (
-    <MapContainer center={center} zoom={zoom} style={{ height: "500px", width: "100%" }}>
-      {/* WMS Tile Layer */}
-      <WMSTileLayer
-        url={wmsUrl}
-        params={{
-          SERVICE: "WMS",
-          VERSION: "1.3.0",
-          REQUEST: "GetMap",
-          LAYERS: "open_address",
-          STYLES: "",
-          CRS: "EPSG:3067",
-          WIDTH: 256,
-          HEIGHT: 256,
-          FORMAT: "image/png",
-          BBOX: bbox, // Using the BBOX you provided or dynamically generated
-        }}
-      />
-      {/* Optionally add markers or other elements */}
-    </MapContainer>
+    <div>
+          {/* <MapContainer
+            center={position}
+            zoom={13}
+            scrollWheelZoom={false}
+            style={{ height: "100vh", width: "100%" }}
+          >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://avoin-karttakuva.maanmittauslaitos.fi/kiinteisto-avoin/tiles/wmts/1.0.0/kiinteistojaotus/default/v3/ETRS-TM35FIN/{z}/{y}/{x}.pbf?api-key=f11f6c03-fe6a-43bb-89b0-6370cd03509b"
+        />
+        <Marker position={position}>
+          <Popup>
+            A pretty CSS3 popup. <br /> Easily customizable.
+          </Popup>
+        </Marker>
+      </MapContainer> */}
+      <MapContainer center={[60.192059, 24.945831]} zoom={12} style={{ width: '100%', height: '100%' }}>
+        {/* MVT-vektoritiili taustakartaksi */}
+        <TileLayer
+        url={vectorTileURL}
+        tileSize={512}  // MVT-vektoritiilien tyypillinen koko
+        maxZoom={18}    // Maksimi zoom-taso
+        minZoom={10}    // Minimi zoom-taso
+        />
+      </MapContainer>
+    </div>
   );
 };
-
 
 export default MapComponent;

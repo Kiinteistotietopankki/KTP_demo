@@ -23,7 +23,7 @@ function Home() {
 
       <Searchbox afterSearch={afterSearch} />
 
-      {/* <MapComponent></MapComponent> */}
+      <MapComponent></MapComponent>
       
       {searchResults.length > 0 ? (
         <Resultdisplay data={searchResults}></Resultdisplay>
