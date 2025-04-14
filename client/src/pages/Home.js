@@ -3,7 +3,7 @@ import Badge from 'react-bootstrap/Badge';
 import '../App.css';
 import Searchbox from '../components/Searchbox';
 import Resultdisplay from '../components/Resultsdisplay';
-import MapComponent from '../components/MapComponent';
+import MapVisual from '../components/MapVisual';
 
 
 
@@ -23,7 +23,8 @@ function Home() {
 
       <Searchbox afterSearch={afterSearch} />
 
-      <MapComponent></MapComponent>
+
+      <MapVisual></MapVisual>
       
       {searchResults.length > 0 ? (
         <Resultdisplay data={searchResults}></Resultdisplay>
