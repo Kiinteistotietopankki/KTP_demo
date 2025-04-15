@@ -19,19 +19,14 @@ function Home() {
     <div className="container mt-3">
       <div className="row">
         {/* LEFT side: text + search + results */}
-        <div className="col-md-6">
+        <div className="col-md-6 mt-3">
           <h1 className="otsikko text-primary mb-5">
             Kiinteistötietopankki <Badge bg="secondary">DEMO</Badge>
           </h1>
 
           <Searchbox afterSearch={afterSearch} />
 
-          {searchResults.length > 0 ? (
-            <Resultdisplay data={searchResults} />
-          ) : (
-            <>
-            </>
-          )}
+
         </div>
 
         {/* RIGHT side: map */}
@@ -39,6 +34,12 @@ function Home() {
           <MapVisual pos={[65.00816937, 25.46030678]} />
         </div>
       </div>
+      {searchResults.length > 0 ? (
+            <Resultdisplay data={searchResults} />
+          ) : (
+            <>
+            </>
+          )}
     </div>
   );
 }
