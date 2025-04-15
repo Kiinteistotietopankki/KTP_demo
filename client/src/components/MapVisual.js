@@ -86,7 +86,7 @@ const MapVisual = ({pos}) => {
     // Add default layer
     layerBasePublic.addTo(map);
 
-    L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+    L.control.layers(baseMaps, overlayMaps, { collapsed: true }).addTo(map);
 
 
     const marker = L.marker(position).addTo(map);
