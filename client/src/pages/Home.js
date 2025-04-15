@@ -35,7 +35,7 @@ function Home() {
         </div>
 
         {/* RIGHT side: map */}
-        <div className="col-md-6">
+        <div className="col-md-6 mt-2">
           <MapVisual pos={[65.00816937, 25.46030678]} />
         </div>
       </div>

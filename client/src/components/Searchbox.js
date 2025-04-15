@@ -295,7 +295,7 @@ function Searchbox({ afterSearch }) {
         <div className='featureAmount-container'>
           {rawResults?.features?.length > 0 ? (
               <span className="badge bg-success">
-                Tuloksia: {rawResults.totalFeatures}
+                Rakennuksia: {rawResults.totalFeatures}
               </span>
             ) : (
               <span className="badge bg-secondary">Ei tuloksia</span>

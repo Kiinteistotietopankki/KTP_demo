@@ -100,7 +100,7 @@ const MapVisual = ({pos}) => {
 
   return (
     // <div className='mapcont mt-5 mb-5'>
-      <div id='map' ref={mapRef} style={{ height: '300px', maxWidth: '100%' }}>
+      <div id='map' ref={mapRef} style={{ height: '300px', maxWidth: '100%',  borderRadius: '12px',}}>
       </div>
     // </div>
   );
