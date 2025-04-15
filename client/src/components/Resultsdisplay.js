@@ -92,8 +92,8 @@ function Resultdisplay({ data }) {
                         </label>
                         <div className="d-flex gap-2">
                     
-                    <button className="export-button btn btn-success" onClick={handleCreateReport}> </button>
-                                Luo raportti
+                    <button className="export-button" onClick={handleCreateReport}> 
+                                Luo raportti</button>
                             <button className="export-button" onClick={handleExport}>
                                 Tallenna Excel
                                 </button>
