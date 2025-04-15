@@ -11,6 +11,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 function Searchbox({ afterSearch }) {
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [postalOffice, setPostalOffice] = useState("")
+
   const [searchType, setSearchType] = useState('kiinteistötunnuksella') // kiinteistötunnuksella, rakennustunnuksella, osoitteella 
 
   const [rawResults, setRawResults] = useState([]);
@@ -18,14 +20,14 @@ function Searchbox({ afterSearch }) {
   const [loading, setLoading] = useState(false); //todo snipper when loading
   const [error, setError] = useState(null);
 
-  const kiinteistotunnusHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=property_identifier='
-  const rakennusKoordinaateillaHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=INTERSECTS(location_geometry_data'
+  const kiinteistotunnusHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:4326&CQL_FILTER=property_identifier='
+  const rakennusKoordinaateillaHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:4326&CQL_FILTER=INTERSECTS(location_geometry_data'
 
-  const rakennustunnusHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=permanent_building_identifier='
-  const osoiteHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:3067&CQL_FILTER=address_fin='
+  const rakennustunnusHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:4326&CQL_FILTER=permanent_building_identifier='
+  const osoiteHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:4326&CQL_FILTER=address_fin='
 
-  const rakennusBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&&featureID=open_building.'
-  const osoiteBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&CQL_FILTER=building_key='
+  const rakennusBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:4326&featureID=open_building.'
+  const osoiteBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:4326&CQL_FILTER=building_key='
 
 
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ function Searchbox({ afterSearch }) {
 
   const handleSearch = async () => {
     setLoading(true); 
-    console.log("Searching for:", searchQuery);
+    console.log("Searching for:", searchQuery, postalOffice);
   
     try {
       let response;
@@ -48,11 +50,19 @@ function Searchbox({ afterSearch }) {
         // console.log('Rakennustunnus haku:',`${rakennustunnusHakuUrl}${query}`)
 
       } else if (searchType === 'osoitteella'){
+
+        let kunta = postalOffice.trim().toUpperCase();
         if (query.length > 0) {
           query = query.charAt(0).toUpperCase() + query.slice(1).toLowerCase();
         }
-        response = await axios.get(`${osoiteHakuUrl}'${query}'`);
 
+        console.log("Searching for 2:", query, kunta);
+        if (kunta.length > 0){
+          response = await axios.get(`${osoiteHakuUrl}'${query}'%20AND%20postal_office_fin='${kunta}'`);
+          console.log(`${osoiteHakuUrl}'${query}'%20AND%20postal_office_fin='${kunta}'`)
+        } else{
+          response = await axios.get(`${osoiteHakuUrl}'${query}'`);
+        }
       }
       setRawResults(response.data);
     } catch (err) {
@@ -88,13 +98,13 @@ function Searchbox({ afterSearch }) {
       // Extract only the UUID part of the ID
       const idKey = feature.id;
 
-      console.log('getBuildinginfo 1', feature.id)
+      // console.log('getBuildinginfo 1', feature.id)
     
       const response = await axios.get(`${rakennusBuildingkeyHakuUrl}${idKey}`);
 
-      console.log('getBuildingInfoQuery: ',`${rakennusBuildingkeyHakuUrl}${idKey}`)
+      // console.log('getBuildingInfoQuery: ',`${rakennusBuildingkeyHakuUrl}${idKey}`)
 
-      console.log('getBuildingInfoData: ',response.data.features[0])
+      // console.log('getBuildingInfoData: ',response.data.features[0])
       return response.data.features[0] || {};
   
     } catch (err) {
@@ -165,7 +175,7 @@ function Searchbox({ afterSearch }) {
         );
   
         setResults(transformedData);
-        console.log("Transformed data - uef[rawResults]", transformedData);
+        // console.log("Transformed data - uef[rawResults]", transformedData);
       } else {
         setResults([]);
       }
@@ -244,10 +254,10 @@ function Searchbox({ afterSearch }) {
       {/* Search Type Toggle Switch */}
 
       <Tabs
-      id="controlled-tab-example"
-      activeKey={searchType}
-      onSelect={(k) => handleTabChange(k)}
-      className="mb-3 d-flex justify-content-center"
+        id="controlled-tab-example"
+        activeKey={searchType}
+        onSelect={(k) => handleTabChange(k)}
+        className="mb-3 d-flex justify-content-center"
       >
           {/* <Tab eventKey="otsikko" title="Hakutyyppi" disabled>
 
@@ -268,7 +278,7 @@ function Searchbox({ afterSearch }) {
       </Tabs>
       
 
-      <div className="mt-4">
+      <div className="mt-4 d-flex flex-column mb-3">
         <div className="input-group mb-3">
           <input
             type="text"
@@ -280,14 +290,31 @@ function Searchbox({ afterSearch }) {
             aria-label="Search"
             aria-describedby="button-addon2"
           />
-          <button
-            className="btn btn-outline-secondary"
-            onClick={handleSearch}
-            id="button-addon2"
-          >
-            Hae
-          </button>
+
         </div>
+
+        {searchType==='osoitteella' ? (
+          <div className="input-group mb-3">
+            <input
+              type="text"
+              className="form-control"
+              placeholder={`Kunta tai kaupunki`}
+              value={postalOffice}
+              onChange={(e) => setPostalOffice(e.target.value)}
+              onKeyDown={handleKeyDown}
+              aria-label="Search"
+              aria-describedby="button-addon2"
+            />
+          </div>
+        ):(<></>)}
+
+        <button
+          className="btn btn-outline-secondary"
+          onClick={handleSearch}
+          id="button-addon2">
+            Hae
+        </button>
+
       </div>
 
 
