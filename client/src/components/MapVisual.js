@@ -1,14 +1,29 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+const apiKey = process.env.REACT_APP_API_KEY;
 
-const apiKey = process.env.API_KEY;
+const MapVisual = ({ pos = [65.00816937, 25.46030678], data }) => {
+  
 
-const MapVisual = ({pos}) => {
+  const [rakennukset, setRakennukset] = useState([]);
+  const [position, setPosition] = useState([pos[0],pos[1]])
+
   const mapRef = useRef(null);
+  // const position = [pos[0], pos[1]]
 
-  const position = [pos[0], pos[1]]
+  useEffect(() => {
+    if (data && data.length > 0){
+      setRakennukset(data);
+      console.log('MAP VISUAL TESTING: ',data?.[0]?.geometry?.coordinates)
+  
+      setPosition([data?.[0]?.geometry?.coordinates[1],data?.[0]?.geometry?.coordinates[0]])
+    
+    }
+
+    
+  }, [data]);
 
   useEffect(() => {
     const map = L.map('map', {
@@ -26,8 +41,9 @@ const MapVisual = ({pos}) => {
         shadowUrl: require('leaflet/dist/images/marker-shadow.png')
       });
 
+    // console.log(apiKey)
+    // console.log(encodeURIComponent(apiKey));
     const template = `https://avoin-karttakuva.maanmittauslaitos.fi/avoin/wmts/1.0.0/{layerName}/default/{tileMatrixSet}/{z}/{y}/{x}.png?apiKey=${apiKey}`;
-
 
     // Layers
 
@@ -90,7 +106,7 @@ const MapVisual = ({pos}) => {
 
 
     const marker = L.marker(position).addTo(map);
-    marker.bindPopup('Default Icon Popup');
+    // marker.bindPopup('Default Icon Popup');
 
     // Clean up
     return () => {
