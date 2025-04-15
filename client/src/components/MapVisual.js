@@ -14,9 +14,15 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], data }) => {
   // const position = [pos[0], pos[1]]
 
   useEffect(() => {
-    setRakennukset(data);
-    console.log('MAP VISUAL TESTING: ',data?.[0]?.geometry?.coordinates)
-    setPosition([data?.[0]?.geometry?.coordinates[1],data?.[0]?.geometry?.coordinates[0]])
+    if (data && data.length > 0){
+      setRakennukset(data);
+      console.log('MAP VISUAL TESTING: ',data?.[0]?.geometry?.coordinates)
+  
+      setPosition([data?.[0]?.geometry?.coordinates[1],data?.[0]?.geometry?.coordinates[0]])
+    
+    }
+
+    
   }, [data]);
 
   useEffect(() => {
