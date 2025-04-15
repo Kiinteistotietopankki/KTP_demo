@@ -24,7 +24,7 @@ function Home() {
       <Searchbox afterSearch={afterSearch} />
 
 
-      <MapVisual></MapVisual>
+      {/* <MapVisual pos={[65.00816937,25.46030678]}></MapVisual> */}
       
       {searchResults.length > 0 ? (
         <Resultdisplay data={searchResults}></Resultdisplay>

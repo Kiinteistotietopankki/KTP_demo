@@ -5,10 +5,10 @@ import 'leaflet/dist/leaflet.css';
 
 const apiKey = process.env.API_KEY;
 
-const MapVisual = () => {
+const MapVisual = ({pos}) => {
   const mapRef = useRef(null);
 
-  const position = [64.91089078, 25.52603082]
+  const position = [pos[0], pos[1]]
 
   useEffect(() => {
     const map = L.map('map', {
@@ -96,13 +96,13 @@ const MapVisual = () => {
     return () => {
       map.remove();
     };
-  }, []);
+  }, [position]);
 
   return (
-    <div className='mapcont mt-5 mb-5'>
-      <div id="map" ref={mapRef} style={{ height: '500px', maxWidth: '100%' }}>
+    // <div className='mapcont mt-5 mb-5'>
+      <div id='map' ref={mapRef} style={{ height: '300px', maxWidth: '100%' }}>
       </div>
-    </div>
+    // </div>
   );
 };
 
