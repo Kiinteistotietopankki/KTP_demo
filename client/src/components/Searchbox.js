@@ -49,9 +49,8 @@ function Searchbox({ afterSearch }) {
 
       } else if (searchType === 'osoitteella'){
         if (query.length > 0) {
-          query = query.charAt(0).toUpperCase() + query.slice(1);
+          query = query.charAt(0).toUpperCase() + query.slice(1).toLowerCase();
         }
-
         response = await axios.get(`${osoiteHakuUrl}'${query}'`);
 
       }
@@ -296,7 +295,7 @@ function Searchbox({ afterSearch }) {
         <div className='featureAmount-container'>
           {rawResults?.features?.length > 0 ? (
               <span className="badge bg-success">
-                Tuloksia: {rawResults.totalFeatures}
+                Rakennuksia: {rawResults.totalFeatures}
               </span>
             ) : (
               <span className="badge bg-secondary">Ei tuloksia</span>
