@@ -87,59 +87,60 @@ function Resultdisplay({ data }) {
                     
                     {rakennukset.map((rakennus, index) => (
                         <div key={index} className="card mb-4">
-                            <div className="card-header d-flex justify-content-between align-items-center">
-                            <label className="d-flex align-items-center gap-2">
-                            <input type="checkbox"
-                                checked={!!selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]}
-                                    onChange={() => handleCheckboxChange(rakennus.properties.yleistiedot.Rakennustunnus)}
-                                    />
-                                <span>{rakennus.properties.yleistiedot["Kohteen osoite"]} {rakennus.properties.yleistiedot["Toimipaikka"]} / {rakennus.properties.yleistiedot.Rakennustunnus}</span>
-                                    </label>
+                            <div className="card-body">
+                                <div className="card-header d-flex justify-content-between align-items-center">
+                                <label className="d-flex align-items-center gap-2">
+                                <input type="checkbox"
+                                    checked={!!selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]}
+                                        onChange={() => handleCheckboxChange(rakennus.properties.yleistiedot.Rakennustunnus)}
+                                        />
+                                    <span>{rakennus.properties.yleistiedot["Kohteen osoite"]} {rakennus.properties.yleistiedot["Toimipaikka"]} / {rakennus.properties.yleistiedot.Rakennustunnus}</span>
+                                        </label>
 
+                                </div>
+
+                                <Accordion>
+                                    <Accordion.Item eventKey="0">
+                                        <Accordion.Header>Yleistiedot</Accordion.Header>
+                                        <Accordion.Body>
+                                            <Tabletemplate
+                                                properties={rakennus.properties.yleistiedot}
+                                                tableTitle={''}
+                                            />
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+
+                                    <Accordion.Item eventKey="1">
+                                        <Accordion.Header>Tekniset tiedot</Accordion.Header>
+                                        <Accordion.Body>
+                                            <Tabletemplate
+                                                properties={rakennus.properties.teknisettiedot}
+                                                tableTitle={''}
+                                            />
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+
+                                    <Accordion.Item eventKey="2">
+                                        <Accordion.Header>Rakennustiedot</Accordion.Header>
+                                        <Accordion.Body>
+                                            <Tabletemplate
+                                                properties={rakennus.properties.rakennustiedot}
+                                                tableTitle={''}
+                                            />
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+
+                                    <Accordion.Item eventKey="3">
+                                        <Accordion.Header>Aluetiedot</Accordion.Header>
+                                        <Accordion.Body>
+                                            <Tabletemplate
+                                                properties={rakennus.properties.aluetiedot}
+                                                tableTitle={''}
+                                            />
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+                                </Accordion>
                             </div>
-
-                            <Accordion>
-                                <Accordion.Item eventKey="0">
-                                    <Accordion.Header>Yleistiedot</Accordion.Header>
-                                    <Accordion.Body>
-                                        <Tabletemplate
-                                            properties={rakennus.properties.yleistiedot}
-                                            tableTitle={''}
-                                        />
-                                    </Accordion.Body>
-                                </Accordion.Item>
-
-                                <Accordion.Item eventKey="1">
-                                    <Accordion.Header>Tekniset tiedot</Accordion.Header>
-                                    <Accordion.Body>
-                                        <Tabletemplate
-                                            properties={rakennus.properties.teknisettiedot}
-                                            tableTitle={''}
-                                        />
-                                    </Accordion.Body>
-                                </Accordion.Item>
-
-                                <Accordion.Item eventKey="2">
-                                    <Accordion.Header>Rakennustiedot</Accordion.Header>
-                                    <Accordion.Body>
-                                        <Tabletemplate
-                                            properties={rakennus.properties.rakennustiedot}
-                                            tableTitle={''}
-                                        />
-                                    </Accordion.Body>
-                                </Accordion.Item>
-
-                                <Accordion.Item eventKey="3">
-                                    <Accordion.Header>Aluetiedot</Accordion.Header>
-                                    <Accordion.Body>
-                                        <Tabletemplate
-                                            properties={rakennus.properties.aluetiedot}
-                                            tableTitle={''}
-                                        />
-                                    </Accordion.Body>
-                                </Accordion.Item>
-                            </Accordion>
-
                         </div>
 
 

@@ -26,12 +26,7 @@ function Home() {
 
           <Searchbox afterSearch={afterSearch} />
 
-          {searchResults.length > 0 ? (
-            <Resultdisplay data={searchResults} />
-          ) : (
-            <>
-            </>
-          )}
+
         </div>
 
         {/* RIGHT side: map */}
@@ -39,6 +34,12 @@ function Home() {
           <MapVisual pos={[65.00816937, 25.46030678]} />
         </div>
       </div>
+      {searchResults.length > 0 ? (
+            <Resultdisplay data={searchResults} />
+          ) : (
+            <>
+            </>
+          )}
     </div>
   );
 }
