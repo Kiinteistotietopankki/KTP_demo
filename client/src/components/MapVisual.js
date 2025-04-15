@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-
-const apiKey = process.env.API_KEY;
+const apiKey = process.env.REACT_APP_API_KEY;
 
 const MapVisual = ({ pos = [65.00816937, 25.46030678], data }) => {
+  
 
   const [rakennukset, setRakennukset] = useState([]);
   const [position, setPosition] = useState([pos[0],pos[1]])
@@ -41,8 +41,9 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], data }) => {
         shadowUrl: require('leaflet/dist/images/marker-shadow.png')
       });
 
+    // console.log(apiKey)
+    // console.log(encodeURIComponent(apiKey));
     const template = `https://avoin-karttakuva.maanmittauslaitos.fi/avoin/wmts/1.0.0/{layerName}/default/{tileMatrixSet}/{z}/{y}/{x}.png?apiKey=${apiKey}`;
-
 
     // Layers
 

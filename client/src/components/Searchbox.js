@@ -61,7 +61,7 @@ function Searchbox({ afterSearch }) {
           response = await axios.get(`${osoiteHakuUrl}'${query}'%20AND%20postal_office_fin='${kunta}'`);
           console.log(`${osoiteHakuUrl}'${query}'%20AND%20postal_office_fin='${kunta}'`)
         } else{
-          response = await axios.get(`${osoiteHakuUrl}"${query}"`);
+          response = await axios.get(`${osoiteHakuUrl}'${query}'`);
         }
       }
       setRawResults(response.data);
