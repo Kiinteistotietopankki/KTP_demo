@@ -62,6 +62,8 @@ function Resultdisplay({ data }) {
 
     return (
         <div className="mt-4">
+           <div key={'kiinteisto'} className="kiinteistocard card mb-4 p-2 border border-primary">
+           <div className="card-header d-flex justify-content-between align-items-center">Kiinteistö xxxxx</div>
             {rakennukset?.length > 0 ? (
                 <>
                     <div className="d-flex justify-content-between mb-3">
@@ -74,14 +76,15 @@ function Resultdisplay({ data }) {
                            <span> Valitse kaikki</span>
                         </label>
                         <div className="d-flex gap-2">
-                    <button className="export-button" onClick={handleExport}>
-                         Tallenna Excel
-                        </button>
-                    <button className="export-button" onClick={handleExportPdf}>
-                         Tallenna PDF
-                    </button>
+                            <button className="export-button" onClick={handleExport}>
+                                Tallenna Excel
+                                </button>
+                            <button className="export-button" onClick={handleExportPdf}>
+                                Tallenna PDF
+                            </button>
                         </div>
-                                </div>
+                    </div>
+                    
                     {rakennukset.map((rakennus, index) => (
                         <div key={index} className="card mb-4">
                             <div className="card-header d-flex justify-content-between align-items-center">
@@ -95,7 +98,7 @@ function Resultdisplay({ data }) {
 
                             </div>
 
-                            <Accordion defaultActiveKey={['0']}>
+                            <Accordion>
                                 <Accordion.Item eventKey="0">
                                     <Accordion.Header>Yleistiedot</Accordion.Header>
                                     <Accordion.Body>
@@ -145,6 +148,7 @@ function Resultdisplay({ data }) {
             ) : (
                 <div>0 results</div>
             )}
+            </div> 
         </div>
     );
 }
