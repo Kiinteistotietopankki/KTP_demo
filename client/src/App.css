@@ -38,6 +38,7 @@
   border-radius: 0.5rem;  /* Rounded corners */
   flex: 0.75;
 
+  flex-direction: column;
 }
 
 .otsikko{
@@ -74,7 +75,7 @@
 }
 
 .featureAmount-container{
-  outline: 2px dashed blue;
+  /* outline: 2px dashed blue; */
 
   margin: 0 auto
 }
