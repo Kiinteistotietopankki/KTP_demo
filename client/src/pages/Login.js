@@ -1,4 +1,4 @@
-/*import React from 'react';
+import React from 'react';
 import { useMsal } from '@azure/msal-react';
 import { useNavigate } from 'react-router-dom';
 import { saveToken } from '../Token';
@@ -55,4 +55,3 @@ function Login() {
 }
 
 export default Login;
-*/
