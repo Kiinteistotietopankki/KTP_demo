@@ -1,17 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet'; // Import Leaflet
-import 'leaflet-wms-header';
 
 import 'leaflet/dist/leaflet.css'; // Import Leaflet's CSS¨
 
+// VANHA!!! EI KÄYTÖSSÄ, Säilössä hetken
 
 const MapComponent = () => {
   const mapRef = useRef(null);
 
   const projectedPoint = L.point(2834228.3862621, 9610523.68631807); 
-
-  const username='Waativakarttakoe'
-  const password='Karttamiesukko12'
 
 
   useEffect(() => {
@@ -28,7 +25,7 @@ const MapComponent = () => {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
 
-    Add the WMS layer
+    // Add the WMS layer
     const wmsLayer = L.TileLayer.wms('https://sopimus-karttakuva.maanmittauslaitos.fi/sopimus/service/wms?SRSNAME=EPSG:4326&', {
       layers: 'public:peruskartta_taustavari',
       headers: {
