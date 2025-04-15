@@ -10,11 +10,11 @@ const PropertyDetailsForm = ({ rakennus }) => {
   const [jarjestelmaText, setJarjestelmaText] = useState('');
   const [PropertyName, setPropertyName] = useState('');
   const [riskidata, setRiskidata] = useState(Riskidataa);
-  const [images, setImages] = useState([]); // Store multiple images as an array
+  const [images, setImages] = useState([]); 
 
   // Handle multiple image file uploads
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);  // Convert FileList to array
+    const files = Array.from(e.target.files);  
     const newImages = [];
 
     files.forEach((file) => {
@@ -25,22 +25,11 @@ const PropertyDetailsForm = ({ rakennus }) => {
           setImages((prevImages) => [...prevImages, ...newImages]);  // Update images state
         }
       };
-      reader.readAsDataURL(file);  // Read each image as a data URL
+      reader.readAsDataURL(file);  
     });
   };
 
-  const getRiskMark = (risk) => {
-    switch (risk) {
-      case 'low':
-        return <span style={{ color: 'green' }}>✓</span>; // Green checkmark for low risk
-      case 'medium':
-        return <span style={{ color: 'yellow' }}>✓</span>; // Yellow checkmark for medium risk
-      case 'high':
-        return <span style={{ color: 'red' }}>✓</span>; // Red checkmark for high risk
-      default:
-        return null;
-    }
-  };
+
 
   const drawGreenLineWithDate = (doc, title = '') => {
     const yPosition = 20;
@@ -95,17 +84,17 @@ const PropertyDetailsForm = ({ rakennus }) => {
         if (item.risk === "medium") color = [255, 165, 0];
         if (item.risk === "high") color = [255, 0, 0];
     
-        // Label
+  
         doc.setFont("Helvetica", "bold");
         doc.setTextColor(0, 0, 0);
         doc.text(label, margin, y);
     
-        // Icon
+       
         doc.setTextColor(...color);
         doc.setFont("Helvetica", "bold");
         doc.text(icon, margin + 70, y);
     
-        // Description
+        
         doc.setFont("Helvetica", "normal");
         doc.setTextColor(0, 0, 0);
         doc.text(description, margin + 80, y, { maxWidth: 100 });
@@ -120,11 +109,11 @@ const PropertyDetailsForm = ({ rakennus }) => {
         }
       });
     
-      return y + 5; // Add bottom space before next section
+      return y + 5; 
     };
     
 
-    // Start creating the document
+    
     drawGreenLineWithDate(doc);
     currentYPosition = 45;
 
@@ -137,7 +126,7 @@ const PropertyDetailsForm = ({ rakennus }) => {
     // Custom Text Section
     doc.setFont("Helvetica", "normal");
     doc.setFontSize(fontSize);
-    const customTextY = pageHeight - 40; // Adjust this value for spacing from the bottom
+    const customTextY = pageHeight - 40; 
     doc.text(`Tarkastuspäivä: ${customText}`, margin, customTextY, { maxWidth: 180 });
     doc.addPage();
     drawGreenLineWithDate(doc);
@@ -157,7 +146,7 @@ const PropertyDetailsForm = ({ rakennus }) => {
     drawGreenLineWithDate(doc);
     currentYPosition = 45;
 
-    // Table of Contents Section
+    
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(pageHeaderSize);
     doc.text("Sisällysluettelo", margin, currentYPosition);
@@ -165,13 +154,13 @@ const PropertyDetailsForm = ({ rakennus }) => {
     doc.addPage();
     drawGreenLineWithDate(doc);
     currentYPosition = 45;
-    // Start with the main content
+    
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(pageHeaderSize);
     doc.text("3. Kohteen Perustiedot", margin, currentYPosition);
     currentYPosition += 7;
     
-    // Draw horizontal line
+    
     doc.setLineWidth(0.5);
     doc.line(margin, currentYPosition, pageWidth - margin, currentYPosition);
     currentYPosition += 10;
@@ -185,7 +174,7 @@ const PropertyDetailsForm = ({ rakennus }) => {
     const allDetails = { ...yleistiedot, ...teknisettiedot };
     
     const labelX = margin;
-    const valueX = pageWidth - margin; // Right-align values
+    const valueX = pageWidth - margin; 
     const lineHeight = 8;
     
     Object.entries(allDetails).forEach(([key, value], index) => {
@@ -228,8 +217,7 @@ const PropertyDetailsForm = ({ rakennus }) => {
     doc.text(jarjestelmaText || '', margin, currentYPosition, { maxWidth: 180 });
     currentYPosition += 20;
     
-    // Filter groups
-    // Group items by category
+    
 const groupedRiskidata = riskidata.reduce((acc, item) => {
   if (!acc[item.category]) acc[item.category] = [];
   acc[item.category].push(item);
@@ -265,7 +253,7 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
   doc.setFont("Helvetica", "normal");
   items.forEach((item) => {
     const riskLevelText =
-      item.risk === 'low' ? '\u2714' :
+      item.risk === 'low' ? 'Matala riski' :
       item.risk === 'medium' ? 'Keskitason riski' :
       item.risk === 'high' ? 'Korkea riski' : '';
 
@@ -296,7 +284,7 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
     }
   });
 
-  currentYPosition += 10; // Add some space before next section
+  currentYPosition += 10; 
 });
 
 
@@ -310,33 +298,30 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
       img.onload = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const maxWidth = 200;  // Set the max width for the image (can adjust to your preference)
-        const maxHeight = 200;  // Set the max height for the image (can adjust to your preference)
+        const maxWidth = 200;  
+        const maxHeight = 200; 
 
         const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
         canvas.width = img.width * ratio;
         canvas.height = img.height * ratio;
 
-        // Draw the image onto the canvas with the new size
+       
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         // Convert the canvas to base64-encoded image
         const compressedImage = canvas.toDataURL('image/jpeg', 1.0); // 0.5 is the compression quality (0-1)
 
-        // Add the image to the PDF at position (10, 10)
         doc.addImage(compressedImage, 'JPEG', 10, currentYPosition, canvas.width, canvas.height);
 
-        // Adjust yPosition for next image
+        
         currentYPosition += canvas.height + 10;
 
-        // Save the PDF after all images are added
+       
         if (index === images.length - 1) {
           doc.save("report.pdf");
         }
       };
     });
-
-    // If no images, just save the PDF
     if (images.length === 0) {
       doc.save("report.pdf");
     }
@@ -344,7 +329,19 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
 
   return (
     <div>
+      
       <button onClick={handleExportPdf} className="btn btn-primary mb-4">Lataa PDF</button>
+      
+      <div className="mb-3">
+        <label>Lisää kuvia</label>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImageChange}
+          className="form-control"
+        />
+      </div>
 
       <div className="mb-3">
         <label>Raportin Otsikko (kuntotarkistus/muu?):</label>
@@ -368,7 +365,8 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
 
       <div className="mb-3">
         <label>Tarkastuspäivä :</label>
-        <textarea
+        <input
+          type="text"
           value={customText}
           onChange={e => setCustomText(e.target.value)}
           className="form-control"
@@ -395,53 +393,57 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
         />
       </div>
 
-      <div className="mb-3">
-        <label>Lisää kuvia</label>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleImageChange}
-          className="form-control"
-        />
-      </div>
 
       <div className="mb-4">
-  <h3>Riskiluokat</h3>
+ 
+
+ 
+
+  {/* Table Rows */}
   {riskidata.map((item, index) => (
-    <div key={item.id} className="mb-4">
-      <label className="form-label">{item.label}</label>
-      <select
-        className="form-control mb-2"
-        value={item.risk}
-        onChange={(e) => {
-          const updated = [...riskidata];
-          updated[index].risk = e.target.value;
-          setRiskidata(updated);
-        }}
-      >
-        <option value="low">?</option>
-        <option value="medium">Keskitason riski</option>
-        <option value="high">Korkea riski</option>
-      </select>
+    <div
+      key={item.id}
+      className="grid grid-cols-[200px_200px_1fr] gap-4 items-center px-2 py-2 border-b border-gray-200"
+    >
       
-      <label className="form-label">Selite:</label>
-      <textarea
-        className="form-control"
-        rows="2"
-        value={item.description || ''}
-        onChange={(e) => {
-          const updated = [...riskidata];
-          updated[index].description = e.target.value;
-          setRiskidata(updated);
-        }}
-      />
-      <div>
-        Riskiluokka: {getRiskMark(item.risk)}
-      </div>
+      <div className="text-sm font-medium">{item.label}</div>
+
+    
+<div className="flex gap-4 items-center">
+  {/* Riski Dropdown */}
+  <select
+    className="py-1 rounded text-sm w-full"
+    value={item.risk}
+    onChange={(e) => {
+      const updated = [...riskidata];
+      updated[index].risk = e.target.value;
+      setRiskidata(updated);
+    }}
+  >
+    <option value="low">✅ Matala riski</option>
+    <option value="medium">🟡 Keskitason riski</option>
+    <option value="high">🔴 Korkea riski</option>
+  </select>
+
+  {/* Selite Text Input */}
+  <input
+    type="text"
+    className="form-input border px-2 py-1 rounded text-sm w-full"
+    placeholder="Kirjoita selite..."
+    value={item.description || ''}
+    onChange={(e) => {
+      const updated = [...riskidata];
+      updated[index].description = e.target.value;
+      setRiskidata(updated);
+    }}
+  />
+</div>
+
     </div>
   ))}
 </div>
+
+
 
     </div>
   ); 
