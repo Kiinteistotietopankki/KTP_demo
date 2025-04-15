@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import Tabletemplate from './Tabletemplate';
 import { Accordion } from 'react-bootstrap';
 import exportToExcel from './Excelexport';
+import EditableReport from './ReportTemplate';
 import exportToPdf from './Pdfexport';
+import Modal from 'react-bootstrap/Modal';
 import '../App.css';
 
 function Resultdisplay({ data }) {
     const [rakennukset, setRakennukset] = useState([]);
     const [selectedRakennukset, setSelectedRakennukset] = useState({}); 
+    const [showReport, setShowReport] = useState(false);
+    const [reportRakennus, setReportRakennus] = useState(null);
 
     useEffect(() => {
         console.log("Data on result displayssa: ",)
@@ -59,6 +63,17 @@ function Resultdisplay({ data }) {
             exportToPdf(rakennus);
         });
     };
+    const handleCreateReport = () => {
+        const selected = rakennukset.find(rakennus =>
+            selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]
+        );
+        if (selected) {
+            setReportRakennus(selected);
+            setShowReport(true);
+        } else {
+            alert("Valitse ensin kiinteistö");
+        }
+    };
 
     return (
         <div className="mt-4">
@@ -80,6 +95,9 @@ function Resultdisplay({ data }) {
                     <button className="export-button" onClick={handleExportPdf}>
                          Tallenna PDF
                     </button>
+                    <button className="export-button btn btn-success" onClick={handleCreateReport}>
+                                Luo raportti
+                            </button>
                         </div>
                                 </div>
                     {rakennukset.map((rakennus, index) => (
@@ -138,9 +156,18 @@ function Resultdisplay({ data }) {
                             </Accordion>
 
                         </div>
+                        
 
 
                     ))}
+                    <Modal show={showReport} onHide={() => setShowReport(false)} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>Muokkaa raporttia</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {reportRakennus && <EditableReport rakennus={reportRakennus} />}
+                </Modal.Body>
+            </Modal>
                 </>
             ) : (
                 <div>0 results</div>

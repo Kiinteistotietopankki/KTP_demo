@@ -26,11 +26,11 @@ function Sidebar() {
                     <Nav.Link as={Link} to="/contact" className="nav-item mt-md-1">Ota yhteyttä</Nav.Link>
                     <Nav.Link as={Link} to="/Profile" className="nav-item mt-md-1">Omat tiedot</Nav.Link>
                 
-                 {/*!isAuthenticated ? (
-          <Nav.Link as={Link} to="/login" className="nav-item">Login</Nav.Link>
+                 {!isAuthenticated ? (
+          <Nav.Link as={Link} to="/login" className="nav-item">Kirjaudu</Nav.Link>
         ): (
-          <Nav.Link as={Link} to="/logout" className="nav-item">Logout</Nav.Link> 
-        )*/}
+          <Nav.Link as={Link} to="/logout" className="nav-item">Kirjaudu ulos</Nav.Link> 
+        )}
                 </Nav>
         </Navbar>
   );

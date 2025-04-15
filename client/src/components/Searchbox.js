@@ -24,7 +24,7 @@ function Searchbox({ afterSearch }) {
   const rakennustunnusHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=permanent_building_identifier='
   const osoiteHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:3067&CQL_FILTER=address_fin='
 
-  const rakennusBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&CQL_FILTER=building_key='
+  const rakennusBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:3067&&featureID=open_building.'
   const osoiteBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&CQL_FILTER=building_key='
 
 
@@ -73,6 +73,29 @@ function Searchbox({ afterSearch }) {
       const response = await axios.get(`${osoiteBuildingkeyHakuUrl}'${idKey}'`);
   
       // Return the whole first feature (with full .properties etc.)
+      return response.data.features[0] || {};
+  
+    } catch (err) {
+      setError("An error occurred during the address fetch.");
+      return {}; // Return empty object if error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getBuildingInfo = async (feature) => {
+    setLoading(true);
+    try {
+      // Extract only the UUID part of the ID
+      const idKey = feature.id;
+
+      console.log('getBuildinginfo 1', feature.id)
+    
+      const response = await axios.get(`${rakennusBuildingkeyHakuUrl}${idKey}`);
+
+      console.log('getBuildingInfoQuery: ',`${rakennusBuildingkeyHakuUrl}${idKey}`)
+
+      console.log('getBuildingInfoData: ',response.data.features[0])
       return response.data.features[0] || {};
   
     } catch (err) {
@@ -157,7 +180,7 @@ function Searchbox({ afterSearch }) {
   const buildrakennusData = (features) => {
       const transformedData = features.map(feature => ({
         type: "Feature",
-        id: feature.id || null,
+        id: feature.properties.building_key || feature.id || null,
         geometry: {
             type: "Point",
             coordinates: feature.geometry.coordinates
