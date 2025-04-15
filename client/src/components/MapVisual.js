@@ -28,7 +28,14 @@ const MapVisual = () => {
 
     const template = `https://avoin-karttakuva.maanmittauslaitos.fi/avoin/wmts/1.0.0/{layerName}/default/{tileMatrixSet}/{z}/{y}/{x}.png?apiKey=${apiKey}`;
 
+
     // Layers
+
+    const layerBasePublic = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    });
+
     const layerBaseMap = L.tileLayer(template, {
       tileMatrixSet: 'WGS84_Pseudo-Mercator',
       layerName: 'taustakartta',
@@ -62,11 +69,10 @@ const MapVisual = () => {
       detectRetina: true
     });
 
-    // Add default layer
-    layerBaseMap.addTo(map);
 
     // Create layer control
     const baseMaps = {
+      'OpenStreetMap' : layerBasePublic,
       'Taustakartta': layerBaseMap,
       'Ilmakuva': layerBaseMapIlmakuva,
       'Selkokartta': layerBaseMapSelko
@@ -76,6 +82,9 @@ const MapVisual = () => {
       'Kiinteistötunnukset': layerKiinteistotunnus,
       'Kiinteistörajat': layerKiinteistorajat
     };
+
+    // Add default layer
+    layerBasePublic.addTo(map);
 
     L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
 
