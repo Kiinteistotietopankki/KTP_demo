@@ -31,7 +31,7 @@ function Home() {
 
         {/* RIGHT side: map */}
         <div className="col-md-6 mt-2">
-          <MapVisual pos={[65.00816937, 25.46030678]} />
+          <MapVisual pos={[65.00816937, 25.46030678]} data={searchResults} />
         </div>
       </div>
       {searchResults.length > 0 ? (
