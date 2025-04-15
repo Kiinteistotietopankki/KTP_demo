@@ -63,6 +63,7 @@ function Resultdisplay({ data }) {
     return (
         <div className="mt-4">
            <div key={'kiinteisto'} className="kiinteistocard card mb-4 p-2 border border-primary">
+           <div className="card-header d-flex justify-content-between align-items-center">Kiinteistö xxxxx</div>
             {rakennukset?.length > 0 ? (
                 <>
                     <div className="d-flex justify-content-between mb-3">
