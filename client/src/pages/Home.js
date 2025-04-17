@@ -4,6 +4,7 @@ import '../App.css';
 import Searchbox from '../components/Searchbox';
 import Resultdisplay from '../components/Resultsdisplay';
 import MapVisual from '../components/MapVisual';
+import Search from '../components/Search';
 
 
 
@@ -25,7 +26,8 @@ function Home() {
         {/* LEFT side: text + search + results */}
         <div className="col-md-6 mt-3">
 
-          <Searchbox afterSearch={afterSearch} />
+          {/* <Searchbox/> */}
+          <Search afterSearch={afterSearch}></Search>
 
 
         </div>
