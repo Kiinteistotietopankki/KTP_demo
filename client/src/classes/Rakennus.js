@@ -69,4 +69,15 @@ export default class Rakennus {
           RadonArvo: this.RadonArvo
         };
       }
+
+      toGeoJSON() {
+        return {
+            type: "Feature",
+            geometry: {
+                type: this.geometryType, 
+                coordinates: this.coordinates 
+            },
+            properties: this.toJSON() 
+        };
+    }
   }

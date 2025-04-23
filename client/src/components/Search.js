@@ -1,13 +1,14 @@
 // Searchbox.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../App.css';
 import { Tabs } from 'react-bootstrap';
 import { Tab } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
+import KiinteistoHaku from '../classes/Kiinteistohaku';
 
 // Hakulogiikka on tässä
 
-function Search() {
+function Search({aftersearch}) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [postalOffice, setPostalOffice] = useState("")
@@ -19,14 +20,16 @@ function Search() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const hakuRef = useRef(new KiinteistoHaku());
+  const KH = useRef(new KiinteistoHaku()).current;
   
 
   const handleSearch = async () => {
+    let response = []
     console.log("Searching for:", searchQuery, postalOffice);
   
     try {
-      let response;
-      let query = searchQuery.trim();
+      let trimmedQuery = searchQuery.trim() 
   
       if (searchType === 'kiinteistötunnuksella') {
 
@@ -35,9 +38,10 @@ function Search() {
 
       } else if (searchType === 'osoitteella'){
 
-
+        let trimmedKunta = postalOffice.trim() 
+        response = await KH.haeKiinteistotOsoitteella(trimmedQuery, trimmedKunta);
+          
       }
-      setRawResults(response.data);
     } catch (err) {
 
     } finally {
@@ -53,16 +57,13 @@ function Search() {
     const queryType = queryParams.get('searchType');    // Extract 'searchType' from the URL
 
     if (queryQuery) {
-      setSearchQuery(queryQuery);  // Set state for searchQuery
+      setSearchQuery(queryQuery);  
     }
     if (queryType) {
-      setSearchType(queryType);    // Set state for searchType
+      setSearchType(queryType);  
     }
 
-    // if (queryQuery && queryType) { <----- autom. haku
-    //   handleSearch();
-    // }
-  }, [location.search]);  // Runs on URL change (including search params)
+  }, [location.search]); 
 
 
 
