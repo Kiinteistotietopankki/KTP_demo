@@ -1,6 +1,8 @@
 // Building.js
+import axios from "axios";
+
 export default class Rakennus {
-    constructor(feature) {
+    constructor(feature) { // Initial feature is always building data
         const p = feature.properties || {};
         this.id = p.building_key || feature.id || null; // Osoite hausta ja rakennushausta
     
@@ -35,6 +37,36 @@ export default class Rakennus {
         this.Tulvariski = null;
         this.Pohjavesialueella = null;
         this.RadonArvo = null;
+      }
+
+
+      async init(){
+        const osoiteFeature = await this.fetchAddressData(this.id)
+        this.setAddressData(osoiteFeature)
+      }
+
+      async fetchAddressData(buildingkey){
+        const url = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:4326&CQL_FILTER=building_key=';
+        
+        try {
+          const response = await axios.get(`${url}'${buildingkey}'`);
+          return response.data;
+        } catch (error) {
+          console.error("Virhe rakennnuksen osoitetietojen haussa:", error);
+          return null;
+        }
+      }
+
+      async setAddressData(feature) {
+        
+        if (!feature || !feature.properties) return;
+      
+        const p = feature.properties;
+      
+        // Only fill address fields if they are missing
+        this.KohteenOsoite ??= p.address_fin || null;
+        this.Postinumero ??= p.postal_code || null;
+        this.Toimipaikka ??= p.postal_office_fin || null;
       }
     
       /**

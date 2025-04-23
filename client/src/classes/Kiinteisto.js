@@ -9,9 +9,9 @@ export default class Kiinteisto {
   }
 
   async init() {
-    const data = await this.fetchRakennukset(this.kiinteistotunnus);
-    if (data?.features) {
-      this.rakennukset = this.createRakennukset(data.features);
+    const data = await this.fetchRakennukset();
+    if (Array.isArray(data?.features)) {
+      this.rakennukset = await this.createRakennukset(data.features);
     }
   }
 
@@ -25,8 +25,13 @@ export default class Kiinteisto {
     }
   }
 
-  createRakennukset(features) {
-    return features.map(feature => new Rakennus(feature.properties));
+  async createRakennukset(features) {
+    const rakennukset = features.map(feature => new Rakennus(feature));
+  
+    // Wait for each rakennus to initialize (fetch address data)
+    await Promise.all(rakennukset.map(rakennus => rakennus.init()));
+  
+    return rakennukset;
   }
 
   getRakennukset() {

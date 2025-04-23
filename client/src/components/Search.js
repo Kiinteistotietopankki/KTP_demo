@@ -40,6 +40,7 @@ function Search({aftersearch}) {
 
         let trimmedKunta = postalOffice.trim() 
         response = await KH.haeKiinteistotOsoitteella(trimmedQuery, trimmedKunta);
+        console.log(response)
           
       }
     } catch (err) {
