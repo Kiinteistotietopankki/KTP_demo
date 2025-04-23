@@ -40,9 +40,9 @@ export default class Kiinteisto {
 
   toGeoJSON() {
     return {
-      type: "FeatureCollection",
-      features: this.rakennukset.map(rakennus => rakennus.toGeoJSON()),
-      collectionId: this.kiinteistotunnus
+      type: "Kiinteisto",
+      rakennukset: this.rakennukset.map(rakennus => rakennus.toGeoJSON()),
+      id_kiinteistotunnus: this.kiinteistotunnus
     };
   }
 }

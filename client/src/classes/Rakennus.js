@@ -77,9 +77,7 @@ export default class Rakennus {
        */
       toJSON() {
         return {
-          id: this.id,
-          geometryType: this.geometryType,
-          coordinates: this.coordinates,
+          buildingkey: this.id,
           Rakennustunnus: this.Rakennustunnus,
           Kiinteistotunnus: this.Kiinteistotunnus,
           KohteenNimi: this.KohteenNimi,
@@ -107,11 +105,13 @@ export default class Rakennus {
 
       toGeoJSON() {
         return {
-            type: "Feature",
+            type: "Rakennus",
             geometry: {
                 type: this.geometryType, 
                 coordinates: this.coordinates 
             },
+            id_buildingkey:this.id,
+            id_rakennustunnus:this.Rakennustunnus,
             properties: this.toJSON() 
         };
     }

@@ -8,19 +8,15 @@ import KiinteistoHaku from '../classes/Kiinteistohaku';
 
 // Hakulogiikka on tässä
 
-function Search({aftersearch}) {
+function Search({afterSearch}) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [postalOffice, setPostalOffice] = useState("")
-
   const [searchType, setSearchType] = useState('kiinteistötunnuksella') // kiinteistötunnuksella, rakennustunnuksella, osoitteella 
-
-  const [rawResults, setRawResults] = useState([]);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const hakuRef = useRef(new KiinteistoHaku());
   const KH = useRef(new KiinteistoHaku()).current;
   
 
@@ -40,7 +36,7 @@ function Search({aftersearch}) {
 
         let trimmedKunta = postalOffice.trim() 
         response = await KH.haeKiinteistotOsoitteella(trimmedQuery, trimmedKunta);
-        console.log(response)
+        afterSearch(response)
           
       }
     } catch (err) {
@@ -154,13 +150,13 @@ function Search({aftersearch}) {
 
     
         <div className='featureAmount-container'>
-          {rawResults?.features?.length > 0 ? (
+          {/* {rawResults?.features?.length > 0 ? (
               <span className="badge bg-success">
                 Rakennuksia: {rawResults.totalFeatures}
               </span>
             ) : (
               <span className="badge bg-secondary">Ei tuloksia</span>
-            )}
+            )} */}
         </div>
       </div>
   );
