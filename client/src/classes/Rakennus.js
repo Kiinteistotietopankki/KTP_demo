@@ -4,7 +4,9 @@ import axios from "axios";
 export default class Rakennus {
     constructor(feature) { // Initial feature is always building data
         const p = feature.properties || {};
-        this.id = p.building_key || feature.id || null; // Osoite hausta ja rakennushausta
+        const rawId = feature.id || null;
+
+        this.id = rawId ? rawId.split(".").pop() : null; // Also known as buildingkey
     
         // Flatten geometry
         this.geometryType = feature.geometry?.type || null;
@@ -41,8 +43,9 @@ export default class Rakennus {
 
 
       async init(){
-        const osoiteFeature = await this.fetchAddressData(this.id)
-        this.setAddressData(osoiteFeature)
+        const data = await this.fetchAddressData(this.id);
+        const osoiteFeature = Array.isArray(data?.features) ? data.features[0] : null;
+        this.setAddressData(osoiteFeature);
       }
 
       async fetchAddressData(buildingkey){

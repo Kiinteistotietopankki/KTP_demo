@@ -9,7 +9,7 @@ export default class Kiinteisto {
   }
 
   async init() {
-    const data = await this.fetchRakennukset();
+    const data = await this.fetchRakennukset(this.kiinteistotunnus);
     if (Array.isArray(data?.features)) {
       this.rakennukset = await this.createRakennukset(data.features);
     }
