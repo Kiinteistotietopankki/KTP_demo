@@ -13,13 +13,12 @@ function ResultdisplayRF({ data }) {
     }, [data]);
 
 
-
     return (
         <div className="mt-4">
             {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
                 <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary">
                     <div className="card-header d-flex justify-content-between align-items-center">
-                        Kiinteistö {kiinteisto?.properties?.Kiinteistötunnus || "N/A"}
+                        Kiinteistö {kiinteisto?.id_kiinteistotunnus || "N/A"}
                     </div>
 
                     {kiinteisto.rakennukset?.length > 0 ? (
@@ -29,7 +28,7 @@ function ResultdisplayRF({ data }) {
                                     <div className="card-header d-flex justify-content-between align-items-center">
                                         <span>
                                             Rakennus {rakennus.id_rakennustunnus} -{" "}
-                                            {rakennus.properties?.["Kohteen osoite"]}{" "}
+                                            {rakennus.properties?.KohteenOsoite}{" "}
                                             {rakennus.properties?.Toimipaikka}
                                         </span>
                                     </div>

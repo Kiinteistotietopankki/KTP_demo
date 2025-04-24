@@ -22,7 +22,7 @@ export default class KiinteistoHaku {
       console.log('HaeKiinteistotOsoitteella - osoitedata', osoiteData)
       const buildingKeys = this.extractBuildingKeys(osoiteData);
       const kiinteistotunnukset = await this.haeKiinteistotunnukset(buildingKeys);
-      return await this.createKiinteistot(kiinteistotunnukset);
+      return await this.createKiinteistot(kiinteistotunnukset, osoite);
     } catch (err) {
       console.error("Virhe haussa:", err);
       return [];
@@ -72,12 +72,12 @@ export default class KiinteistoHaku {
   }
 
   // Create kiinteistot based on kiinteistotunnukset
-  async createKiinteistot(kiinteistotunnukset) {
+  async createKiinteistot(kiinteistotunnukset, osoite) {
     const list = Array.from(kiinteistotunnukset); // convert Set to Array
     const kiinteistot = list.map(tunnus => new Kiinteisto(tunnus));
   
-    // Call init (or kiinteistoMain) on each
-    await Promise.all(kiinteistot.map(k => k.init()));
+    // Call init on each
+    await Promise.all(kiinteistot.map(k => k.init(osoite)));
   
     return kiinteistot;
   }

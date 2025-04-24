@@ -8,10 +8,10 @@ export default class Kiinteisto {
     this.rakennukset = [];
   }
 
-  async init() {
+  async init(haunOsoite) {
     const data = await this.fetchRakennukset(this.kiinteistotunnus);
     if (Array.isArray(data?.features)) {
-      this.rakennukset = await this.createRakennukset(data.features);
+      this.rakennukset = await this.createRakennukset(data.features, haunOsoite);
     }
   }
 
@@ -25,11 +25,11 @@ export default class Kiinteisto {
     }
   }
 
-  async createRakennukset(features) {
+  async createRakennukset(features, haunOsoite) {
     const rakennukset = features.map(feature => new Rakennus(feature));
   
     // Wait for each rakennus to initialize (fetch address data)
-    await Promise.all(rakennukset.map(rakennus => rakennus.init()));
+    await Promise.all(rakennukset.map(rakennus => rakennus.init(haunOsoite)));
   
     return rakennukset;
   }
