@@ -8,7 +8,7 @@ export default class Kiinteisto {
     this.rakennukset = [];
   }
 
-  async init(haunOsoite) {
+  async init(haunOsoite='') {
     const data = await this.fetchRakennukset(this.kiinteistotunnus);
     if (Array.isArray(data?.features)) {
       this.rakennukset = await this.createRakennukset(data.features, haunOsoite);
@@ -17,7 +17,7 @@ export default class Kiinteisto {
 
   async fetchRakennukset(tunnus) {
     try {
-      const response = await axios.get(`${this.urlKiinteistohaku}${tunnus}`);
+      const response = await axios.get(`${this.urlKiinteistohaku}'${tunnus}'`);
       return response.data;
     } catch (error) {
       console.error("Virhe rakennusten haussa:", error);
@@ -25,7 +25,7 @@ export default class Kiinteisto {
     }
   }
 
-  async createRakennukset(features, haunOsoite) {
+  async createRakennukset(features, haunOsoite='') {
     const rakennukset = features.map(feature => new Rakennus(feature));
   
     // Wait for each rakennus to initialize (fetch address data)

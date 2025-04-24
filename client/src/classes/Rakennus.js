@@ -42,17 +42,23 @@ export default class Rakennus {
       }
 
 
-      async init(haunOsoite){
+      async init(haunOsoite=''){
         const data = await this.fetchAddressData(this.id, haunOsoite);
         const osoiteFeature = Array.isArray(data?.features) ? data.features[0] : null;
         this.setAddressData(osoiteFeature);
       }
 
-      async fetchAddressData(buildingkey, haunOsoite){
+      async fetchAddressData(buildingkey, haunOsoite=''){
         const url = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:4326&CQL_FILTER=building_key=';
         const addressConfirm = '%20AND%20address_fin%20ILIKE%20'
+        const addressNumberConfirm = `%20AND%20address_number='1'`
         try {
-          const response = await axios.get(`${url}'${buildingkey}'${addressConfirm}'${haunOsoite}%25'`);
+          let response
+          if (haunOsoite.length > 0){
+            response = await axios.get(`${url}'${buildingkey}'${addressConfirm}'${haunOsoite}%25'`);
+          } else{
+            response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
+          }
           return response.data;
         } catch (error) {
           console.error("Virhe rakennnuksen osoitetietojen haussa:", error);

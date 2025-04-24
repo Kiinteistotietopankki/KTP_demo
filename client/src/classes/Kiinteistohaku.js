@@ -29,6 +29,14 @@ export default class KiinteistoHaku {
     }
   }
 
+  async haeKiinteistoTunnuksella(kiinteistotunnus){
+    try {
+      return await this.createKiinteistot(kiinteistotunnus);
+    } catch (err) {
+      console.error("Virhe haussa:", err);
+    }
+  }
+
   // Helper method to fetch osoite data
   async fetchOsoiteData(osoite, kaupunki='') {
     let url
@@ -40,8 +48,6 @@ export default class KiinteistoHaku {
     
     const response = await this.http.get(url);
 
-    console.log('fetchOsoiteData', response.data)
-    console.log('fetchOsoiteData 2', url)
     return response.data;
   }
 
@@ -78,8 +84,12 @@ export default class KiinteistoHaku {
   }
 
   // Create kiinteistot based on kiinteistotunnukset
-  async createKiinteistot(kiinteistotunnukset, osoite) {
-    const list = Array.from(kiinteistotunnukset); // convert Set to Array
+  async createKiinteistot(kiinteistotunnukset, osoite = '') {
+    // Normalize input: ensure it's always an array
+    const list = typeof kiinteistotunnukset === 'string'
+      ? [kiinteistotunnukset]
+      : Array.from(kiinteistotunnukset);
+  
     const kiinteistot = list.map(tunnus => new Kiinteisto(tunnus));
   
     // Call init on each

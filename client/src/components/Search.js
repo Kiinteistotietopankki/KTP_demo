@@ -31,6 +31,9 @@ function Search({afterSearch}) {
       let trimmedQuery = searchQuery.trim() 
   
       if (searchType === 'kiinteistötunnuksella') {
+        response = await KH.haeKiinteistoTunnuksella(trimmedQuery)
+        setResponseCount(response)
+        afterSearch(response)
 
       } else if (searchType === 'rakennustunnuksella') {
 
