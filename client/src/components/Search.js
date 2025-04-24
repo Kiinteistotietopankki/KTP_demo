@@ -12,7 +12,10 @@ function Search({afterSearch}) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [postalOffice, setPostalOffice] = useState("")
-  const [searchType, setSearchType] = useState('kiinteistötunnuksella') // kiinteistötunnuksella, rakennustunnuksella, osoitteella 
+  const [searchType, setSearchType] = useState('kiinteistötunnuksella') // kiinteistötunnuksella, rakennustunnuksella, osoitteella
+
+  const [kiinteistoCount, setKiinteistoCount] = useState()
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,6 +39,7 @@ function Search({afterSearch}) {
 
         let trimmedKunta = postalOffice.trim() 
         response = await KH.haeKiinteistotOsoitteella(trimmedQuery, trimmedKunta);
+        setResponseCount(response)
         afterSearch(response)
           
       }
@@ -45,6 +49,9 @@ function Search({afterSearch}) {
     }
   };
 
+  const setResponseCount = (response) =>{
+    setKiinteistoCount(response.length)
+  }
 
 
   useEffect(() => {
@@ -81,83 +88,83 @@ function Search({afterSearch}) {
 
   return (
     <div className='search-container'>
-      {/* Search Type Toggle Switch */}
+        {/* Search Type Toggle Switch */}
 
-      <Tabs
-        id="controlled-tab-example"
-        activeKey={searchType}
-        onSelect={(k) => handleTabChange(k)}
-        className="mb-3 d-flex justify-content-center"
-      >
-          {/* <Tab eventKey="otsikko" title="Hakutyyppi" disabled>
+        <Tabs
+          id="controlled-tab-example"
+          activeKey={searchType}
+          onSelect={(k) => handleTabChange(k)}
+          className="mb-3 d-flex justify-content-center"
+        >
+            {/* <Tab eventKey="otsikko" title="Hakutyyppi" disabled>
 
-          </Tab> */}
+            </Tab> */}
 
-          <Tab eventKey="kiinteistötunnuksella" title="Kiinteistötunnus">
+            <Tab eventKey="kiinteistötunnuksella" title="Kiinteistötunnus">
 
-          </Tab>
+            </Tab>
 
-          <Tab eventKey="rakennustunnuksella" title="Rakennustunnus">
+            <Tab eventKey="rakennustunnuksella" title="Rakennustunnus">
 
-          </Tab>
+            </Tab>
 
-          <Tab eventKey="osoitteella" title="Osoite">
+            <Tab eventKey="osoitteella" title="Osoite">
 
-          </Tab>
+            </Tab>
 
-      </Tabs>
-      
+        </Tabs>
+        
 
-      <div className="mt-4 d-flex flex-column mb-3">
-        <div className="input-group mb-3">
-          <input
-            type="text"
-            className="form-control"
-            placeholder={`Hae ${searchType}...`}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            aria-label="Search"
-            aria-describedby="button-addon2"
-          />
-
-        </div>
-
-        {searchType==='osoitteella' ? (
+        <div className="mt-4 d-flex flex-column mb-3">
           <div className="input-group mb-3">
             <input
               type="text"
               className="form-control"
-              placeholder={`Kunta tai kaupunki`}
-              value={postalOffice}
-              onChange={(e) => setPostalOffice(e.target.value)}
+              placeholder={`Hae ${searchType}...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               aria-label="Search"
               aria-describedby="button-addon2"
             />
+
           </div>
-        ):(<></>)}
 
-        <button
-          className="btn btn-outline-secondary"
-          onClick={handleSearch}
-          id="button-addon2">
-            Hae
-        </button>
+          {searchType==='osoitteella' ? (
+            <div className="input-group mb-3">
+              <input
+                type="text"
+                className="form-control"
+                placeholder={`Kunta tai kaupunki`}
+                value={postalOffice}
+                onChange={(e) => setPostalOffice(e.target.value)}
+                onKeyDown={handleKeyDown}
+                aria-label="Search"
+                aria-describedby="button-addon2"
+              />
+            </div>
+          ):(<></>)}
 
-      </div>
+          <button
+            className="btn btn-outline-secondary"
+            onClick={handleSearch}
+            id="button-addon2">
+              Hae
+          </button>
 
-
-    
-        <div className='featureAmount-container'>
-          {/* {rawResults?.features?.length > 0 ? (
-              <span className="badge bg-success">
-                Rakennuksia: {rawResults.totalFeatures}
-              </span>
-            ) : (
-              <span className="badge bg-secondary">Ei tuloksia</span>
-            )} */}
         </div>
+
+
+      
+          <div className='featureAmount-container'>
+            {kiinteistoCount > 0 ? (
+                <span className="badge bg-success">
+                  Kiinteistöjä: {kiinteistoCount}
+                </span>
+              ) : (
+                <span className="badge bg-secondary">Ei tuloksia</span>
+              )}
+          </div>
       </div>
   );
 }
