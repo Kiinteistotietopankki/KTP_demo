@@ -13,13 +13,13 @@ export default class KiinteistoHaku {
       'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:4326&featureID=open_building.';
     this.urlBuildingkeyOsoite =
       'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:4326&CQL_FILTER=building_key=';
-  }
+    this.addressConfirm = '%20AND%20address_fin%20ILIKE%20'
+    }
 
   // Public method to start the process
-  async haeKiinteistotOsoitteella(osoite, kaupunki) {
+  async haeKiinteistotOsoitteella(osoite,kaupunki='') {
     try {
       const osoiteData = await this.fetchOsoiteData(osoite, kaupunki);
-      console.log('HaeKiinteistotOsoitteella - osoitedata', osoiteData)
       const buildingKeys = this.extractBuildingKeys(osoiteData);
       const kiinteistotunnukset = await this.haeKiinteistotunnukset(buildingKeys);
       return await this.createKiinteistot(kiinteistotunnukset, osoite);
@@ -30,8 +30,14 @@ export default class KiinteistoHaku {
   }
 
   // Helper method to fetch osoite data
-  async fetchOsoiteData(osoite, kaupunki) {
-    let url = `${this.urlOsoitehaku}'${osoite}%25'${this.urlOsoitehakuKunta}'${kaupunki}'`
+  async fetchOsoiteData(osoite, kaupunki='') {
+    let url
+    if (kaupunki.length > 0){
+      url = `${this.urlOsoitehaku}'${osoite}%25'${this.urlOsoitehakuKunta}'${kaupunki}'`
+    }else{
+      url = `${this.urlOsoitehaku}'${osoite}%25'`
+    }
+    
     const response = await this.http.get(url);
 
     console.log('fetchOsoiteData', response.data)
