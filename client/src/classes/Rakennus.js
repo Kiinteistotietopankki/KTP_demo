@@ -87,6 +87,9 @@ export default class Rakennus {
        * Return a plain object for JSON serialization
        */
       toJSON() {
+        const sourceNameRyhtiYmparistofi = "Ymparisto.fi RYHTI";
+        const sourceNameYmparistofi = "Ymparisto.fi";
+
         return {
           buildingkey: this.id,
           Rakennustunnus: this.Rakennustunnus,
@@ -110,7 +113,32 @@ export default class Rakennus {
           KantavanRakenteenRakennusaine: this.KantavanRakenteenRakennusaine,
           Tulvariski: this.Tulvariski,
           Pohjavesialueella: this.Pohjavesialueella,
-          RadonArvo: this.RadonArvo
+          RadonArvo: this.RadonArvo,
+
+          sources: {
+            Rakennustunnus: sourceNameRyhtiYmparistofi,
+            Kiinteistotunnus: sourceNameRyhtiYmparistofi,
+            KohteenNimi: sourceNameRyhtiYmparistofi,
+            KohteenOsoite: sourceNameRyhtiYmparistofi,
+            Postinumero: sourceNameRyhtiYmparistofi,
+            Toimipaikka: sourceNameRyhtiYmparistofi,
+            Rakennusvuosi: sourceNameRyhtiYmparistofi,
+            Kokonaisala: sourceNameRyhtiYmparistofi,
+            Kerrosala: sourceNameRyhtiYmparistofi,
+            Huoneistoala: sourceNameRyhtiYmparistofi,
+            Tilavuus: sourceNameRyhtiYmparistofi,
+            Kerroksia: sourceNameRyhtiYmparistofi,
+            Rakennusluokitus: sourceNameRyhtiYmparistofi,
+            Runkotapa: sourceNameRyhtiYmparistofi,
+            Kaytossaolotilanne: sourceNameRyhtiYmparistofi,
+            JulkisivunRakennusaine: sourceNameRyhtiYmparistofi,
+            Lammitystapa: sourceNameRyhtiYmparistofi,
+            Lammitysenergianlahde: sourceNameRyhtiYmparistofi,
+            KantavanRakenteenRakennusaine: sourceNameRyhtiYmparistofi,
+            Tulvariski: sourceNameYmparistofi,
+            Pohjavesialueella: sourceNameYmparistofi,
+            RadonArvo: sourceNameRyhtiYmparistofi
+        }
         };
       }
 
