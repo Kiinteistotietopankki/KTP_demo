@@ -45,8 +45,45 @@ function ResultdisplayRF({ data, setMapCoords}) {
                                             <Accordion.Header>Yleistiedot</Accordion.Header>
                                             <Accordion.Body>
                                                 
-                                            <h1>{rakennus.properties?.Toimipaikka}</h1>
-                                            <h1>{rakennus.sources?.Toimipaikka}</h1>
+                                            {/* <h1>{rakennus.properties?.Toimipaikka}</h1>
+                                            <h1>{rakennus.sources?.Toimipaikka}</h1> */}
+
+                                            <Table striped bordered responsive hover style={{ fontSize: '0.8em' }}>
+                                                <thead>
+                                                <tr>
+                                                    <th>Nimi</th>
+                                                    <th>Arvo</th>
+                                                    <th>Lähde</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>Rakennusluokitus</td>
+                                                    <td>{rakennus.properties?.Rakennusluokitus}</td>
+                                                    <td>{rakennus.sources?.Rakennusluokitus}</td>
+                                                </tr>
+
+                                                </tbody>
+                                            </Table>
+
+                                            
+                                            <Table striped bordered responsive hover style={{ fontSize: '0.8em' }}>
+                                                <thead>
+                                                <tr>
+                                                    <th>Nimi</th>
+                                                    <th>Arvo</th>
+                                                    <th>Lähde</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>{rakennus.properties?.KohteenOsoite}</td>
+                                                    <td>{rakennus.properties?.Toimipaikka}</td>
+                                                    <td>{rakennus.properties?.Postinumero}</td>
+                                                </tr>
+
+                                                </tbody>
+                                            </Table>
 
                                             </Accordion.Body>
                                         </Accordion.Item>
