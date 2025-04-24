@@ -5,7 +5,7 @@ import exportToExcel from './Excelexport';
 import exportToPdf from './Pdfexport';
 import '../App.css';
 
-function ResultdisplayRF({ data }) {
+function ResultdisplayRF({ data, setMapCoords}) {
     const [kiinteistot, setKiinteistot] = useState([]);
 
     useEffect(() => {
@@ -26,11 +26,17 @@ function ResultdisplayRF({ data }) {
                             <div key={rakennusIndex} className="card mb-4">
                                 <div className="card-body">
                                     <div className="card-header d-flex justify-content-between align-items-center">
-                                        <span>
-                                            Rakennus {rakennus.id_rakennustunnus} -{" "}
-                                            {rakennus.properties?.KohteenOsoite}{" "}
-                                            {rakennus.properties?.Toimipaikka}
-                                        </span>
+                                    <span>
+                                        Rakennus {rakennus.id_rakennustunnus} -{" "}
+                                        {rakennus.properties?.KohteenOsoite}{" "}
+                                        {rakennus.properties?.Toimipaikka}
+                                    </span>
+                                    <button
+                                    className="btn btn-outline-primary btn-sm ms-2"
+                                    onClick={() => setMapCoords(rakennus.geometry?.coordinates)}
+                                    >
+                                        Näytä kartalla
+                                    </button>
                                     </div>
 
                                     <Accordion>

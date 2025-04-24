@@ -1,5 +1,6 @@
 // Building.js
 import axios from "axios";
+import rakennusKoodit from "../assets/rakennusKoodit";
 
 export default class Rakennus {
     constructor(feature) { // Initial feature is always building data
@@ -27,13 +28,14 @@ export default class Rakennus {
         this.Tilavuus = p.volume || null;
         this.Kerroksia = p.number_of_storeys || null;
     
-        this.Rakennusluokitus = p.main_purpose || null;
-        this.Runkotapa = p.construction_method || null;
-        this.Kaytossaolotilanne = p.usage_status || null;
-        this.JulkisivunRakennusaine = p.facade_material || null;
-        this.Lammitystapa = p.heating_method || null;
-        this.Lammitysenergianlahde = p.heating_energy_source || null;
-        this.KantavanRakenteenRakennusaine = p.material_of_load_bearing_structures || null;
+        const getCode = uri => uri?.split("/").pop() || null;
+        this.Rakennusluokitus = rakennusKoodit.rakennusluokitus[getCode(p.main_purpose)] || null;
+        this.Runkotapa = rakennusKoodit.rakentamistapa[getCode(p.construction_method)] || null;
+        this.Kaytossaolotilanne = rakennusKoodit.kayttotilanne[getCode(p.usage_status)] || null;
+        this.JulkisivunRakennusaine = rakennusKoodit.julkisivumateriaali[getCode(p.facade_material)] || null;
+        this.Lammitystapa = rakennusKoodit.lammitystapa[getCode(p.heating_method)] || null;
+        this.Lammitysenergianlahde = rakennusKoodit.lammitysenergialahde[getCode(p.heating_energy_source)] || null;
+        this.KantavanRakenteenRakennusaine = rakennusKoodit.rakennusaine[getCode(p.material_of_load_bearing_structures)] || null;
     
         // Placeholder fields
         this.Tulvariski = null;

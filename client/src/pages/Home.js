@@ -15,10 +15,13 @@ function Home() {
   const [kiinteistoObjects, setKiinteistoOjbects] = useState([])
   const [kiinteistotJson, setKiinteistotJson]  = useState([])
 
+
   const afterSearch = (results) => {
     // setSearchResults(results)
     setKiinteistoOjbects(results);
   };
+
+
 
   useEffect(() => {
     if (kiinteistoObjects.length > 0) {
@@ -26,13 +29,16 @@ function Home() {
       setKiinteistotJson(jsonData);
       console.log('UEF HOME jsonData',jsonData)
     }
-
-    
+ 
   }, [kiinteistoObjects]);
 
-  useEffect(() => {
-    
-  }, [kiinteistoObjects]);
+
+
+  const [coordinates, setCoordinates] = useState([])
+
+  const setMapCoords = (coords) =>{
+    setCoordinates([coords[1],coords[0]])
+  }
 
   return (
     <>
@@ -52,12 +58,12 @@ function Home() {
 
         {/* RIGHT side: map */}
         <div className="col-md-6 mt-2">
-          <MapVisual pos={[65.00816937, 25.46030678]} data={searchResults} />
+          <MapVisual pos={coordinates} data={searchResults} />
         </div>
       </div>
       
       {kiinteistotJson.length > 0 ? (
-            <ResultdisplayRF data={kiinteistotJson} />
+            <ResultdisplayRF data={kiinteistotJson} setMapCoords={setMapCoords} />
           ) : (
             <>
             </>
