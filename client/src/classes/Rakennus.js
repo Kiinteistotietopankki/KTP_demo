@@ -58,6 +58,9 @@ export default class Rakennus {
           let response
           if (haunOsoite.length > 0){
             response = await axios.get(`${url}'${buildingkey}'${addressConfirm}'${haunOsoite}%25'`);
+            if (response.data?.features?.length < 1){
+              response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
+            }
           } else{
             response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
           }
