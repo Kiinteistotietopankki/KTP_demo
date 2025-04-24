@@ -30,6 +30,7 @@ function ResultdisplayRF({ data, setMapCoords}) {
                                         Rakennus {rakennus.id_rakennustunnus} -{" "}
                                         {rakennus.properties?.KohteenOsoite}{" "}
                                         {rakennus.properties?.Toimipaikka}
+                                        {" "}{`(${rakennus.properties?.Rakennusluokitus})`}
                                     </span>
                                     <button
                                     className="btn btn-outline-primary btn-sm ms-2"
