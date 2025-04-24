@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Tabletemplate from './Tabletemplate';
-import { Accordion } from 'react-bootstrap';
+import { Accordion, Table } from 'react-bootstrap';
 import exportToExcel from './Excelexport';
 import exportToPdf from './Pdfexport';
 import '../App.css';
@@ -38,13 +38,16 @@ function ResultdisplayRF({ data, setMapCoords}) {
                                     >
                                         Näytä kartalla
                                     </button>
-                                    </div>
+                                    </div> 
 
                                     <Accordion>
                                         <Accordion.Item eventKey="0">
                                             <Accordion.Header>Yleistiedot</Accordion.Header>
                                             <Accordion.Body>
-                                                <Tabletemplate properties={rakennus.properties} tableTitle="" />
+                                                
+                                            <h1>{rakennus.properties?.Toimipaikka}</h1>
+                                            <h1>{rakennus.sources?.Toimipaikka}</h1>
+
                                             </Accordion.Body>
                                         </Accordion.Item>
                                     </Accordion>

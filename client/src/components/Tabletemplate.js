@@ -1,9 +1,9 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-const Tabletemplate = ({ properties, tableTitle }) => {
+const Tabletemplate = ({ rakennus, tableTitle }) => {
     // Dynamically generate headers from properties keys
-    const headers = Object.keys(properties).map((key) => ({
+    const headers = Object.keys(rakennus.properties).map((key) => ({
         key,
         label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())  // Convert camelCase to human-readable text
     }));
@@ -21,19 +21,20 @@ const Tabletemplate = ({ properties, tableTitle }) => {
                 </thead>
                 <tbody>
                     {headers.map(({ key, label }) => (
-                        <tr key={key}>
-                            <td>{label}</td>
-                            <td>
-                                {properties[key] !== undefined && properties[key] !== null
-                                    ? properties[key]
-                                    : 'Ei tiedossa'}
-                            </td>
-                            <td>
-                                {properties[`source_${key}`] !== undefined && properties[`source_${key}`] !== null
-                                    ? properties[`source_${key}`]
-                                    : '-'}
-                            </td>
-                        </tr>
+                    <tr key={key}>
+                    <td>{label}</td>
+                    <td>
+                        {rakennus.properties[key] !== undefined && rakennus.properties[key] !== null
+                            ? rakennus.properties[key]
+                            : 'Ei tiedossa'}
+                    </td>
+                    <td>
+                        {/* Access the correct source */}
+                        {rakennus.sources[key] !== undefined && rakennus.sources[key] !== null
+                            ? rakennus.sources[key]
+                            : '-'}
+                    </td>
+                </tr>
                     ))}
                 </tbody>
             </Table>

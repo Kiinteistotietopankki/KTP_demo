@@ -87,9 +87,6 @@ export default class Rakennus {
        * Return a plain object for JSON serialization
        */
       toJSON() {
-        const sourceNameRyhtiYmparistofi = "Ymparisto.fi RYHTI";
-        const sourceNameYmparistofi = "Ymparisto.fi";
-
         return {
           buildingkey: this.id,
           Rakennustunnus: this.Rakennustunnus,
@@ -114,32 +111,37 @@ export default class Rakennus {
           Tulvariski: this.Tulvariski,
           Pohjavesialueella: this.Pohjavesialueella,
           RadonArvo: this.RadonArvo,
-
-          sources: {
-            Rakennustunnus: sourceNameRyhtiYmparistofi,
-            Kiinteistotunnus: sourceNameRyhtiYmparistofi,
-            KohteenNimi: sourceNameRyhtiYmparistofi,
-            KohteenOsoite: sourceNameRyhtiYmparistofi,
-            Postinumero: sourceNameRyhtiYmparistofi,
-            Toimipaikka: sourceNameRyhtiYmparistofi,
-            Rakennusvuosi: sourceNameRyhtiYmparistofi,
-            Kokonaisala: sourceNameRyhtiYmparistofi,
-            Kerrosala: sourceNameRyhtiYmparistofi,
-            Huoneistoala: sourceNameRyhtiYmparistofi,
-            Tilavuus: sourceNameRyhtiYmparistofi,
-            Kerroksia: sourceNameRyhtiYmparistofi,
-            Rakennusluokitus: sourceNameRyhtiYmparistofi,
-            Runkotapa: sourceNameRyhtiYmparistofi,
-            Kaytossaolotilanne: sourceNameRyhtiYmparistofi,
-            JulkisivunRakennusaine: sourceNameRyhtiYmparistofi,
-            Lammitystapa: sourceNameRyhtiYmparistofi,
-            Lammitysenergianlahde: sourceNameRyhtiYmparistofi,
-            KantavanRakenteenRakennusaine: sourceNameRyhtiYmparistofi,
-            Tulvariski: sourceNameYmparistofi,
-            Pohjavesialueella: sourceNameYmparistofi,
-            RadonArvo: sourceNameRyhtiYmparistofi
-        }
         };
+      }
+
+      getSources(){
+        const sourceNameRyhtiYmparistofi = "Ymparisto.fi RYHTI";
+        const sourceNameYmparistofi = "Ymparisto.fi";
+
+        return {
+          Rakennustunnus: sourceNameRyhtiYmparistofi,
+          Kiinteistotunnus: sourceNameRyhtiYmparistofi,
+          KohteenNimi: sourceNameRyhtiYmparistofi,
+          KohteenOsoite: sourceNameRyhtiYmparistofi,
+          Postinumero: sourceNameRyhtiYmparistofi,
+          Toimipaikka: sourceNameRyhtiYmparistofi,
+          Rakennusvuosi: sourceNameRyhtiYmparistofi,
+          Kokonaisala: sourceNameRyhtiYmparistofi,
+          Kerrosala: sourceNameRyhtiYmparistofi,
+          Huoneistoala: sourceNameRyhtiYmparistofi,
+          Tilavuus: sourceNameRyhtiYmparistofi,
+          Kerroksia: sourceNameRyhtiYmparistofi,
+          Rakennusluokitus: sourceNameRyhtiYmparistofi,
+          Runkotapa: sourceNameRyhtiYmparistofi,
+          Kaytossaolotilanne: sourceNameRyhtiYmparistofi,
+          JulkisivunRakennusaine: sourceNameRyhtiYmparistofi,
+          Lammitystapa: sourceNameRyhtiYmparistofi,
+          Lammitysenergianlahde: sourceNameRyhtiYmparistofi,
+          KantavanRakenteenRakennusaine: sourceNameRyhtiYmparistofi,
+          Tulvariski: sourceNameYmparistofi,
+          Pohjavesialueella: sourceNameYmparistofi,
+          RadonArvo: sourceNameRyhtiYmparistofi
+      }
       }
 
       toGeoJSON() {
@@ -151,7 +153,8 @@ export default class Rakennus {
             },
             id_buildingkey:this.id,
             id_rakennustunnus:this.Rakennustunnus,
-            properties: this.toJSON() 
+            properties: this.toJSON(),
+            sources: this.getSources()
         };
     }
   }
