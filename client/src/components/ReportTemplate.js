@@ -1,33 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import { Riskidataa } from '../assets/Riskidata';
 
+const loadStateFromLocalStorage = (key, defaultValue) => {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
 const PropertyDetailsForm = ({ rakennus }) => {
-  const [title, setTitle] = useState('');
-  const [customText, setCustomText] = useState('');
-  const [johdantoText, setJohdantoText] = useState('');
-  const [sisaltoText, setSisaltoText] = useState('');
-  const [jarjestelmaText, setJarjestelmaText] = useState('');
-  const [PropertyName, setPropertyName] = useState('');
-  const [riskidata, setRiskidata] = useState(Riskidataa);
+  const [title, setTitle] = useState(() => loadStateFromLocalStorage('title', ''));
+  const [customText, setCustomText] = useState(() => loadStateFromLocalStorage('customText', ''));
+  const [johdantoText, setJohdantoText] = useState(() => loadStateFromLocalStorage('johdantoText', ''));
+  const [jarjestelmaText, setJarjestelmaText] = useState(() => loadStateFromLocalStorage('jarjestelmaText', ''));
+  const [RakennetekniikkaText, setRakennetekniikkaText] = useState(() => loadStateFromLocalStorage('RakennetekniikkaText', ''));
+  const [SähköjärjestelmäText, setSähköjärjestelmäText] = useState(() => loadStateFromLocalStorage('SähköjärjestelmäText', ''));
   const [images, setImages] = useState([]); 
+  const [LVIText, setLVIText] = useState(() => loadStateFromLocalStorage('LVIText', ''));
+  const [PropertyName, setPropertyName] = useState(() => loadStateFromLocalStorage('PropertyName', ''));
+  const [riskidata, setRiskidata] = useState(() => loadStateFromLocalStorage('riskidata', Riskidataa));
+  const [imagesByCategory, setImagesByCategory] = useState(() => loadStateFromLocalStorage('imagesByCategory', {
+    'LVI-laitteet': [],
+    'Sähkölaitteet': [],
+    'Rakenteet': [],
+  }));
+  const [coverImage, setCoverImage] = useState(() => loadStateFromLocalStorage('coverImage', null));
+
+  useEffect(() => { localStorage.setItem('title', JSON.stringify(title)); }, [title]);
+  useEffect(() => { localStorage.setItem('customText', JSON.stringify(customText)); }, [customText]);
+  useEffect(() => { localStorage.setItem('johdantoText', JSON.stringify(johdantoText)); }, [johdantoText]);
+  useEffect(() => { localStorage.setItem('jarjestelmaText', JSON.stringify(jarjestelmaText)); }, [jarjestelmaText]);
+  useEffect(() => { localStorage.setItem('RakennetekniikkaText', JSON.stringify(RakennetekniikkaText)); }, [RakennetekniikkaText]);
+  useEffect(() => { localStorage.setItem('SähköjärjestelmäText', JSON.stringify(SähköjärjestelmäText)); }, [SähköjärjestelmäText]);
+  useEffect(() => { localStorage.setItem('LVIText', JSON.stringify(LVIText)); }, [LVIText]);
+  useEffect(() => { localStorage.setItem('PropertyName', JSON.stringify(PropertyName)); }, [PropertyName]);
+  useEffect(() => { localStorage.setItem('riskidata', JSON.stringify(riskidata)); }, [riskidata]);
+  useEffect(() => { localStorage.setItem('imagesByCategory', JSON.stringify(imagesByCategory)); }, [imagesByCategory]);
+  useEffect(() => { localStorage.setItem('coverImage', JSON.stringify(coverImage)); }, [coverImage]);
 
   // Handle multiple image file uploads
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);  
-    const newImages = [];
-
+  const handleCategoryImageUpload = (e, category) => {
+    const files = Array.from(e.target.files);
+    const readers = [];
+  
     files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        newImages.push(reader.result);  // Store image data URL
-        if (newImages.length === files.length) {
-          setImages((prevImages) => [...prevImages, ...newImages]);  // Update images state
-        }
+        setImagesByCategory((prev) => ({
+          ...prev,
+          [category]: [...prev[category], reader.result],
+        }));
       };
-      reader.readAsDataURL(file);  
+      reader.readAsDataURL(file);
     });
   };
+  
 
 
 
@@ -63,6 +93,33 @@ const PropertyDetailsForm = ({ rakennus }) => {
 
     let currentYPosition = 20;
 
+    const insertImagesByCategory = (doc, images, yStart, title) => {
+      let y = yStart;
+      const maxImageWidth = 180;
+      const maxImageHeight = 100;
+    
+      if (images.length === 0) return y;
+    
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("Sähkölaitteet" , 15, y);
+      y += 5;
+    
+      images.forEach((imgSrc, index) => {
+        doc.addImage(imgSrc, 'JPEG', 15, y, maxImageWidth, maxImageHeight);
+        y += maxImageHeight + 10;
+    
+        // Add page if overflow
+        if (y > doc.internal.pageSize.height - 40) {
+          doc.addPage();
+          drawGreenLineWithDate(doc);
+          y = 45;
+        }
+      });
+    
+      return y;
+    };
+    
     const renderRiskSection = (doc, sectionTitle, items, startY, margin) => {
       let y = startY;
     
@@ -121,7 +178,15 @@ const PropertyDetailsForm = ({ rakennus }) => {
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(headingFontSize);
     doc.text(title || "Raportin otsikko", margin, currentYPosition);
-    currentYPosition += 10;
+    currentYPosition += 15; 
+    if (coverImage) {
+      const imgWidth = 100; // You can adjust this, maybe 80–120
+      const imgHeight = imgWidth * 0.66; // Maintain aspect ratio (adjust as needed)
+      const centerX = (pageWidth - imgWidth) / 2; // Center the image
+    
+      doc.addImage(coverImage, 'JPEG', centerX, currentYPosition, imgWidth, imgHeight, '', 'FAST');
+      currentYPosition += imgHeight + 10;
+    }
 
     // Custom Text Section
     doc.setFont("Helvetica", "normal");
@@ -224,7 +289,7 @@ const groupedRiskidata = riskidata.reduce((acc, item) => {
   return acc;
 }, {});
 
-// Loop through each category and render its items
+
 Object.entries(groupedRiskidata).forEach(([category, items]) => {
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(pageHeaderSize);
@@ -236,7 +301,7 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
   doc.line(margin, currentYPosition, 195, currentYPosition);
   currentYPosition += 5;
 
-  // Table headers
+  
   doc.setFontSize(10);
   doc.setFont("Helvetica", "bold");
   doc.text("Nimi", margin, currentYPosition);
@@ -244,12 +309,12 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
   doc.text("Selite", margin + 120, currentYPosition);
   currentYPosition += 6;
 
-  // Draw another separator line
+  
   doc.setLineWidth(0.2);
   doc.line(margin, currentYPosition, 195, currentYPosition);
   currentYPosition += 5;
 
-  // Loop through items
+  
   doc.setFont("Helvetica", "normal");
   items.forEach((item) => {
     const riskLevelText =
@@ -259,11 +324,11 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
 
     const description = item.description || '';
 
-    // Text wrapping for long descriptions
+   
     const descLines = doc.splitTextToSize(description, 65);
     const lineCount = Math.max(1, descLines.length);
 
-    // Print name, risk, and description (first line)
+    
     doc.text(item.label, margin, currentYPosition);
     doc.text(riskLevelText, margin + 80, currentYPosition);
     doc.text(descLines[0], margin + 120, currentYPosition);
@@ -285,10 +350,57 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
   });
 
   currentYPosition += 10; 
+
+  
 });
 
+// Rakennetekniikka osio
+
+doc.addPage();
+drawGreenLineWithDate(doc);
+currentYPosition = 45;
+
+doc.setFont("Helvetica", "bold");
+doc.setFontSize(pageHeaderSize);
+doc.text("Rakennetekniikka", margin, currentYPosition);
+currentYPosition += 10;
+
+doc.setFont("Helvetica", "normal");
+doc.setFontSize(fontSize);
+doc.text(RakennetekniikkaText || '', margin, currentYPosition, { maxWidth: 180 });
+currentYPosition += 20;
+currentYPosition = insertImagesByCategory(doc, imagesByCategory['Rakenteet'], currentYPosition, "Rakenteet");
 
 
+doc.addPage();
+drawGreenLineWithDate(doc);
+currentYPosition = 45;
+
+doc.setFont("Helvetica", "bold");
+doc.setFontSize(pageHeaderSize);
+doc.text("LVI-JÄRJESTELMÄ", margin, currentYPosition);
+currentYPosition += 10;
+
+doc.setFont("Helvetica", "normal");
+doc.setFontSize(fontSize);
+doc.text(LVIText || '', margin, currentYPosition, { maxWidth: 180 });
+currentYPosition += 20;
+currentYPosition = insertImagesByCategory(doc, imagesByCategory['LVI-laitteet'], currentYPosition, "LVI-laitteet");
+
+doc.addPage();
+drawGreenLineWithDate(doc);
+currentYPosition = 45;
+
+doc.setFont("Helvetica", "bold");
+doc.setFontSize(pageHeaderSize);
+doc.text("SÄHKÖJÄRJESTELMÄT", margin, currentYPosition);
+currentYPosition += 10;
+
+doc.setFont("Helvetica", "normal");
+doc.setFontSize(fontSize);
+doc.text(SähköjärjestelmäText || '', margin, currentYPosition, { maxWidth: 180 });
+currentYPosition += 20;
+currentYPosition = insertImagesByCategory(doc, imagesByCategory['Sähkölaitteet'], currentYPosition, "Sähkölaitteet");
 
 
     // Add multiple images to PDF if they exist
@@ -328,70 +440,119 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
   };
 
   return (
-    <div>
+    <div className="p-4">
+      {/* ✅ Your updated header row */}
+      <div className="d-flex flex-wrap align-items-center gap-3 mb-4">
+  {/* PDF Button */}
+  <button onClick={handleExportPdf} className="btn btn-primary">
+    Lataa PDF
+  </button>
+
+  {/* Uploads for each category */}
+  {Object.keys(imagesByCategory).map((category) => (
+    <div key={category} className="d-flex align-items-center gap-2">
+      <span className="small fw-medium">{category}</span>
+
+      <label htmlFor={`upload-${category}`} className="btn btn-outline-secondary btn-sm mb-0">
+        +
+      </label>
+
+      <input
+        id={`upload-${category}`}
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={(e) => handleCategoryImageUpload(e, category)}
+        style={{ display: 'none' }}
+      />
+    </div>
+    
+  ))}
+
+</div>
+
+
+
+
+  
+
+
+
       
-      <button onClick={handleExportPdf} className="btn btn-primary mb-4">Lataa PDF</button>
-      
-      <div className="mb-3">
-        <label>Lisää kuvia</label>
+
+      <div className="mb-6 border p-4 rounded shadow-sm">
+  <h3 className="text-lg font-semibold mb-3">📄 Kansisivu</h3>
+
+  <div className="mb-3">
+    <label>Raportin Otsikko:</label>
+    <input
+      type="text"
+      value={title}
+      onChange={(e) => setTitle(e.target.value)}
+      className="form-control"
+    />
+  </div>
+  <div className="mb-3">
+        <label>Lisää Kansikuva</label>
         <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleImageChange}
-          className="form-control"
+  type="file"
+  accept="image/*"
+  onChange={(e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCoverImage(reader.result);
+    };
+    if (file) reader.readAsDataURL(file);
+  }}
+  className="form-control"
         />
       </div>
+  <div className="mb-3">
+    <label>Asunnon nimi (näkyy kansisivulla):</label>
+    <input
+      type="text"
+      value={PropertyName}
+      onChange={(e) => setPropertyName(e.target.value)}
+      className="form-control"
+      placeholder="Kirjoita kohteen nimi..."
+    />
+  </div>
 
-      <div className="mb-3">
-        <label>Raportin Otsikko (kuntotarkistus/muu?):</label>
-        <input
-          type="text"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          className="form-control"
-        />
-      </div>
+  <div className="mb-3">
+    <label>Tarkastuspäivä:</label>
+    <input
+      type="text"
+      value={customText}
+      onChange={(e) => setCustomText(e.target.value)}
+      className="form-control"
+      placeholder="Päivämäärä..."
+    />
+  </div>
+</div>
 
-      <div className="mb-3">
-        <label>Asunnon nimi (näkyy alareunassa ja bannerissa):</label>
-        <input
-          type="text"
-          value={PropertyName}
-          onChange={e => setPropertyName(e.target.value)}
-          className="form-control"
-        />
-      </div>
 
-      <div className="mb-3">
-        <label>Tarkastuspäivä :</label>
-        <input
-          type="text"
-          value={customText}
-          onChange={e => setCustomText(e.target.value)}
-          className="form-control"
-        />
-      </div>
+<div className="mb-6 border p-4 rounded shadow-sm">
+  <h3 className="text-lg font-semibold mb-3">📝 Johdanto</h3>
 
-      <div className="mb-3">
-        <label>Johdanto:</label>
-        <textarea
-          value={johdantoText}
-          onChange={e => setJohdantoText(e.target.value)}
-          className="form-control"
-          rows="4"
-        />
-      </div>
+  <textarea
+    value={johdantoText}
+    onChange={(e) => setJohdantoText(e.target.value)}
+    className="form-control"
+    rows="4"
+  />
+</div>
+<div className="mb-6 border p-4 rounded shadow-sm">
+  <h3 className="text-lg font-semibold mb-3">⚙️ Järjestelmäkuvaukset ja Riskiluokitus</h3>
 
-      <div className="mb-3">
-        <label>Järjestelmäkuvaukset ja Riskiluokitus:</label>
-        <textarea
-          value={jarjestelmaText}
-          onChange={e => setJarjestelmaText(e.target.value)}
-          className="form-control"
-          rows="4"
-        />
-      </div>
+  <textarea
+    value={jarjestelmaText}
+    onChange={(e) => setJarjestelmaText(e.target.value)}
+    className="form-control"
+    placeholder="Kirjoita järjestelmä ja riskitiedot..."
+    rows="4"
+  />
+</div>
 
 
       <div className="mb-4">
@@ -440,11 +601,39 @@ Object.entries(groupedRiskidata).forEach(([category, items]) => {
 </div>
 
     </div>
+    
   ))}
 </div>
+<div className="mb-6 border p-4 rounded shadow-sm">
+  <h3 className="text-lg font-semibold mb-3">Rakennetekniikka</h3>
 
+  <textarea
+    value={RakennetekniikkaText}
+    onChange={(e) => setRakennetekniikkaText(e.target.value)}
+    className="form-control"
+    rows="4"
+  />
+</div>
+<div className="mb-6 border p-4 rounded shadow-sm">
+  <h3 className="text-lg font-semibold mb-3">LVI-Järjestelmä</h3>
 
+  <textarea
+    value={LVIText}
+    onChange={(e) => setLVIText(e.target.value)}
+    className="form-control"
+    rows="4"
+  />
+</div>
+<div className="mb-6 border p-4 rounded shadow-sm">
+  <h3 className="text-lg font-semibold mb-3">Sähköjärjestelmät</h3>
 
+  <textarea
+    value={SähköjärjestelmäText}
+    onChange={(e) => setSähköjärjestelmäText(e.target.value)}
+    className="form-control"
+    rows="4"
+  />
+</div>
     </div>
   ); 
 };
