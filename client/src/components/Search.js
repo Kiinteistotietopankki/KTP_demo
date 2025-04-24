@@ -34,10 +34,6 @@ function Search({afterSearch}) {
         response = await KH.haeKiinteistoTunnuksella(trimmedQuery)
         setResponseCount(response)
         afterSearch(response)
-
-      } else if (searchType === 'rakennustunnuksella') {
-
-
       } else if (searchType === 'osoitteella'){
 
         let trimmedKunta = postalOffice.trim() 
@@ -104,10 +100,6 @@ function Search({afterSearch}) {
             </Tab> */}
 
             <Tab eventKey="kiinteistötunnuksella" title="Kiinteistötunnus">
-
-            </Tab>
-
-            <Tab eventKey="rakennustunnuksella" title="Rakennustunnus">
 
             </Tab>
 
