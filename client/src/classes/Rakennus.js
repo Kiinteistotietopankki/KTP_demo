@@ -121,35 +121,45 @@ export default class Rakennus {
         };
       }
 
-      getSources(){
-        const sourceNameRyhtiYmparistofi = "Ymparisto.fi RYHTI";
-        const sourceNameYmparistofi = "Ymparisto.fi";
+      toCategoriesJSON() {
+        const sourceYmparistofi = "Ympäristö.fi";
+
+
 
         return {
-          Rakennustunnus: sourceNameRyhtiYmparistofi,
-          Kiinteistotunnus: sourceNameRyhtiYmparistofi,
-          KohteenNimi: sourceNameRyhtiYmparistofi,
-          KohteenOsoite: sourceNameRyhtiYmparistofi,
-          Postinumero: sourceNameRyhtiYmparistofi,
-          Toimipaikka: sourceNameRyhtiYmparistofi,
-          Rakennusvuosi: sourceNameRyhtiYmparistofi,
-          Kokonaisala: sourceNameRyhtiYmparistofi,
-          Kerrosala: sourceNameRyhtiYmparistofi,
-          Huoneistoala: sourceNameRyhtiYmparistofi,
-          Tilavuus: sourceNameRyhtiYmparistofi,
-          Kerroksia: sourceNameRyhtiYmparistofi,
-          Rakennusluokitus: sourceNameRyhtiYmparistofi,
-          Runkotapa: sourceNameRyhtiYmparistofi,
-          Kaytossaolotilanne: sourceNameRyhtiYmparistofi,
-          JulkisivunRakennusaine: sourceNameRyhtiYmparistofi,
-          Lammitystapa: sourceNameRyhtiYmparistofi,
-          Lammitysenergianlahde: sourceNameRyhtiYmparistofi,
-          KantavanRakenteenRakennusaine: sourceNameRyhtiYmparistofi,
-          Tulvariski: sourceNameYmparistofi,
-          Pohjavesialueella: sourceNameYmparistofi,
-          RadonArvo: sourceNameRyhtiYmparistofi
+          yleistiedot: {
+            "Rakennustunnus": { value: this.Rakennustunnus, source: sourceYmparistofi },
+            "Kiinteistötunnus": { value: this.Kiinteistotunnus, source: sourceYmparistofi },
+            "Kohteen nimi": { value: null, source: null },
+            "Kohteen osoite": { value: this.KohteenOsoite, source: sourceYmparistofi },
+            "Postinumero": { value: this.Postinumero, source: sourceYmparistofi },
+            "Toimipaikka": { value: this.Toimipaikka, source: sourceYmparistofi },
+          },
+          teknisettiedot: {
+            "Rakennusvuosi": { value: this.Rakennusvuosi,  source: sourceYmparistofi  },
+            "Kokonaisala (m²)": { value: this.Kokonaisala,  source: sourceYmparistofi },
+            "Kerrosala (m²)": { value: this.Kerrosala,  source: sourceYmparistofi },
+            "Huoneistoala (m²)": { value: this.Huoneistoala,  source: sourceYmparistofi  },
+            "Tilavuus (m³)": { value: this.Tilavuus,  source: sourceYmparistofi },
+            "Kerroksia": { value: this.Kerroksia, source: sourceYmparistofi  },
+          },
+          rakennustiedot: {
+            "Rakennusluokitus": { value: this.Rakennusluokitus,  source: sourceYmparistofi  },
+            "Runkotapa": { value: this.Runkotapa,  source: sourceYmparistofi  },
+            "Käytössäolotilanne": { value: this.Kaytossaolotilanne,  source: sourceYmparistofi },
+            "Julkisivun rakennusaine": { value: this.JulkisivunRakennusaine, source: sourceYmparistofi },
+            "Lämmitystapa": { value: this.Lammitystapa, source: sourceYmparistofi },
+            "Lämmitysenergianlähde": { value: this.Lammitysenergianlahde, source: sourceYmparistofi  },
+            "Kantavanrakenteen rakennusaine": { value: this.KantavanRakenteenRakennusaine, source: sourceYmparistofi },
+          },
+          aluetiedot: {
+            "Tulvariski": { value: null, source: sourceYmparistofi },
+            "Pohjavesialueella": { value: null, source: sourceYmparistofi },
+            "radon arvo": { value: null, source: sourceYmparistofi}
+          }      
+        }
       }
-      }
+
 
       toGeoJSON() {
         return {
@@ -160,8 +170,7 @@ export default class Rakennus {
             },
             id_buildingkey:this.id,
             id_rakennustunnus:this.Rakennustunnus,
-            properties: this.toJSON(),
-            sources: this.getSources()
+            properties: this.toCategoriesJSON(),
         };
     }
   }

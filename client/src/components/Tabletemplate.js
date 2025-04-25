@@ -1,9 +1,12 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-const Tabletemplate = ({ rakennus, tableTitle }) => {
+const Tabletemplate = ({ properties, tableTitle }) => {
+    // Fallback in case properties is null or undefined
+    const safeProperties = properties || {};
+
     // Dynamically generate headers from properties keys
-    const headers = Object.keys(rakennus.properties).map((key) => ({
+    const headers = Object.keys(safeProperties).map((key) => ({
         key,
         label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())  // Convert camelCase to human-readable text
     }));
@@ -20,22 +23,20 @@ const Tabletemplate = ({ rakennus, tableTitle }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {headers.map(({ key, label }) => (
-                    <tr key={key}>
-                    <td>{label}</td>
-                    <td>
-                        {rakennus.properties[key] !== undefined && rakennus.properties[key] !== null
-                            ? rakennus.properties[key]
-                            : 'Ei tiedossa'}
-                    </td>
-                    <td>
-                        {/* Access the correct source */}
-                        {rakennus.sources[key] !== undefined && rakennus.sources[key] !== null
-                            ? rakennus.sources[key]
-                            : '-'}
-                    </td>
-                </tr>
-                    ))}
+                    {headers.map(({ key, label }) => {
+                        const property = safeProperties[key];
+
+                        const value = property?.value ? property.value : '-';
+                        const source = property?.value ? property.source : '-'
+
+                        return (
+                            <tr key={key}>
+                                <td>{label}</td>
+                                <td>{value}</td>
+                                <td>{source}</td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </Table>
         </div>

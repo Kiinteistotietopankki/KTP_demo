@@ -5,7 +5,7 @@ import Searchbox from '../components/Searchbox';
 import Resultdisplay from '../components/Resultsdisplay';
 import MapVisual from '../components/MapVisual';
 import Search from '../components/Search';
-import ResultdisplayRF from '../components/ResultDisplayRF';
+
 
 
 
@@ -63,7 +63,7 @@ function Home() {
       </div>
       
       {kiinteistotJson.length > 0 ? (
-            <ResultdisplayRF data={kiinteistotJson} setMapCoords={setMapCoords} />
+            <Resultdisplay data={kiinteistotJson} setMapCoords={setMapCoords} />
           ) : (
             <>
             </>
