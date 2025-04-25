@@ -100,7 +100,7 @@ export default class KiinteistoHaku {
 
     const tunnuksetWithAdressKeys =  kiinteistotunnusArray.map((val, index) => [val, akList[index]]);
 
-    console.log('Kiinteistoarraywithaddresskeys: ', tunnuksetWithAdressKeys)
+    // console.log('Kiinteistoarraywithaddresskeys: ', tunnuksetWithAdressKeys)
 
     // const kiinteistot = kiinteistotunnusArray.map(tunnus => new Kiinteisto(tunnus)); // Vanha, ilman addresskeyta
 
