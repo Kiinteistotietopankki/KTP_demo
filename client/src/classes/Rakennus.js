@@ -3,7 +3,7 @@ import axios from "axios";
 import rakennusKoodit from "../assets/rakennusKoodit";
 
 export default class Rakennus {
-    constructor(feature) { // Initial feature is always building data
+    constructor(feature, addreskey='') { // Initial feature is always building data
         const p = feature.properties || {};
         const rawId = feature.id || null;
 
@@ -12,6 +12,8 @@ export default class Rakennus {
         // Flatten geometry
         this.geometryType = feature.geometry?.type || null;
         this.coordinates = feature.geometry?.coordinates || [];
+
+        this.Addresskey = addreskey || null // Original addresskey
     
         // Flatten formerly nested properties into direct fields
         this.Rakennustunnus = p.permanent_building_identifier || null;
@@ -20,6 +22,7 @@ export default class Rakennus {
         this.KohteenOsoite = p.address_fin || null; // Osoite hausta
         this.Postinumero = p.postal_code || null; // Osoite hausta
         this.Toimipaikka = p.postal_office_fin || null; // Osoite hausta
+
     
         this.Rakennusvuosi = p.completion_date ? p.completion_date.split("-")[0] : null;
         this.Kokonaisala = p.total_area || null;
@@ -54,12 +57,16 @@ export default class Rakennus {
         const url = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:4326&CQL_FILTER=building_key=';
         const addressConfirm = '%20AND%20address_fin%20ILIKE%20'
         const addressNumberConfirm = `%20AND%20address_number='1'`
+        const addressKeyConfirm = `%20AND%20address_key='${this.Addresskey}'`
+
         try {
           let response
           if (haunOsoite.length > 0){
+            // response = await axios.get(`${url}'${buildingkey}'${addressKeyConfirm}`);
             response = await axios.get(`${url}'${buildingkey}'${addressConfirm}'${haunOsoite}%25'`);
             if (response.data?.features?.length < 1){
               response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
+
             }
           } else{
             response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);

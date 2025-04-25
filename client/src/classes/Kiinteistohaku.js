@@ -22,10 +22,10 @@ export default class KiinteistoHaku {
       const osoiteData = await this.fetchOsoiteData(osoite, kaupunki);
       const buildingKeys = this.extractBuildingKeys(osoiteData);
       const addressKeys = this.extractAddressKeys(osoiteData)
-      
+
       const kiinteistotunnukset = await this.haeKiinteistotunnukset(buildingKeys);
 
-      return await this.createKiinteistot(kiinteistotunnukset, osoite);
+      return await this.createKiinteistot(kiinteistotunnukset, addressKeys, osoite);
 
     } catch (err) {
       console.error("Virhe haussa:", err);
@@ -35,7 +35,7 @@ export default class KiinteistoHaku {
 
   async haeKiinteistoTunnuksella(kiinteistotunnus){
     try {
-      return await this.createKiinteistot(kiinteistotunnus);
+      return await this.createKiinteistotWithoutAddress(kiinteistotunnus);
     } catch (err) {
       console.error("Virhe haussa:", err);
     }
@@ -60,7 +60,7 @@ export default class KiinteistoHaku {
     return [...new Set(osoiteData.features.map(f => f.properties.building_key))];
   }
 
-  ectractAddressKeys(osoiteData) {
+  extractAddressKeys(osoiteData) {
     return [...new Set(osoiteData.features.map(f => f.properties.address_key))];
   }
 
@@ -92,16 +92,41 @@ export default class KiinteistoHaku {
   }
 
   // Create kiinteistot based on kiinteistotunnukset
-  async createKiinteistot(kiinteistotunnukset, osoite = '') {
+  async createKiinteistot(kiinteistotunnukset, addresskeys='',osoite = '') {
     // Normalize input: ensure it's always an array
-    const list = typeof kiinteistotunnukset === 'string'
-      ? [kiinteistotunnukset]
-      : Array.from(kiinteistotunnukset);
-  
-    const kiinteistot = list.map(tunnus => new Kiinteisto(tunnus));
+    const kiinteistotunnusArray = typeof kiinteistotunnukset === 'string' ? [kiinteistotunnukset] : Array.from(kiinteistotunnukset);
+    
+    const akList = Array.from(addresskeys)
+
+    const tunnuksetWithAdressKeys =  kiinteistotunnusArray.map((val, index) => [val, akList[index]]);
+
+    console.log('Kiinteistoarraywithaddresskeys: ', tunnuksetWithAdressKeys)
+
+    // const kiinteistot = kiinteistotunnusArray.map(tunnus => new Kiinteisto(tunnus)); // Vanha, ilman addresskeyta
+
+    const kiinteistot = tunnuksetWithAdressKeys.map(([buildingKey, addressKey]) =>
+      new Kiinteisto(buildingKey, addressKey)
+    );
   
     // Call init on each
     await Promise.all(kiinteistot.map(k => k.init(osoite)));
+  
+    return kiinteistot;
+  }
+
+  async createKiinteistotWithoutAddress(kiinteistotunnukset) {
+    // Normalize input: ensure it's always an array
+    const kiinteistotunnusArray = typeof kiinteistotunnukset === 'string' ? [kiinteistotunnukset] : Array.from(kiinteistotunnukset);
+  
+
+    const kiinteistot = kiinteistotunnusArray.map(tunnus => new Kiinteisto(tunnus)); // Vanha, ilman addresskeyta
+
+    // const kiinteistot = tunnuksetWithAdressKeys.map(([buildingKey, addressKey]) =>
+    //   new Kiinteisto(buildingKey, addressKey)
+    // );
+  
+    // Call init on each
+    await Promise.all(kiinteistot.map(k => k.init()));
   
     return kiinteistot;
   }
