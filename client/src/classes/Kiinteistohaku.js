@@ -21,8 +21,12 @@ export default class KiinteistoHaku {
     try {
       const osoiteData = await this.fetchOsoiteData(osoite, kaupunki);
       const buildingKeys = this.extractBuildingKeys(osoiteData);
+      const addressKeys = this.extractAddressKeys(osoiteData)
+      
       const kiinteistotunnukset = await this.haeKiinteistotunnukset(buildingKeys);
+
       return await this.createKiinteistot(kiinteistotunnukset, osoite);
+
     } catch (err) {
       console.error("Virhe haussa:", err);
       return [];
@@ -54,6 +58,10 @@ export default class KiinteistoHaku {
   // Helper method to extract building keys from data
   extractBuildingKeys(osoiteData) {
     return [...new Set(osoiteData.features.map(f => f.properties.building_key))];
+  }
+
+  ectractAddressKeys(osoiteData) {
+    return [...new Set(osoiteData.features.map(f => f.properties.address_key))];
   }
 
   // Fetch kiinteistotunnukset based on building keys
