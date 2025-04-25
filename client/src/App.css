@@ -148,3 +148,20 @@
 .export-button:hover {
   background-color: #e6f5ea;
 }
+.form-control {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+textarea.form-control {
+  min-height: 100px;
+  max-height: 500px; /* Optional, to prevent textarea from growing too large */
+}

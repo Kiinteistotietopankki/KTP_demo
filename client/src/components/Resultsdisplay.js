@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Tabletemplate from './Tabletemplate';
 import { Accordion } from 'react-bootstrap';
 import exportToExcel from './Excelexport';
+import EditableReport from './ReportTemplate';
 import exportToPdf from './Pdfexport';
+import Modal from 'react-bootstrap/Modal';
 import '../App.css';
 
 function Resultdisplay({ data, setMapCoords}) {
