@@ -26,15 +26,16 @@ const Tabletemplate = ({ properties, tableTitle }) => {
                     {headers.map(({ key, label }) => {
                         const property = safeProperties[key];
 
-                        const value = property?.value ? property.value : '-';
-                        const source = property?.value ? property.source : '-'
+                        const rawValue = property?.value;
+                        const value = Array.isArray(rawValue) ? rawValue.join(", ") : rawValue ?? '-';
+                        const source = rawValue ? property.source : '-';
 
                         return (
-                            <tr key={key}>
-                                <td>{label}</td>
-                                <td>{value}</td>
-                                <td>{source}</td>
-                            </tr>
+                        <tr key={key}>
+                            <td>{label}</td>
+                            <td>{value}</td>
+                            <td>{source}</td>
+                        </tr>
                         );
                     })}
                 </tbody>

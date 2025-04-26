@@ -19,7 +19,7 @@ export default class Rakennus {
         this.Rakennustunnus = p.permanent_building_identifier || null;
         this.Kiinteistotunnus = p.property_identifier || null; 
         this.KohteenNimi = null;
-        this.KohteenOsoite = p.address_fin || null; // Osoite hausta
+        this.KohteenOsoite = p.address_fin || []; // Osoite hausta
         this.Postinumero = p.postal_code || null; // Osoite hausta
         this.Toimipaikka = p.postal_office_fin || null; // Osoite hausta
 
@@ -49,7 +49,7 @@ export default class Rakennus {
 
       async init(haunOsoite=''){
         const data = await this.fetchAddressData(this.id, haunOsoite);
-        const osoiteFeature = Array.isArray(data?.features) ? data.features[0] : null;
+        const osoiteFeature = data?.features;
         this.setAddressData(osoiteFeature);
       }
 
@@ -69,8 +69,8 @@ export default class Rakennus {
 
             }
           } else{
-            response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
-            // response = await axios.get(`${url}'${buildingkey}'`);
+            // response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
+            response = await axios.get(`${url}'${buildingkey}'`);
           }
           return response.data;
         } catch (error) {
@@ -79,16 +79,19 @@ export default class Rakennus {
         }
       }
 
-      async setAddressData(feature) {
+      async setAddressData(features) {
         
-        if (!feature || !feature.properties) return;
+        if (!features) return;
       
-        const p = feature.properties;
+        for (const feature of features){
+          if (!feature || !feature.properties) continue;
+
+          const p = feature.properties;
       
-        // Only fill address fields if they are missing
-        this.KohteenOsoite ??= p.address_fin || null;
-        this.Postinumero ??= p.postal_code || null;
-        this.Toimipaikka ??= p.postal_office_fin || null;
+          this.KohteenOsoite.push(p.address_fin);
+          this.Postinumero ??= p.postal_code || null;
+          this.Toimipaikka ??= p.postal_office_fin || null
+        }
       }
     
       /**
@@ -132,7 +135,7 @@ export default class Rakennus {
             "Rakennustunnus": { value: this.Rakennustunnus, source: sourceYmparistofi },
             "Kiinteistötunnus": { value: this.Kiinteistotunnus, source: sourceYmparistofi },
             "Kohteen nimi": { value: null, source: null },
-            "Kohteen osoite": { value: this.KohteenOsoite, source: sourceYmparistofi },
+            "Kohteen osoitteet": { value: this.KohteenOsoite, source: sourceYmparistofi },
             "Postinumero": { value: this.Postinumero, source: sourceYmparistofi },
             "Toimipaikka": { value: this.Toimipaikka, source: sourceYmparistofi },
           },

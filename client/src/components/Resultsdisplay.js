@@ -91,7 +91,10 @@ function Resultdisplay({ data, setMapCoords}) {
                                     <div className="card-header d-flex justify-content-between align-items-center">
                                     <span>
                                         Rakennus {rakennus.id_rakennustunnus}{" "}
-                                        {rakennus.properties?.yleistiedot["Kohteen osoite"].value}{" "}
+                                        {Array.isArray(rakennus.properties?.yleistiedot["Kohteen osoitteet"].value)
+                                            ? rakennus.properties.yleistiedot["Kohteen osoitteet"].value.join(", ")
+                                            : rakennus.properties?.yleistiedot["Kohteen osoitteet"].value
+                                        }{" "}
                                         {rakennus.properties?.yleistiedot["Toimipaikka"].value}
                                         {` (${rakennus.properties?.rakennustiedot["Rakennusluokitus"].value})`}
                                     </span>
