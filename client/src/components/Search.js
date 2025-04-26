@@ -10,8 +10,10 @@ import KiinteistoHaku from '../classes/Kiinteistohaku';
 
 function Search({afterSearch}) {
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [postalOffice, setPostalOffice] = useState("")
+  const [kiinteistotunnus, setKiinteistotunnus] = useState("")
+  const [osoite, setOsoite] = useState("")
+  const [paikkakunta, setPaikkakunta] = useState("")
+
   const [searchType, setSearchType] = useState('kiinteistötunnuksella') // kiinteistötunnuksella, rakennustunnuksella, osoitteella
 
   const [kiinteistoCount, setKiinteistoCount] = useState()
@@ -25,19 +27,19 @@ function Search({afterSearch}) {
 
   const handleSearch = async () => {
     let response = []
-    console.log("Searching for:", searchQuery, postalOffice);
   
     try {
-      let trimmedQuery = searchQuery.trim() 
-  
-      if (searchType === 'kiinteistötunnuksella') {
-        response = await KH.haeKiinteistoTunnuksella(trimmedQuery)
+      let trimmedKt = kiinteistotunnus.trim()
+      let trimmedOsoite = osoite.trim() 
+      let trimmedKunta = paikkakunta.trim() 
+
+      if (trimmedKt.length > 0) {
+        response = await KH.haeKiinteistoTunnuksella(trimmedKt)
         setResponseCount(response)
         afterSearch(response)
-      } else if (searchType === 'osoitteella'){
 
-        let trimmedKunta = postalOffice.trim() 
-        response = await KH.haeKiinteistotOsoitteella(trimmedQuery, trimmedKunta);
+      } else if (trimmedOsoite.length > 0){
+        response = await KH.haeKiinteistotOsoitteella(trimmedOsoite, trimmedKunta);
         setResponseCount(response)
         afterSearch(response)
           
@@ -56,16 +58,19 @@ function Search({afterSearch}) {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search); // Parse the query string from the URL
 
-    const queryQuery = queryParams.get('searchQuery');  // Extract 'searchQuery' from the URL
-    const queryType = queryParams.get('searchType');    // Extract 'searchType' from the URL
+    const queryKiinteistotunnus = queryParams.get('kiinteistotunnus')
+    const queryOsoite = queryParams.get('osoite')
+    const queryPaikkakunta = queryParams.get('paikkakunta')
 
-    if (queryQuery) {
-      setSearchQuery(queryQuery);  
+    if (queryKiinteistotunnus) {
+      setKiinteistotunnus(queryKiinteistotunnus);  
     }
-    if (queryType) {
-      setSearchType(queryType);  
+    if (queryOsoite) {
+      setOsoite(queryOsoite);  
     }
-
+    if (queryPaikkakunta){
+      setPaikkakunta(queryPaikkakunta)
+    }
   }, [location.search]); 
 
 
@@ -78,8 +83,8 @@ function Search({afterSearch}) {
   };
 
   useEffect(() => {
-    navigate(`?searchQuery=${searchQuery}&searchType=${searchType}`);
-  }, [searchType, searchQuery]);
+    navigate(`?kiinteistotunnus=${kiinteistotunnus}&osoite=${osoite}&paikkakunta=${paikkakunta}`);
+  }, [kiinteistotunnus, osoite, paikkakunta]);
 
   const handleTabChange = (newSearchType) => {
     setSearchType(newSearchType);
@@ -95,17 +100,9 @@ function Search({afterSearch}) {
           onSelect={(k) => handleTabChange(k)}
           className="mb-3 d-flex justify-content-center"
         >
-            {/* <Tab eventKey="otsikko" title="Hakutyyppi" disabled>
 
-            </Tab> */}
 
-            <Tab eventKey="kiinteistötunnuksella" title="Kiinteistötunnus">
-
-            </Tab>
-
-            <Tab eventKey="osoitteella" title="Osoite">
-
-            </Tab>
+            <Tab eventKey="kiinteistötunnuksella" title="Kiinteistöhaku"></Tab>
 
         </Tabs>
         
@@ -115,9 +112,9 @@ function Search({afterSearch}) {
             <input
               type="text"
               className="form-control"
-              placeholder={`Hae ${searchType}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={`Kiinteistötunnus`}
+              value={kiinteistotunnus}
+              onChange={(e) => setKiinteistotunnus(e.target.value)}
               onKeyDown={handleKeyDown}
               aria-label="Search"
               aria-describedby="button-addon2"
@@ -125,20 +122,33 @@ function Search({afterSearch}) {
 
           </div>
 
-          {searchType==='osoitteella' ? (
-            <div className="input-group mb-3">
+          <div className="input-group mb-3">
+            <input
+              type="text"
+              className="form-control"
+              placeholder={`Osoite`}
+              value={osoite}
+              onChange={(e) => setOsoite(e.target.value)}
+              onKeyDown={handleKeyDown}
+              aria-label="Search"
+              aria-describedby="button-addon2"
+            />
+
+          </div>
+
+          <div className="input-group mb-3">
               <input
                 type="text"
                 className="form-control"
-                placeholder={`Kunta tai kaupunki`}
-                value={postalOffice}
-                onChange={(e) => setPostalOffice(e.target.value)}
+                placeholder={`Paikkakunta`}
+                value={paikkakunta}
+                onChange={(e) => setPaikkakunta(e.target.value)}
                 onKeyDown={handleKeyDown}
                 aria-label="Search"
                 aria-describedby="button-addon2"
               />
-            </div>
-          ):(<></>)}
+          </div>
+
 
           <button
             className="btn btn-outline-secondary"

@@ -33,7 +33,7 @@ export default class KiinteistoHaku {
     }
   }
 
-  async haeKiinteistoTunnuksella(kiinteistotunnus){
+  async haeKiinteistoTunnuksella(kiinteistotunnus, osoite='', kaupunki=''){
     try {
       return await this.createKiinteistotWithoutAddress(kiinteistotunnus);
     } catch (err) {
@@ -100,9 +100,6 @@ export default class KiinteistoHaku {
 
     const tunnuksetWithAdressKeys =  kiinteistotunnusArray.map((val, index) => [val, akList[index]]);
 
-    // console.log('Kiinteistoarraywithaddresskeys: ', tunnuksetWithAdressKeys)
-
-    // const kiinteistot = kiinteistotunnusArray.map(tunnus => new Kiinteisto(tunnus)); // Vanha, ilman addresskeyta
 
     const kiinteistot = tunnuksetWithAdressKeys.map(([buildingKey, addressKey]) =>
       new Kiinteisto(buildingKey, addressKey)
