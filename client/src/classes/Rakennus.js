@@ -70,6 +70,7 @@ export default class Rakennus {
             }
           } else{
             response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
+            // response = await axios.get(`${url}'${buildingkey}'`);
           }
           return response.data;
         } catch (error) {

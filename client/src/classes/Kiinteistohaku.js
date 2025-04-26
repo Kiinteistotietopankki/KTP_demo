@@ -16,28 +16,27 @@ export default class KiinteistoHaku {
     this.addressConfirm = '%20AND%20address_fin%20ILIKE%20'
     }
 
-  // Public method to start the process
-  async haeKiinteistotOsoitteella(osoite,kaupunki='') {
+
+  async haeKiinteistoja({kiinteistotunnus='', osoite='', kaupunki=''}){
     try {
-      const osoiteData = await this.fetchOsoiteData(osoite, kaupunki);
-      const buildingKeys = this.extractBuildingKeys(osoiteData);
-      const addressKeys = this.extractAddressKeys(osoiteData)
+      if(osoite.length > 0 && kiinteistotunnus.length > 0){
 
-      const kiinteistotunnukset = await this.haeKiinteistotunnukset(buildingKeys);
+      }
+      else if (osoite.length > 0){
+        const osoiteData = await this.fetchOsoiteData(osoite, kaupunki);
+        const buildingKeys = this.extractBuildingKeys(osoiteData);
+        const addressKeys = this.extractAddressKeys(osoiteData)
+        
+        const kiinteistotunnukset = await this.haeKiinteistotunnukset(buildingKeys);
+        return await this.createKiinteistot(kiinteistotunnukset, addressKeys, osoite);
+      }
+      else if (kiinteistotunnus.length > 0){
+        return await this.createKiinteistotWithoutAddress(kiinteistotunnus);
+      }
 
-      return await this.createKiinteistot(kiinteistotunnukset, addressKeys, osoite);
-
-    } catch (err) {
-      console.error("Virhe haussa:", err);
+    } catch (error) {
+      console.error("Virhe haussa:", error);
       return [];
-    }
-  }
-
-  async haeKiinteistoTunnuksella(kiinteistotunnus, osoite='', kaupunki=''){
-    try {
-      return await this.createKiinteistotWithoutAddress(kiinteistotunnus);
-    } catch (err) {
-      console.error("Virhe haussa:", err);
     }
   }
 

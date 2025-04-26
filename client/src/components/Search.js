@@ -33,17 +33,10 @@ function Search({afterSearch}) {
       let trimmedOsoite = osoite.trim() 
       let trimmedKunta = paikkakunta.trim() 
 
-      if (trimmedKt.length > 0) {
-        response = await KH.haeKiinteistoTunnuksella(trimmedKt)
-        setResponseCount(response)
-        afterSearch(response)
+      response = await KH.haeKiinteistoja({kiinteistotunnus:trimmedKt,osoite:trimmedOsoite,kaupunki:trimmedKunta})
+      setResponseCount(response)
+      afterSearch(response)
 
-      } else if (trimmedOsoite.length > 0){
-        response = await KH.haeKiinteistotOsoitteella(trimmedOsoite, trimmedKunta);
-        setResponseCount(response)
-        afterSearch(response)
-          
-      }
     } catch (err) {
 
     } finally {
