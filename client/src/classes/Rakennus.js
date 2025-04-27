@@ -1,6 +1,7 @@
 // Building.js
 import axios from "axios";
 import rakennusKoodit from "../assets/rakennusKoodit";
+import { ktEsitysmuotoon } from "../assets/ktMuuntaja";
 
 export default class Rakennus {
     constructor(feature, addreskey='') { // Initial feature is always building data
@@ -17,7 +18,8 @@ export default class Rakennus {
     
         // Flatten formerly nested properties into direct fields
         this.Rakennustunnus = p.permanent_building_identifier || null;
-        this.Kiinteistotunnus = p.property_identifier || null; 
+        this.Kiinteistotunnus = p.property_identifier || null;
+        this.KiinteistotunnusEsitysmuoto = ktEsitysmuotoon(p.property_identifier) || null
         this.KohteenNimi = null;
         this.KohteenOsoite = p.address_fin || []; // Osoite hausta
         this.Postinumero = p.postal_code || null; // Osoite hausta
@@ -129,11 +131,11 @@ export default class Rakennus {
         const sourceYmparistofi = "Ympäristö.fi";
 
 
-
         return {
           yleistiedot: {
             "Rakennustunnus": { value: this.Rakennustunnus, source: sourceYmparistofi },
-            "Kiinteistötunnus": { value: this.Kiinteistotunnus, source: sourceYmparistofi },
+            "Kiinteistötunnus": { value: this.KiinteistotunnusEsitysmuoto, source: sourceYmparistofi },
+            "Kiinteistötunnus kokonainen": { value: this.Kiinteistotunnus, source: sourceYmparistofi },
             "Kohteen nimi": { value: null, source: null },
             "Kohteen osoitteet": { value: this.KohteenOsoite, source: sourceYmparistofi },
             "Postinumero": { value: this.Postinumero, source: sourceYmparistofi },

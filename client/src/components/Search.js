@@ -5,6 +5,7 @@ import { Tabs } from 'react-bootstrap';
 import { Tab } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 import KiinteistoHaku from '../classes/Kiinteistohaku';
+import { ktKokomuotoon } from '../assets/ktMuuntaja';
 
 // Hakulogiikka on tässä
 
@@ -30,10 +31,11 @@ function Search({afterSearch}) {
   
     try {
       let trimmedKt = kiinteistotunnus.trim()
+      let ktKokomuoto = ktKokomuotoon(trimmedKt)
       let trimmedOsoite = osoite.trim() 
       let trimmedKunta = paikkakunta.trim() 
 
-      response = await KH.haeKiinteistoja({kiinteistotunnus:trimmedKt,osoite:trimmedOsoite,kaupunki:trimmedKunta})
+      response = await KH.haeKiinteistoja({kiinteistotunnus:ktKokomuoto, osoite:trimmedOsoite, kaupunki:trimmedKunta})
       setResponseCount(response)
       afterSearch(response)
 

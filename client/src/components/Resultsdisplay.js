@@ -81,7 +81,7 @@ function Resultdisplay({ data, setMapCoords}) {
             {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
                 <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary bg-dark text-white p-1">
                     <div className="card-header d-flex justify-content-between align-items-center">
-                        Kiinteistö {kiinteisto?.id_kiinteistotunnus || "N/A"}
+                        Kiinteistö {kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}
                     </div>
 
                     {kiinteisto.rakennukset?.length > 0 ? (

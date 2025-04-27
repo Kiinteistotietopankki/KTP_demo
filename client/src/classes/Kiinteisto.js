@@ -1,3 +1,4 @@
+import { ktEsitysmuotoon } from "../assets/ktMuuntaja";
 import Rakennus from "./Rakennus";
 import axios from "axios";
 
@@ -61,7 +62,8 @@ export default class Kiinteisto {
     return {
       type: "Kiinteisto",
       rakennukset: this.rakennukset.map(rakennus => rakennus.toGeoJSON()),
-      id_kiinteistotunnus: this.kiinteistotunnus
+      id_kiinteistotunnus: this.kiinteistotunnus,
+      id_esitysmuoto_kiinteistotunnus: ktEsitysmuotoon(this.kiinteistotunnus)
     };
   }
 }
