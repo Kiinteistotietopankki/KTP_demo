@@ -79,14 +79,14 @@ function Resultdisplay({ data, setMapCoords}) {
     return (
         <div className="mt-4">
             {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
-                <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary">
+                <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary bg-dark text-white p-1">
                     <div className="card-header d-flex justify-content-between align-items-center">
                         Kiinteistö {kiinteisto?.id_kiinteistotunnus || "N/A"}
                     </div>
 
                     {kiinteisto.rakennukset?.length > 0 ? (
                         kiinteisto.rakennukset.map((rakennus, rakennusIndex) => (
-                            <div key={rakennusIndex} className="card mb-4">
+                            <div key={rakennusIndex} className="card mb-4 p-1">
                                 <div className="card-body">
                                     <div className="card-header d-flex justify-content-between align-items-center">
                                     <span>

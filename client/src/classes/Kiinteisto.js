@@ -10,10 +10,28 @@ export default class Kiinteisto {
   }
 
   async init(haunOsoite='') {
+    // const data = await this.fetchRakennukset(this.kiinteistotunnus);
+    // if (Array.isArray(data?.features)) {
+    //   this.rakennukset = await this.createRakennukset(data.features, this.addressKey,haunOsoite);
+    // }
     const data = await this.fetchRakennukset(this.kiinteistotunnus);
     if (Array.isArray(data?.features)) {
-      this.rakennukset = await this.createRakennukset(data.features,this.addressKey,haunOsoite);
+      let rakennukset = await this.createRakennukset(data.features, this.addressKey, haunOsoite);
+
+      console.log('Rakennusten tyyppi', rakennukset)
+  
+      // Filter rakennukset: keep only those that include haunOsoite
+      if (haunOsoite.length > 0) {
+        const regex = new RegExp(`^${haunOsoite}`, 'i');  // 'i' for case-insensitive match
+        rakennukset = rakennukset.filter(rakennus => {
+          return regex.test(rakennus?.KohteenOsoite); 
+        });
+      }
+  
+      this.rakennukset = rakennukset;
     }
+
+
   }
 
   async fetchRakennukset(tunnus) {

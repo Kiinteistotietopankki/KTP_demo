@@ -17,15 +17,40 @@ export default class KiinteistoHaku {
     }
 
 
+  // Osoitteella haku palauttaa:
+  //   Rakennukset joilla on tämä osoite
+
+
+  // Kiinteistötunnuksella haku palauttaa:
+  //   Kaikki kiinteistön rakennukset
+
+
+  // Kiinteistötunnuksella JA osoitteella haku palauttaa:
+  //   Kiinteistön rakennukset tässä osoitteessa
+
   async haeKiinteistoja({kiinteistotunnus='', osoite='', kaupunki=''}){
     try {
       if(osoite.length > 0 && kiinteistotunnus.length > 0){
+        console.log('YHTEISHAKU')
+        const osoiteData = await this.fetchOsoiteData(osoite, kaupunki);
+        const buildingKeys = this.extractBuildingKeys(osoiteData);
+        const addressKeys = this.extractAddressKeys(osoiteData)
+        
+        const kiinteistotunnukset = await this.haeKiinteistotunnukset(buildingKeys);
 
+
+        if (kiinteistotunnukset.has(kiinteistotunnus)) {
+          return await this.createKiinteistot(kiinteistotunnus, addressKeys, osoite);
+        } else {
+          console.log('Kiinteistotunnus not found.');
+        }
+        
       }
       else if (osoite.length > 0){
         const osoiteData = await this.fetchOsoiteData(osoite, kaupunki);
         const buildingKeys = this.extractBuildingKeys(osoiteData);
         const addressKeys = this.extractAddressKeys(osoiteData)
+        
         
         const kiinteistotunnukset = await this.haeKiinteistotunnukset(buildingKeys);
         return await this.createKiinteistot(kiinteistotunnukset, addressKeys, osoite);

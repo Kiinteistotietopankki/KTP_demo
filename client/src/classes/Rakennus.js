@@ -64,17 +64,17 @@ export default class Rakennus {
           if (haunOsoite.length > 0){
             // response = await axios.get(`${url}'${buildingkey}'${addressKeyConfirm}`);
             response = await axios.get(`${url}'${buildingkey}'${addressConfirm}'${haunOsoite}%25'`);
-            if (response.data?.features?.length < 1){
-              response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
+            // if (response.data?.features?.length < 1){
+            //   response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
 
-            }
+            // }
           } else{
             // response = await axios.get(`${url}'${buildingkey}'${addressNumberConfirm}`);
             response = await axios.get(`${url}'${buildingkey}'`);
           }
           return response.data;
         } catch (error) {
-          console.error("Virhe rakennnuksen osoitetietojen haussa:", error);
+          console.error("Virhe rakennuksen osoitetietojen haussa:", error);
           return null;
         }
       }
