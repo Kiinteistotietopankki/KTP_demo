@@ -93,7 +93,7 @@ function Resultdisplay({ data, setMapCoords }) {
     <div className="mt-4">
       {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
         <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary bg-dark text-white p-1">
-          <div className="card-header d-flex gap-3 align-items-center ms-3">
+          <div className="card-header d-flex gap-3 align-items-center ms-2">
             <p className="h4">Kiinteistö <span className='text-decoration-underline'>{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}</span></p>
             <button className="btn btn-outline-secondary btn-sm d-flex align-items-center" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>
               <i className="bi bi-clipboard me-2"></i> Kopioi
@@ -103,17 +103,17 @@ function Resultdisplay({ data, setMapCoords }) {
           {kiinteisto.rakennukset?.length > 0 ? (
             <>
               <div className="d-flex justify-content-between align-items-center p-2">
-                <label className="d-flex align-items-center gap-2">
-                <input
-                     type="checkbox"
-                checked={
-                kiinteisto.rakennukset.every(rakennus => selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value])
-                    }
-                     onChange={handleSelectAll}
-                    />
+                <label className="d-flex align-items-center gap-2 ms-4">
+                    <input
+                        type="checkbox"
+                    checked={
+                    kiinteisto.rakennukset.every(rakennus => selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value])
+                        }
+                        onChange={handleSelectAll}
+                        />
 
-                  
-                  Valitse kaikki rakennukset
+                    
+                    Valitse kaikki rakennukset
                 </label>
                 <div className="d-flex gap-2">
                   <button className="export-button" onClick={handleCreateReport}>Luo raportti</button>
