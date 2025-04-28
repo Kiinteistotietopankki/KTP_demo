@@ -103,7 +103,7 @@ function Resultdisplay({ data, setMapCoords }) {
           {kiinteisto.rakennukset?.length > 0 ? (
             <>
               <div className="d-flex justify-content-between align-items-center p-2">
-                <label className="d-flex align-items-center gap-2">
+                <label className="d-flex align-items-center gap-2 ms-4">
                 <input
                      type="checkbox"
                 checked={
