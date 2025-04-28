@@ -12,13 +12,21 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
   // const position = [pos[0], pos[1]]
 
   useEffect(() => {
-    if (coords && coords.length> 0){
-      setPosition([coords[0],coords[1]])
-      console.log('MapVisual coords',position)
+    if (coords && coords.length > 0) {
+      // Check if the new coordinates are different from the current position
+      const isDifferent = coords[0] !== position[0] || coords[1] !== position[1];
+      
+      if (isDifferent) {
+        setPosition([coords[0], coords[1]]);
+        console.log('MapVisual coords updated:', coords);
+      } else {
+        console.log('Coordinates are the same, not updating position');
+      }
     }
   }, [coords]);
 
   useEffect(() => {
+    console.log('POSTION SET UEF')
     const map = L.map('map', {
       center: position,
       zoom: 16,
@@ -49,7 +57,7 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
       tileMatrixSet: 'WGS84_Pseudo-Mercator',
       layerName: 'taustakartta',
       attribution: '&copy; Maanmittauslaitos',
-      detectRetina: true
+      detectRetina: true,
     });
 
     const layerBaseMapIlmakuva = L.tileLayer(template, {
