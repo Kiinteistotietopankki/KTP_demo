@@ -19,6 +19,8 @@ function Search({afterSearch}) {
 
   const [kiinteistoCount, setKiinteistoCount] = useState()
 
+  const [loading, setLoading] = useState(false);
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,6 +30,8 @@ function Search({afterSearch}) {
 
   const handleSearch = async () => {
     let response = []
+
+    setLoading(true)
   
     try {
       let trimmedKt = kiinteistotunnus.trim()
@@ -42,6 +46,7 @@ function Search({afterSearch}) {
     } catch (err) {
 
     } finally {
+      setLoading(false)
     }
   };
 
@@ -156,7 +161,8 @@ function Search({afterSearch}) {
 
 
       
-          <div className='featureAmount-container'>
+          <div className='featureAmount-container d-flex align-items-center'>
+
             {kiinteistoCount > 0 ? (
                 <span className="badge bg-success">
                   Kiinteistöjä: {kiinteistoCount}
@@ -164,6 +170,9 @@ function Search({afterSearch}) {
               ) : (
                 <span className="badge bg-secondary">Ei tuloksia</span>
               )}
+              {loading ? (<div className="spinner-border ms-3" role="status"></div>):(<></>)}
+            
+         
           </div>
       </div>
   );

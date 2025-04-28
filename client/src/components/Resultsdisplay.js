@@ -10,71 +10,9 @@ import '../App.css';
 function Resultdisplay({ data, setMapCoords}) {
     const [kiinteistot, setKiinteistot] = useState([]);
 
-    const [selectedRakennukset, setSelectedRakennukset] = useState({}); 
-    const [showReport, setShowReport] = useState(false);
-    const [reportRakennus, setReportRakennus] = useState(null);
-
     useEffect(() => {
         setKiinteistot(data);
     }, [data]);
-
-
-    // // individual selection
-    // const handleCheckboxChange = (rakennusTunnus) => {
-    //     setSelectedRakennukset(prevState => {
-    //         const updatedSelectedRakennukset = { ...prevState };
-    //         if (updatedSelectedRakennukset[rakennusTunnus]) {
-    //             delete updatedSelectedRakennukset[rakennusTunnus]; 
-    //         } else {
-    //             updatedSelectedRakennukset[rakennusTunnus] = true; 
-    //         }
-    //         return updatedSelectedRakennukset;
-    //     });
-    // };
-
-    // // Select All
-    // const handleSelectAll = () => {
-    //     if (Object.keys(selectedRakennukset).length === rakennukset.length) {
-    //         setSelectedRakennukset({}); 
-    //     } else {
-    //         const allSelected = {};
-    //         rakennukset.forEach(rakennus => {
-    //             allSelected[rakennus.properties.yleistiedot.Rakennustunnus] = true;
-    //         });
-    //         setSelectedRakennukset(allSelected); 
-    //     }
-    // };
-
-    // // Export selected buildings to Excel
-    // const handleExport = () => {
-    //     const selectedData = rakennukset.filter(rakennus =>
-    //         selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]
-    //     );
-    //     selectedData.forEach(rakennus => {
-    //         exportToExcel(rakennus); 
-    //     });
-    // };
-    
-    
-    // const handleExportPdf = () => {
-    //     const selectedData = rakennukset.filter(rakennus =>
-    //         selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]
-    //     );
-    //     selectedData.forEach(rakennus => {
-    //         exportToPdf(rakennus);
-    //     });
-    // };
-    // const handleCreateReport = () => {
-    //     const selected = rakennukset.find(rakennus =>
-    //         selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]
-    //     );
-    //     if (selected) {
-    //         setReportRakennus(selected);
-    //         setShowReport(true);
-    //     } else {
-    //         alert("Valitse ensin kiinteistö");
-    //     }
-    // };
 
     return (
         <div className="mt-4">
