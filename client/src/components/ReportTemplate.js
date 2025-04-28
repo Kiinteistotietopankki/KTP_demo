@@ -122,10 +122,13 @@ const allDetails = { ...yleistiedot, ...teknisettiedot };
 const labelX = margin;
 const valueX = pageWidth - margin;
 const lineHeight = 8;
-
 Object.entries(allDetails).forEach(([key, value], index) => {
   const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-  const formattedValue = value != null ? String(value) : "";
+  const formattedValue = value && typeof value === 'object' && value.value !== undefined 
+    ? String(value.value) 
+    : value != null 
+      ? String(value) 
+      : "";
 
   doc.text(formattedKey, labelX, currentYPosition);
 
@@ -145,6 +148,7 @@ Object.entries(allDetails).forEach(([key, value], index) => {
     currentYPosition = 45;
   }
 });
+
 
     for (const section of sections) {
       if (!section.include) continue;

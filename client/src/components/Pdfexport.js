@@ -9,10 +9,10 @@ const exportToPdf = (rakennus) => {
     doc.text(`Rakennus: ${Rakennustunnus}`, 10, 10);
 
     const data = [
-        { title: 'Yleistiedot', data: rakennus.properties.yleistiedot },
-        { title: 'Tekniset tiedot', data: rakennus.properties.teknisettiedot },
-        { title: 'Rakennustiedot', data: rakennus.properties.rakennustiedot },
-        { title: 'Aluetiedot', data: rakennus.properties.aluetiedot },
+        { title: 'Yleistiedot', data: rakennus.properties.yleistiedot?.value },
+        { title: 'Tekniset tiedot', data: rakennus.properties.teknisettiedo },
+        { title: 'Rakennustiedot', data: rakennus.properties.rakennustiedot?.value },
+        { title: 'Aluetiedot', data: rakennus.properties.aluetiedot?.value },
     ];
 
     let currentY = 20;
