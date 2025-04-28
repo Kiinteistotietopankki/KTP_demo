@@ -112,7 +112,7 @@ function Search({afterSearch}) {
             <input
               type="text"
               className="form-control"
-              placeholder={`Kiinteistötunnus`}
+              placeholder={`Kiinteistötunnus (esitys- tai täysmuodossa)`}
               value={kiinteistotunnus}
               onChange={(e) => setKiinteistotunnus(e.target.value)}
               onKeyDown={handleKeyDown}
