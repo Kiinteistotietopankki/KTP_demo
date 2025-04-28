@@ -14,6 +14,13 @@ function Resultdisplay({ data, setMapCoords}) {
         setKiinteistot(data);
     }, [data]);
 
+    // Initial map view
+    useEffect(() => {
+        if (kiinteistot.length > 0){
+            setMapCoords(kiinteistot[0]?.rakennukset[0]?.geometry?.coordinates)
+        }
+    }, [kiinteistot]);
+
     return (
         <div className="mt-4">
             {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
