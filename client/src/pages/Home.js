@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import '../App.css';
-import Searchbox from '../components/Searchbox';
 import Resultdisplay from '../components/Resultsdisplay';
 import MapVisual from '../components/MapVisual';
 import Search from '../components/Search';
@@ -36,7 +35,7 @@ function Home() {
 
   const [coordinates, setCoordinates] = useState([])
 
-  const setMapCoords = (coords) =>{
+  const setMapCoords = (coords) =>{http://localhost:3000/?kiinteistotunnus=205-2-47-1&osoite=L%C3%B6nnrotinkatu%201c&paikkakunta=
     setCoordinates([coords[1],coords[0]])
   }
 
