@@ -29,7 +29,7 @@ const MapComponent = () => {
     const wmsLayer = L.TileLayer.wms('https://sopimus-karttakuva.maanmittauslaitos.fi/sopimus/service/wms?SRSNAME=EPSG:4326&', {
       layers: 'public:peruskartta_taustavari',
       headers: {
-        'Authorization': 'Basic ' + btoa('Waativakarttakoe:Karttamiesukko12') // Replace with your actual username and password
+        'Authorization': 'Basic ' + btoa('') // Replace with your actual username and password
       }
     }).addTo(map);
 
