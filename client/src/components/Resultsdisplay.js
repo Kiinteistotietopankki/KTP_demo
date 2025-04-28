@@ -23,12 +23,19 @@ function Resultdisplay({ data, setMapCoords}) {
         }
     }, [kiinteistot]);
 
+    const copyText = (textToCopy) => {
+        navigator.clipboard.writeText(textToCopy)
+      };
+
     return (
         <div className="mt-4">
             {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
                 <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary bg-dark text-white p-1">
-                    <div className="card-header d-flex justify-content-between align-items-center">
-                        Kiinteistö {kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}
+                    <div className="card-header d-flex gap-3 align-items-center ms-3">
+                        <p className="h4">Kiinteistö <span className='text-decoration-underline'>{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"} </span></p>
+                        <button className="btn btn-outline-secondary btn-sm d-flex align-items-center" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>
+                            <i className="bi bi-clipboard me-2"></i> Kopioi
+                        </button>
                     </div>
 
                     {kiinteisto.rakennukset?.length > 0 ? (
@@ -45,12 +52,14 @@ function Resultdisplay({ data, setMapCoords}) {
                                         {rakennus.properties?.yleistiedot["Toimipaikka"].value}
                                         {` (${rakennus.properties?.rakennustiedot["Rakennusluokitus"].value})`}
                                     </span>
+
                                     <button
-                                    className="btn btn-outline-primary btn-sm ms-2"
-                                    onClick={() => setMapCoords(rakennus.geometry?.coordinates)}
-                                    >
-                                        Näytä kartalla
+                                        className="btn btn-outline-primary btn-sm ms-2"
+                                        onClick={() => setMapCoords(rakennus.geometry?.coordinates)}
+                                        >
+                                        <i className="bi bi-geo-alt-fill me-1"></i> Näytä kartalla
                                     </button>
+
                                     </div> 
 
                                     <Accordion>
