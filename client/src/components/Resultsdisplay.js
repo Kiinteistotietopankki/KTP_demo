@@ -11,7 +11,9 @@ function Resultdisplay({ data, setMapCoords}) {
     const [kiinteistot, setKiinteistot] = useState([]);
 
     useEffect(() => {
-        setKiinteistot(data);
+        if (data.length > 0){
+            setKiinteistot(data);
+        }
     }, [data]);
 
     // Initial map view
