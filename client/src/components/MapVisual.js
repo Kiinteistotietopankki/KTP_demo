@@ -1,31 +1,45 @@
 import React, { useEffect, useRef, useState } from 'react';
-import L from 'leaflet';
+import { basicTileHeader, L } from '../assets/leafletHeader'; 
 import 'leaflet/dist/leaflet.css';
+
+
+
 
 const apiKey = process.env.REACT_APP_API_KEY;
 
-const MapVisual = ({ pos = [65.00816937, 25.46030678], data }) => {
+const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
   
-
-  const [rakennukset, setRakennukset] = useState([]);
   const [position, setPosition] = useState([pos[0],pos[1]])
+
+  const username = apiKey;
+  const password = apiKey;
+
+  // Combine username and password in the format "username:password"
+  const combined = `${username}:${username}`;
+
+// Encode the combined string in Base64
+  const base64UserNameAndPassword = btoa(combined);
 
   const mapRef = useRef(null);
   // const position = [pos[0], pos[1]]
 
+
   useEffect(() => {
-    if (data && data.length > 0){
-      setRakennukset(data);
-      console.log('MAP VISUAL TESTING: ',data?.[0]?.geometry?.coordinates)
-  
-      setPosition([data?.[0]?.geometry?.coordinates[1],data?.[0]?.geometry?.coordinates[0]])
-    
+    if (coords && coords.length > 0) {
+      // Check if the new coordinates are different from the current position
+      const isDifferent = coords[0] !== position[0] || coords[1] !== position[1];
+      
+      if (isDifferent) {
+        setPosition([coords[0], coords[1]]);
+        console.log('MapVisual coords updated:', coords);
+      } else {
+        console.log('Coordinates are the same, not updating position');
+      }
     }
-
-    
-  }, [data]);
+  }, [coords]);
 
   useEffect(() => {
+    console.log('POSTION SET UEF')
     const map = L.map('map', {
       center: position,
       zoom: 16,
@@ -43,7 +57,7 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], data }) => {
 
     // console.log(apiKey)
     // console.log(encodeURIComponent(apiKey));
-    const template = `https://avoin-karttakuva.maanmittauslaitos.fi/avoin/wmts/1.0.0/{layerName}/default/{tileMatrixSet}/{z}/{y}/{x}.png?apiKey=${apiKey}`;
+    const template = `https://avoin-karttakuva.maanmittauslaitos.fi/avoin/wmts/1.0.0/{layerName}/default/{tileMatrixSet}/{z}/{y}/{x}.png?`;
 
     // Layers
 
@@ -52,38 +66,55 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], data }) => {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     });
 
-    const layerBaseMap = L.tileLayer(template, {
-      tileMatrixSet: 'WGS84_Pseudo-Mercator',
-      layerName: 'taustakartta',
-      attribution: '&copy; Maanmittauslaitos',
-      detectRetina: true
-    });
+    const layerBaseMap = basicTileHeader(
+      template,
+      {
+        tileMatrixSet: 'WGS84_Pseudo-Mercator',
+        layerName: 'taustakartta',
+        attribution: '&copy; Maanmittauslaitos',
+        detectRetina: true,
+      },
+      [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
+      null
+    );
 
-    const layerBaseMapIlmakuva = L.tileLayer(template, {
+    const layerBaseMapIlmakuva = basicTileHeader(template, {
         tileMatrixSet: 'WGS84_Pseudo-Mercator',
         layerName: 'ortokuva',
         attribution: '&copy; Maanmittauslaitos',
         detectRetina: true
-    });
+      },
+      [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
+      null
+  );
 
-    const layerBaseMapSelko = L.tileLayer(template, {
+    const layerBaseMapSelko = basicTileHeader(template, {
         tileMatrixSet: 'WGS84_Pseudo-Mercator',
         layerName: 'selkokartta',
         attribution: '&copy; Maanmittauslaitos',
         detectRetina: true
-    });
+        },
+        [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
+        null
+      );
 
-    const layerKiinteistotunnus = L.tileLayer(template, {
+    const layerKiinteistotunnus = basicTileHeader(template, {
       tileMatrixSet: 'WGS84_Pseudo-Mercator',
       layerName: 'kiinteistotunnukset',
       detectRetina: true
-    });
+      },
+      [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
+      null
+    );
 
-    const layerKiinteistorajat = L.tileLayer(template, {
+    const layerKiinteistorajat = basicTileHeader(template, {
       tileMatrixSet: 'WGS84_Pseudo-Mercator',
       layerName: 'kiinteistojaotus',
       detectRetina: true
-    });
+      },
+      [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
+      null
+    );
 
 
     // Create layer control

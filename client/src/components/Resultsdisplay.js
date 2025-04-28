@@ -2,185 +2,196 @@ import React, { useEffect, useState } from 'react';
 import Tabletemplate from './Tabletemplate';
 import { Accordion } from 'react-bootstrap';
 import exportToExcel from './Excelexport';
-import EditableReport from './ReportTemplate';
 import exportToPdf from './Pdfexport';
+import EditableReport from './ReportTemplate';
 import Modal from 'react-bootstrap/Modal';
 import '../App.css';
 
-function Resultdisplay({ data }) {
-    const [rakennukset, setRakennukset] = useState([]);
-    const [selectedRakennukset, setSelectedRakennukset] = useState({}); 
-    const [showReport, setShowReport] = useState(false);
-    const [reportRakennus, setReportRakennus] = useState(null);
+function Resultdisplay({ data, setMapCoords }) {
+  const [kiinteistot, setKiinteistot] = useState([]);
+  const [selectedRakennukset, setSelectedRakennukset] = useState({});
+  const [showReport, setShowReport] = useState(false);
+  const [reportRakennus, setReportRakennus] = useState(null);
+
+
 
     useEffect(() => {
-        console.log("Data on result displayssa: ",)
-        setRakennukset(data);
+        if (data.length > 0){
+            setKiinteistot(data);
+        }
     }, [data]);
 
-    // individual selection
-    const handleCheckboxChange = (rakennusTunnus) => {
-        setSelectedRakennukset(prevState => {
-            const updatedSelectedRakennukset = { ...prevState };
-            if (updatedSelectedRakennukset[rakennusTunnus]) {
-                delete updatedSelectedRakennukset[rakennusTunnus]; 
-            } else {
-                updatedSelectedRakennukset[rakennusTunnus] = true; 
-            }
-            return updatedSelectedRakennukset;
-        });
-    };
-
-    // Select All
-    const handleSelectAll = () => {
-        if (Object.keys(selectedRakennukset).length === rakennukset.length) {
-            setSelectedRakennukset({}); 
-        } else {
-            const allSelected = {};
-            rakennukset.forEach(rakennus => {
-                allSelected[rakennus.properties.yleistiedot.Rakennustunnus] = true;
-            });
-            setSelectedRakennukset(allSelected); 
+    // Initial map view
+    useEffect(() => {
+        if (kiinteistot.length > 0){
+            setMapCoords(kiinteistot[0]?.rakennukset[0]?.geometry?.coordinates)
         }
-    };
+    }, [kiinteistot]);
 
-    // Export selected buildings to Excel
-    const handleExport = () => {
-        const selectedData = rakennukset.filter(rakennus =>
-            selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]
-        );
-        selectedData.forEach(rakennus => {
-            exportToExcel(rakennus); 
+    const copyText = (textToCopy) => {
+        navigator.clipboard.writeText(textToCopy)
+      };
+
+      const handleCheckboxChange = (rakennusTunnusValue) => {
+        setSelectedRakennukset(prev => {
+          const updated = { ...prev };
+          if (updated[rakennusTunnusValue]) {
+            delete updated[rakennusTunnusValue];
+          } else {
+            updated[rakennusTunnusValue] = true;
+          }
+          return updated;
         });
-    };
-    
-    
-    const handleExportPdf = () => {
-        const selectedData = rakennukset.filter(rakennus =>
-            selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]
-        );
-        selectedData.forEach(rakennus => {
-            exportToPdf(rakennus);
-        });
-    };
-    const handleCreateReport = () => {
-        const selected = rakennukset.find(rakennus =>
-            selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]
-        );
-        if (selected) {
-            setReportRakennus(selected);
-            setShowReport(true);
-        } else {
-            alert("Valitse ensin kiinteistö");
+      };
+      
+
+  const handleSelectAll = () => {
+    const allSelected = {};
+    kiinteistot.forEach(kiinteisto => {
+      kiinteisto.rakennukset?.forEach(rakennus => {
+        allSelected[rakennus.properties.yleistiedot.Rakennustunnus?.value] = true;
+      });
+    });
+    if (Object.keys(selectedRakennukset).length === Object.keys(allSelected).length) {
+      setSelectedRakennukset({});
+    } else {
+      setSelectedRakennukset(allSelected);
+    }
+  };
+
+  const handleExport = () => {
+    const selectedData = [];
+    kiinteistot.forEach(kiinteisto => {
+      kiinteisto.rakennukset?.forEach(rakennus => {
+        if (selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value]) {
+          selectedData.push(rakennus);
         }
-    };
+      });
+    });
+    selectedData.forEach(exportToExcel);
+  };
 
-    return (
-        <div className="mt-4">
-           <div key={'kiinteisto'} className="kiinteistocard card mb-4 p-2 border border-primary">
-           <div className="card-header d-flex justify-content-between align-items-center">
-                Kiinteistö {rakennukset?.[0]?.properties?.yleistiedot["Kiinteistötunnus"] || 'N/A'}
-            </div>
-            {rakennukset?.length > 0 ? (
-                <>
-                    <div className="d-flex justify-content-between mb-3">
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={Object.keys(selectedRakennukset).length === rakennukset.length}
-                                onChange={handleSelectAll}
-                                />
-                            <span> Valitse kaikki</span>
-                        </label>
-                        <div className="d-flex gap-2">
-                    
-                    <button className="export-button" onClick={handleCreateReport}> 
-                                Luo raportti</button>
-                            <button className="export-button" onClick={handleExport}>
-                                Tallenna Excel
-                                </button>
-                            <button className="export-button" onClick={handleExportPdf}>
-                                Tallenna PDF
-                            </button>
-                        </div>
-                    </div>
-                    
-                    {rakennukset.map((rakennus, index) => (
-                        <div key={index} className="card mb-4">
-                            <div className="card-body">
-                                <div className="card-header d-flex justify-content-between align-items-center">
-                                <label className="d-flex align-items-center gap-2">
-                                    <input type="checkbox"
-                                        checked={!!selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus]}
-                                        onChange={() => handleCheckboxChange(rakennus.properties.yleistiedot.Rakennustunnus)}
-                                        />
-                                    <span>Rakennus {rakennus.properties.yleistiedot.Rakennustunnus} - {rakennus.properties.yleistiedot["Kohteen osoite"]} {rakennus.properties.yleistiedot["Toimipaikka"]}</span>
-                                </label>
 
-                                </div>
+  const handleCreateReport = () => {
+    let selected = null;
+    kiinteistot.forEach(kiinteisto => {
+      kiinteisto.rakennukset?.forEach(rakennus => {
+        if (selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value]) {
+          selected = rakennus;
+        }
+      });
+    });
+    if (selected) {
+      setReportRakennus(selected);
+      setShowReport(true);
+    } else {
+      alert("Valitse ensin rakennus");
+    }
+  };
 
-                                <Accordion>
-                                    <Accordion.Item eventKey="0">
-                                        <Accordion.Header>Yleistiedot</Accordion.Header>
-                                        <Accordion.Body>
-                                            <Tabletemplate
-                                                properties={rakennus.properties.yleistiedot}
-                                                tableTitle={''}
-                                            />
-                                        </Accordion.Body>
-                                    </Accordion.Item>
+  return (
+    <div className="mt-4">
+      {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
+        <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary bg-dark text-white p-1">
+          <div className="card-header d-flex gap-3 align-items-center ms-3">
+            <p className="h4">Kiinteistö <span className='text-decoration-underline'>{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}</span></p>
+            <button className="btn btn-outline-secondary btn-sm d-flex align-items-center" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>
+              <i className="bi bi-clipboard me-2"></i> Kopioi
+            </button>
+          </div>
 
-                                    <Accordion.Item eventKey="1">
-                                        <Accordion.Header>Tekniset tiedot</Accordion.Header>
-                                        <Accordion.Body>
-                                            <Tabletemplate
-                                                properties={rakennus.properties.teknisettiedot}
-                                                tableTitle={''}
-                                            />
-                                        </Accordion.Body>
-                                    </Accordion.Item>
+          {kiinteisto.rakennukset?.length > 0 ? (
+            <>
+              <div className="d-flex justify-content-between align-items-center p-2">
+                <label className="d-flex align-items-center gap-2">
+                <input
+                     type="checkbox"
+                checked={
+                kiinteisto.rakennukset.every(rakennus => selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value])
+                    }
+                     onChange={handleSelectAll}
+                    />
 
-                                    <Accordion.Item eventKey="2">
-                                        <Accordion.Header>Rakennustiedot</Accordion.Header>
-                                        <Accordion.Body>
-                                            <Tabletemplate
-                                                properties={rakennus.properties.rakennustiedot}
-                                                tableTitle={''}
-                                            />
-                                        </Accordion.Body>
-                                    </Accordion.Item>
+                  
+                  Valitse kaikki rakennukset
+                </label>
+                <div className="d-flex gap-2">
+                  <button className="export-button" onClick={handleCreateReport}>Luo raportti</button>
+                  <button className="export-button" onClick={handleExport}>Tallenna Excel</button>
+                 
+                </div>
+              </div>
 
-                                    <Accordion.Item eventKey="3">
-                                        <Accordion.Header>Aluetiedot</Accordion.Header>
-                                        <Accordion.Body>
-                                            <Tabletemplate
-                                                properties={rakennus.properties.aluetiedot}
-                                                tableTitle={''}
-                                            />
-                                        </Accordion.Body>
-                                    </Accordion.Item>
-                                </Accordion>
-                            </div>
-                        </div>
+              {kiinteisto.rakennukset.map((rakennus, rakennusIndex) => (
+                <div key={rakennusIndex} className="card mb-4 p-2">
+                  <div className="card-body">
+                    <div className="card-header d-flex justify-content-between align-items-center">
+                      <label className="d-flex align-items-center gap-2">
+                      <input
+                type="checkbox"
+                    checked={!!selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value]}
+                    onChange={() => handleCheckboxChange(rakennus.properties.yleistiedot.Rakennustunnus?.value)}
+                        />
+
                         
+                        Rakennus {rakennus.properties.yleistiedot.Rakennustunnus?.value || ''} - {Array.isArray(rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value) ? rakennus.properties.yleistiedot["Kohteen osoitteet"].value.join(", ") : rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value || ''} {rakennus.properties.yleistiedot["Toimipaikka"]?.value || ''}
 
+                      </label>
 
-                    ))}
-                    <Modal show={showReport} onHide={() => setShowReport(false)} size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>Muokkaa raporttia</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {reportRakennus && <EditableReport rakennus={reportRakennus} />}
-                </Modal.Body>
-            </Modal>
-                </>
-            ) : (
-                <div>0 results</div>
-            )}
-            </div> 
+                      <button
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={() => setMapCoords(rakennus.geometry?.coordinates)}
+                      >
+                        <i className="bi bi-geo-alt-fill me-1"></i> Näytä kartalla
+                      </button>
+                    </div>
+
+                    <Accordion>
+                      <Accordion.Item eventKey="0">
+                        <Accordion.Header>Yleistiedot</Accordion.Header>
+                        <Accordion.Body>
+                          <Tabletemplate properties={rakennus.properties.yleistiedot} />
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item eventKey="1">
+                        <Accordion.Header>Tekniset tiedot</Accordion.Header>
+                        <Accordion.Body>
+                          <Tabletemplate properties={rakennus.properties.teknisettiedot} />
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item eventKey="2">
+                        <Accordion.Header>Rakennustiedot</Accordion.Header>
+                        <Accordion.Body>
+                          <Tabletemplate properties={rakennus.properties.rakennustiedot} />
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item eventKey="3">
+                        <Accordion.Header>Aluetiedot</Accordion.Header>
+                        <Accordion.Body>
+                          <Tabletemplate properties={rakennus.properties.aluetiedot} />
+                        </Accordion.Body>
+                      </Accordion.Item>
+                    </Accordion>
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : (
+            <div className="p-2">Ei rakennuksia</div>
+          )}
         </div>
-    );
+      ))}
+
+      <Modal show={showReport} onHide={() => setShowReport(false)} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Muokkaa raporttia</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {reportRakennus && <EditableReport rakennus={reportRakennus} />}
+        </Modal.Body>
+      </Modal>
+    </div>
+  );
 }
 
 export default Resultdisplay;

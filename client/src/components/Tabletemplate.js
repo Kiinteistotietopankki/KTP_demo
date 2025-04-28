@@ -2,8 +2,11 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 
 const Tabletemplate = ({ properties, tableTitle }) => {
+    // Fallback in case properties is null or undefined
+    const safeProperties = properties || {};
+
     // Dynamically generate headers from properties keys
-    const headers = Object.keys(properties).map((key) => ({
+    const headers = Object.keys(safeProperties).map((key) => ({
         key,
         label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())  // Convert camelCase to human-readable text
     }));
@@ -20,21 +23,21 @@ const Tabletemplate = ({ properties, tableTitle }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {headers.map(({ key, label }) => (
+                    {headers.map(({ key, label }) => {
+                        const property = safeProperties[key];
+
+                        const rawValue = property?.value;
+                        const value = Array.isArray(rawValue) ? rawValue.join(", ") : rawValue ?? '-';
+                        const source = rawValue ? property.source : '-';
+
+                        return (
                         <tr key={key}>
                             <td>{label}</td>
-                            <td>
-                                {properties[key] !== undefined && properties[key] !== null
-                                    ? properties[key]
-                                    : 'Ei tiedossa'}
-                            </td>
-                            <td>
-                                {properties[`source_${key}`] !== undefined && properties[`source_${key}`] !== null
-                                    ? properties[`source_${key}`]
-                                    : '-'}
-                            </td>
+                            <td>{value}</td>
+                            <td>{source}</td>
                         </tr>
-                    ))}
+                        );
+                    })}
                 </tbody>
             </Table>
         </div>

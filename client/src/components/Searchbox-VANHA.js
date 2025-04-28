@@ -24,7 +24,7 @@ function Searchbox({ afterSearch }) {
   const rakennusKoordinaateillaHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:4326&CQL_FILTER=INTERSECTS(location_geometry_data'
 
   const rakennustunnusHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:4326&CQL_FILTER=permanent_building_identifier='
-  const osoiteHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:4326&CQL_FILTER=address_fin='
+  const osoiteHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:4326&CQL_FILTER=address_fin%20ILIKE%20'
 
   const rakennusBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=ryhti_building:open_building&outputFormat=application/json&SRSNAME=EPSG:4326&featureID=open_building.'
   const osoiteBuildingkeyHakuUrl = 'https://paikkatiedot.ymparisto.fi/geoserver/ryhti_building/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=ryhti_building:open_address&SRSNAME=EPSG:4326&CQL_FILTER=building_key='
@@ -56,12 +56,13 @@ function Searchbox({ afterSearch }) {
           query = query.charAt(0).toUpperCase() + query.slice(1).toLowerCase();
         }
 
-        console.log("Searching for 2:", query, kunta);
+        // console.log("Searching for 2:", query, kunta);
         if (kunta.length > 0){
-          response = await axios.get(`${osoiteHakuUrl}'${query}'%20AND%20postal_office_fin='${kunta}'`);
-          console.log(`${osoiteHakuUrl}'${query}'%20AND%20postal_office_fin='${kunta}'`)
+          response = await axios.get(`${osoiteHakuUrl}'${query}%25'%20AND%20postal_office_fin='${kunta}'`);
+          console.log(`${osoiteHakuUrl}'${query}%25'%20AND%20postal_office_fin='${kunta}'`)
         } else{
-          response = await axios.get(`${osoiteHakuUrl}'${query}'`);
+          response = await axios.get(`${osoiteHakuUrl}'${query}%25'`);
+          console.log(`SISÄLTÄÄ HAKU ${osoiteHakuUrl}'${query}%25'`)
         }
       }
       setRawResults(response.data);

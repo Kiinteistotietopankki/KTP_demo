@@ -1,452 +1,487 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { jsPDF } from 'jspdf';
+import 'handsontable/dist/handsontable.full.min.css';
+import ExcelTabs from '../assets/exceltoReport';
 import { Riskidataa } from '../assets/Riskidata';
+import html2canvas from 'html2canvas';
 
 const PropertyDetailsForm = ({ rakennus }) => {
   const [title, setTitle] = useState('');
   const [customText, setCustomText] = useState('');
-  const [johdantoText, setJohdantoText] = useState('');
-  const [sisaltoText, setSisaltoText] = useState('');
-  const [jarjestelmaText, setJarjestelmaText] = useState('');
   const [PropertyName, setPropertyName] = useState('');
+  const [coverImage, setCoverImage] = useState(null);
   const [riskidata, setRiskidata] = useState(Riskidataa);
-  const [images, setImages] = useState([]); 
-
-  // Handle multiple image file uploads
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);  
-    const newImages = [];
-
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        newImages.push(reader.result);  // Store image data URL
-        if (newImages.length === files.length) {
-          setImages((prevImages) => [...prevImages, ...newImages]);  // Update images state
-        }
+  const [sections, setSections] = useState([
+    { key: 'johdanto', label: '📝 Johdanto', content: '', include: false, images: [] },
+    { key: 'jarjestelma', label: '⚙️ Järjestelmäkuvaukset ja Riskiluokitus', content: '', include: false, images: [] },
+    { key: 'rakennetekniikka', label: '🏗️ Rakennetekniikkan Kuvat', content: '', include: false, images: [] },
+    { key: 'lvi', label: '💧 LVI-Tekniikan Kuvat', content: '', include: false, images: [] },
+    { key: 'sahko', label: '⚡ Sähköjärjestelmien Kuvat', content: '', include: false, images: [] },
+  ]);
+  
+ 
+  const handleAddCustomSection = () => {
+    const header = prompt('Anna uuden osion otsikko:');
+    if (header) {
+      const newSection = { 
+        key: `custom-${Date.now()}`, 
+        label: header, 
+        content: '', 
+        include: true, 
+        images: [] 
       };
-      reader.readAsDataURL(file);  
-    });
+  
+      setSections((prevSections) => {
+        const firstKuvatIndex = prevSections.findIndex(
+          (section) =>
+            section.key === 'rakennetekniikka' ||
+            section.key === 'lvi' ||
+            section.key === 'sahko'
+        );
+  
+        if (firstKuvatIndex === -1) {
+          return [...prevSections, newSection];
+        } else {
+          const updatedSections = [...prevSections];
+          updatedSections.splice(firstKuvatIndex, 0, newSection);
+          return updatedSections;
+        }
+      });
+    }
   };
+  
+  
+  const hotTableRef = useRef(null);
 
-
-
-  const drawGreenLineWithDate = (doc, title = '') => {
+  const drawGreenBanner = (doc, pageWidth, margin) => {
     const yPosition = 20;
     const bannerHeight = 10;
 
     doc.setFillColor(0, 128, 0);
-    doc.rect(15, yPosition, 180, bannerHeight, 'F');
-    doc.setFont("Dotum", "bold");
+    doc.rect(margin, yPosition, pageWidth - margin * 2, bannerHeight, 'F');
     doc.setFontSize(10);
     doc.setTextColor(255, 255, 255);
 
     const date = new Date().toLocaleDateString('fi-FI');
-    doc.text(date, 20, yPosition + 7);
+    doc.text(date, margin + 5, yPosition + 7);
 
-    const rightText = PropertyName || "ASUNTO OY MALLILIA";
-    const textWidth = doc.getTextWidth(rightText);
-    const rightX = 200 - textWidth - 15;
-    doc.text(rightText, rightX, yPosition + 7);
+    const rightText = PropertyName || 'ASUNTO OY MALLILIA';
+    const rightTextWidth = doc.getTextWidth(rightText);
+    doc.text(rightText, pageWidth - margin - rightTextWidth, yPosition + 7);
 
     doc.setTextColor(0, 0, 0);
   };
 
-  const handleExportPdf = () => {
+  const handleExportPdf = async () => {
     const doc = new jsPDF();
     const margin = 15;
-    const fontSize = 12;
-    const headingFontSize = 30;
-    const pageHeaderSize =17;
     const pageHeight = doc.internal.pageSize.height;
     const pageWidth = doc.internal.pageSize.getWidth();
+    let y = 20;
 
-    let currentYPosition = 20;
+    drawGreenBanner(doc, pageWidth, margin);
+    y += 20;
 
-    const renderRiskSection = (doc, sectionTitle, items, startY, margin) => {
-      let y = startY;
-    
-      // Section Heading
-      doc.setFont("Helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text(sectionTitle, margin, y);
-      y += 8;
-    
-      doc.setFont("Helvetica", "normal");
-      doc.setFontSize(10);
-    
-      items.forEach(item => {
-        const label = item.label;
-        const description = item.description || "";
-        const icon = "✓";
-    
-        let color = [0, 128, 0];
-        if (item.risk === "medium") color = [255, 165, 0];
-        if (item.risk === "high") color = [255, 0, 0];
-    
-  
-        doc.setFont("Helvetica", "bold");
-        doc.setTextColor(0, 0, 0);
-        doc.text(label, margin, y);
-    
-       
-        doc.setTextColor(...color);
-        doc.setFont("Helvetica", "bold");
-        doc.text(icon, margin + 70, y);
-    
-        
-        doc.setFont("Helvetica", "normal");
-        doc.setTextColor(0, 0, 0);
-        doc.text(description, margin + 80, y, { maxWidth: 100 });
-    
-        y += 10;
-    
-        // Page break
-        if (y > pageHeight - 30) {
-          doc.addPage();
-          drawGreenLineWithDate(doc);
-          y = 45;
-        }
-      });
-    
-      return y + 5; 
-    };
-    
+    doc.setFontSize(30);
+    doc.text(title || 'Raportin Otsikko', margin, y);
+    y += 15;
 
-    
-    drawGreenLineWithDate(doc);
-    currentYPosition = 45;
-
-    // Title Section
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(headingFontSize);
-    doc.text(title || "Raportin otsikko", margin, currentYPosition);
-    currentYPosition += 10;
-
-    // Custom Text Section
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(fontSize);
-    const customTextY = pageHeight - 40; 
-    doc.text(`Tarkastuspäivä: ${customText}`, margin, customTextY, { maxWidth: 180 });
-    doc.addPage();
-    drawGreenLineWithDate(doc);
-    currentYPosition = 45;
-    
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(pageHeaderSize);
-    doc.text("2. Johdanto", margin, currentYPosition);
-    currentYPosition += 10;
-    
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(fontSize);
-    doc.text(johdantoText || '', margin, currentYPosition, { maxWidth: 180 });
-    currentYPosition += 20;
-    // Add a page for the TOC
-    doc.addPage();
-    drawGreenLineWithDate(doc);
-    currentYPosition = 45;
-
-    
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(pageHeaderSize);
-    doc.text("Sisällysluettelo", margin, currentYPosition);
-    currentYPosition += 10;
-    doc.addPage();
-    drawGreenLineWithDate(doc);
-    currentYPosition = 45;
-    
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(pageHeaderSize);
-    doc.text("3. Kohteen Perustiedot", margin, currentYPosition);
-    currentYPosition += 7;
-    
-    
-    doc.setLineWidth(0.5);
-    doc.line(margin, currentYPosition, pageWidth - margin, currentYPosition);
-    currentYPosition += 10;
-    
-    // Prepare data
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(fontSize);
-    
-    const yleistiedot = rakennus?.properties?.yleistiedot || {};
-    const teknisettiedot = rakennus?.properties?.teknisettiedot || {};
-    const allDetails = { ...yleistiedot, ...teknisettiedot };
-    
-    const labelX = margin;
-    const valueX = pageWidth - margin; 
-    const lineHeight = 8;
-    
-    Object.entries(allDetails).forEach(([key, value], index) => {
-      const formattedKey = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize
-      const formattedValue = value != null ? String(value) : "";
-    
-      doc.setFont("Helvetica", "normal");
-      doc.text(formattedKey, labelX, currentYPosition);
-    
-      const textWidth = doc.getTextWidth(formattedValue);
-      doc.text(formattedValue, valueX - textWidth, currentYPosition);
-    
-      currentYPosition += lineHeight;
-    
-      if ((index + 1) % 3 === 0) {
-        doc.setLineWidth(0.2);
-        doc.line(margin, currentYPosition - 4, pageWidth - margin, currentYPosition - 4);
-      }
-    
-      if (currentYPosition > pageHeight - 40) {
-        doc.addPage();
-        drawGreenLineWithDate(doc);
-        currentYPosition = 45;
-      }
-    });
-    
-    
-    // Section 4 - Järjestelmäkuvaukset ja Riskiluokitus
-    doc.addPage();
-    drawGreenLineWithDate(doc);
-    currentYPosition = 45;
-    
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(pageHeaderSize);
-    doc.text("4. Järjestelmäkuvaukset ja Riskiluokitus", margin, currentYPosition);
-    currentYPosition += 10;
-    
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(fontSize);
-    doc.text(jarjestelmaText || '', margin, currentYPosition, { maxWidth: 180 });
-    currentYPosition += 20;
-    
-    
-const groupedRiskidata = riskidata.reduce((acc, item) => {
-  if (!acc[item.category]) acc[item.category] = [];
-  acc[item.category].push(item);
-  return acc;
-}, {});
-
-// Loop through each category and render its items
-Object.entries(groupedRiskidata).forEach(([category, items]) => {
-  doc.setFont("Helvetica", "bold");
-  doc.setFontSize(pageHeaderSize);
-  doc.text(category.toUpperCase(), margin, currentYPosition);
-  currentYPosition += 8;
-
-  // Draw horizontal line under the header
-  doc.setLineWidth(0.5);
-  doc.line(margin, currentYPosition, 195, currentYPosition);
-  currentYPosition += 5;
-
-  // Table headers
-  doc.setFontSize(10);
-  doc.setFont("Helvetica", "bold");
-  doc.text("Nimi", margin, currentYPosition);
-  doc.text("Riski", margin + 80, currentYPosition);
-  doc.text("Selite", margin + 120, currentYPosition);
-  currentYPosition += 6;
-
-  // Draw another separator line
-  doc.setLineWidth(0.2);
-  doc.line(margin, currentYPosition, 195, currentYPosition);
-  currentYPosition += 5;
-
-  // Loop through items
-  doc.setFont("Helvetica", "normal");
-  items.forEach((item) => {
-    const riskLevelText =
-      item.risk === 'low' ? 'Matala riski' :
-      item.risk === 'medium' ? 'Keskitason riski' :
-      item.risk === 'high' ? 'Korkea riski' : '';
-
-    const description = item.description || '';
-
-    // Text wrapping for long descriptions
-    const descLines = doc.splitTextToSize(description, 65);
-    const lineCount = Math.max(1, descLines.length);
-
-    // Print name, risk, and description (first line)
-    doc.text(item.label, margin, currentYPosition);
-    doc.text(riskLevelText, margin + 80, currentYPosition);
-    doc.text(descLines[0], margin + 120, currentYPosition);
-
-    // Additional lines of description
-    for (let i = 1; i < descLines.length; i++) {
-      currentYPosition += 5;
-      doc.text(descLines[i], margin + 120, currentYPosition);
+    if (coverImage) {
+      const imgWidth = 100;
+      const imgHeight = imgWidth * 0.66;
+      const centerX = (pageWidth - imgWidth) / 2;
+      doc.addImage(coverImage, 'JPEG', centerX, y, imgWidth, imgHeight);
+      y += imgHeight + 10;
     }
 
-    currentYPosition += 8;
+    doc.setFontSize(12);
+    doc.text(`Tarkastuspäivä: ${customText}`, margin, pageHeight - 20);
+// 3. Kohteen Perustiedot
+doc.addPage();
+drawGreenBanner(doc, pageWidth, margin);
 
-    // Page break logic
-    if (currentYPosition > pageHeight - 40) {
-      doc.addPage();
-      drawGreenLineWithDate(doc);
-      currentYPosition = 45;
-    }
-  });
+let currentYPosition = 40;
+const fontSize = 12;
 
-  currentYPosition += 10; 
+doc.setFontSize(20);
+doc.text("Kohteen Perustiedot", margin, currentYPosition);
+currentYPosition += 7;
+
+doc.setLineWidth(0.5);
+doc.line(margin, currentYPosition, pageWidth - margin, currentYPosition);
+currentYPosition += 10;
+
+
+doc.setFont("Helvetica", "normal");
+doc.setFontSize(fontSize);
+
+const yleistiedot = rakennus?.properties?.yleistiedot || {};
+const teknisettiedot = rakennus?.properties?.teknisettiedot || {};
+const allDetails = { ...yleistiedot, ...teknisettiedot };
+
+const labelX = margin;
+const valueX = pageWidth - margin;
+const lineHeight = 8;
+Object.entries(allDetails).forEach(([key, value], index) => {
+  const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
+  const formattedValue = value && typeof value === 'object' && value.value !== undefined 
+    ? String(value.value) 
+    : value != null 
+      ? String(value) 
+      : "";
+
+  doc.text(formattedKey, labelX, currentYPosition);
+
+  const textWidth = doc.getTextWidth(formattedValue);
+  doc.text(formattedValue, valueX - textWidth, currentYPosition);
+
+  currentYPosition += lineHeight;
+
+  if ((index + 1) % 3 === 0) {
+    doc.setLineWidth(0.2);
+    doc.line(margin, currentYPosition - 4, pageWidth - margin, currentYPosition - 4);
+  }
+
+  if (currentYPosition > pageHeight - 40) {
+    doc.addPage();
+    drawGreenBanner(doc, pageWidth, margin);
+    currentYPosition = 45;
+  }
 });
 
 
+    for (const section of sections) {
+      if (!section.include) continue;
 
+      doc.addPage();
+      drawGreenBanner(doc, pageWidth, margin);
 
+      let ySection = 40;
 
-    // Add multiple images to PDF if they exist
-    images.forEach((image, index) => {
-      const img = new Image();
-      img.src = image;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const maxWidth = 200;  
-        const maxHeight = 200; 
+      doc.setFontSize(20);
+      const cleanLabel = section.label.replace(/^[^\p{L}\p{N}]+/u, '').trim();
+      doc.text(cleanLabel, margin, ySection);
+      ySection += 10;
 
-        const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
-        canvas.width = img.width * ratio;
-        canvas.height = img.height * ratio;
+      doc.setFontSize(12);
+      const lines = doc.splitTextToSize(section.content, pageWidth - margin * 2);
+      doc.text(lines, margin, ySection);
+      ySection += lines.length * 7 + 10;
 
-       
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      // Add section images
+      const imagesPerRow = 3;
+      const imageMargin = 5;
+      const imageWidth = (pageWidth - margin * 2 - (imagesPerRow - 1) * imageMargin) / imagesPerRow;
+      const imageHeight = imageWidth * 1; 
+      
+      let imageIndex = 0;
+      
+      for (const imgSrc of section.images) {
+        const img = new Image();
+        img.src = imgSrc;
+      
+        await new Promise((resolve) => {
+          img.onload = () => {
+            const col = imageIndex % imagesPerRow;
+            const row = Math.floor(imageIndex / imagesPerRow);
+      
+            let x = margin + col * (imageWidth + imageMargin);
+            let yImage = ySection + row * (imageHeight + imageMargin);
+      
+            
+            if (yImage + imageHeight > pageHeight - 30) {
+              doc.addPage();
+              drawGreenBanner(doc, pageWidth, margin);
+              ySection = 40;
+              imageIndex = 0; 
+              x = margin;
+              yImage = ySection;
+            }
+      
+            doc.addImage(imgSrc, 'JPEG', x, yImage, imageWidth, imageHeight);
+            imageIndex++;
+            resolve();
+          };
+        });
+      }
 
-        // Convert the canvas to base64-encoded image
-        const compressedImage = canvas.toDataURL('image/jpeg', 1.0); // 0.5 is the compression quality (0-1)
+      ySection += Math.ceil(section.images.length / imagesPerRow) * (imageHeight + imageMargin) + 10;
+      if (section.key === 'jarjestelma') {
+        const groupedRiskidata = riskidata.reduce((acc, item) => {
+          if (!acc[item.category]) acc[item.category] = [];
+          acc[item.category].push(item);
+          return acc;
+        }, {});
 
-        doc.addImage(compressedImage, 'JPEG', 10, currentYPosition, canvas.width, canvas.height);
+        for (const [category, items] of Object.entries(groupedRiskidata)) {
+          ySection += 10;
+          if (ySection > pageHeight - 40) {
+            doc.addPage();
+            drawGreenBanner(doc, pageWidth, margin);
+            ySection = 40;
+          }
 
-        
-        currentYPosition += canvas.height + 10;
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(16);
+          doc.text(category.toUpperCase(), margin, ySection);
+          ySection += 8;
 
-       
-        if (index === images.length - 1) {
-          doc.save("report.pdf");
+          doc.setFontSize(12);
+          doc.text('Nimi', margin, ySection);
+          doc.text('Riski', margin + 80, ySection);
+          doc.text('Selite', margin + 130, ySection);
+
+          ySection += 5;
+          doc.setLineWidth(0.5);
+          doc.line(margin, ySection, pageWidth - margin, ySection);
+          ySection += 5;
+
+          doc.setFont("Helvetica", "normal");
+
+          for (const item of items) {
+            const riskText = item.risk === 'low' ? 'Matala' : item.risk === 'medium' ? 'Keskitaso' : 'Korkea';
+            const description = item.description || '';
+
+            doc.text(item.label, margin, ySection);
+            doc.text(riskText, margin + 80, ySection);
+            doc.text(doc.splitTextToSize(description, pageWidth - margin - (margin + 130)), margin + 130, ySection);
+
+            ySection += 8;
+            if (ySection > pageHeight - 40) {
+              doc.addPage();
+              drawGreenBanner(doc, pageWidth, margin);
+              ySection = 40;
+            }
+          }
         }
-      };
-    });
-    if (images.length === 0) {
-      doc.save("report.pdf");
+      }
     }
+
+    
+    if (hotTableRef.current) {
+      const tableContainer = hotTableRef.current.hotInstance.rootElement;
+      const canvas = await html2canvas(tableContainer);
+      const imgData = canvas.toDataURL('image/png');
+      const imgProps = doc.getImageProperties(imgData);
+
+      const pdfWidth = pageWidth - 30;
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      doc.addPage();
+      drawGreenBanner(doc, pageWidth, margin);
+      doc.setFontSize(16);
+      doc.text('PTS-ehdotukset', margin, 30);
+      doc.addImage(imgData, 'PNG', 15, 40, pdfWidth, pdfHeight);
+      
+    }
+
+    doc.save('report.pdf');
+  };
+
+  const handleCoverImageUpload = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCoverImage(reader.result);
+    };
+    if (file) reader.readAsDataURL(file);
   };
 
   return (
-    <div>
-      
-      <button onClick={handleExportPdf} className="btn btn-primary mb-4">Lataa PDF</button>
-      
-      <div className="mb-3">
-        <label>Lisää kuvia</label>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleImageChange}
-          className="form-control"
-        />
-      </div>
-
-      <div className="mb-3">
-        <label>Raportin Otsikko (kuntotarkistus/muu?):</label>
+    <div className="p-4 space-y-6">
+      {/* Kansisivu */}
+      <div className="border p-4 rounded shadow-sm">
+        <h3 className="text-xl font-semibold mb-4">📄 Kansisivu</h3>
         <input
           type="text"
           value={title}
-          onChange={e => setTitle(e.target.value)}
-          className="form-control"
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Raportin otsikko"
+          className="form-control mb-3"
         />
-      </div>
-
-      <div className="mb-3">
-        <label>Asunnon nimi (näkyy alareunassa ja bannerissa):</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleCoverImageUpload}
+          className="form-control mb-3"
+        />
         <input
           type="text"
           value={PropertyName}
-          onChange={e => setPropertyName(e.target.value)}
-          className="form-control"
+          onChange={(e) => setPropertyName(e.target.value)}
+          placeholder="Kohteen nimi"
+          className="form-control mb-3"
         />
-      </div>
-
-      <div className="mb-3">
-        <label>Tarkastuspäivä :</label>
         <input
           type="text"
           value={customText}
-          onChange={e => setCustomText(e.target.value)}
+          onChange={(e) => setCustomText(e.target.value)}
+          placeholder="Tarkastuspäivämäärä"
           className="form-control"
         />
       </div>
 
-      <div className="mb-3">
-        <label>Johdanto:</label>
-        <textarea
-          value={johdantoText}
-          onChange={e => setJohdantoText(e.target.value)}
-          className="form-control"
-          rows="4"
-        />
-      </div>
+  
 
-      <div className="mb-3">
-        <label>Järjestelmäkuvaukset ja Riskiluokitus:</label>
-        <textarea
-          value={jarjestelmaText}
-          onChange={e => setJarjestelmaText(e.target.value)}
-          className="form-control"
-          rows="4"
-        />
-      </div>
-
-
-      <div className="mb-4">
- 
-
- 
-
-  {/* Table Rows */}
-  {riskidata.map((item, index) => (
-    <div
-      key={item.id}
-      className="grid grid-cols-[200px_200px_1fr] gap-4 items-center px-2 py-2 border-b border-gray-200"
-    >
-      
-      <div className="text-sm font-medium">{item.label}</div>
-
-    
-<div className="flex gap-4 items-center">
-  {/* Riski Dropdown */}
-  <select
-    className="py-1 rounded text-sm w-full"
-    value={item.risk}
-    onChange={(e) => {
-      const updated = [...riskidata];
-      updated[index].risk = e.target.value;
-      setRiskidata(updated);
+      {/* osiott */}
+      {sections.map((section, index) => (
+        <div key={section.key} className="border p-4 rounded shadow-sm">
+          <div className="flex justify-between items-center mb-2">
+  <div
+    className="text-lg font-semibold cursor-pointer select-none"
+    onClick={() => {
+      const updated = [...sections];
+      updated[index].include = !updated[index].include;
+      setSections(updated);
     }}
   >
-    <option value="low">✅ Matala riski</option>
-    <option value="medium">🟡 Keskitason riski</option>
-    <option value="high">🔴 Korkea riski</option>
-  </select>
+    {section.label} {section.include ? '▼' : '▶️'}
+  </div>
 
-  {/* Selite Text Input */}
-  <input
-    type="text"
-    className="form-input border px-2 py-1 rounded text-sm w-full"
-    placeholder="Kirjoita selite..."
-    value={item.description || ''}
-    onChange={(e) => {
-      const updated = [...riskidata];
-      updated[index].description = e.target.value;
-      setRiskidata(updated);
-    }}
-  />
-</div>
+  
 
-    </div>
-  ))}
 </div>
 
 
 
+          {section.include && (
+            <>
+              <textarea
+                className="form-control mt-2"
+                rows="10"
+                value={section.content}
+                onChange={(e) => {
+                  const updated = [...sections];
+                  updated[index].content = e.target.value;
+                  setSections(updated);
+                }}
+              />
+
+              {/* kuvan lisäys*/}
+              <div className="mt-2">
+                <button
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={() => document.getElementById(`file-${section.key}`).click()}
+                >
+                  ➕ Lisää kuva
+                </button>
+                <input
+                  type="file"
+                  id={`file-${section.key}`}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  multiple
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files);
+                    const images = files.map(file => URL.createObjectURL(file));
+                    const updated = [...sections];
+                    updated[index].images.push(...images);
+                    setSections(updated);
+                  }}
+                />
+              </div>
+              <div
+
+style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(3, 1fr)',
+  gap: '8px',
+  marginTop: '8px'
+}}
+>
+{section.images.map((img, i) => (
+  <div key={i} style={{ position: 'relative' }}>
+    <img
+      src={img}
+      alt="Section"
+      style={{
+        width: '100px',
+        height: '100px',
+        objectFit: 'cover',
+        borderRadius: '4px'
+      }}
+    />
+    <button
+      type="button"
+      style={{
+        position: 'absolute',
+        top: '2px',
+        right: '90px',
+        background: '#ef4444',
+        color: 'white',
+        borderRadius: '9999px',
+        padding: '2px 6px',
+        fontSize: '10px',
+        opacity: 0.75,
+        border: 'none'
+      }}
+      onClick={() => {
+        const updated = [...sections];
+        updated[index].images = updated[index].images.filter((_, imgIndex) => imgIndex !== i);
+        setSections(updated);
+      }}
+    >
+      ❌
+    </button>
+  </div>
+))}
+</div>
+
+
+
+              {/* Riskidata */}
+              {section.key === 'jarjestelma' && (
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  <h4 className="text-md font-semibold mb-2">Riskidata</h4>
+                  {riskidata.map((item, riskIndex) => (
+                    <div key={item.id} className="flex gap-4 items-center mb-2">
+                      <select
+                        className="py-1 rounded text-sm w-1/3"
+                        value={item.risk}
+                        onChange={(e) => {
+                          const updated = [...riskidata];
+                          updated[riskIndex].risk = e.target.value;
+                          setRiskidata(updated);
+                        }}
+                      >
+                        <option value="low">✅ Matala riski</option>
+                        <option value="medium">🟡 Keskitason riski</option>
+                        <option value="high">🔴 Korkea riski</option>
+                      </select>
+                      <input
+                        type="text"
+                        className="form-input border px-2 py-1 rounded text-sm w-2/3"
+                        placeholder="Kirjoita selite..."
+                        value={item.description || ''}
+                        onChange={(e) => {
+                          const updated = [...riskidata];
+                          updated[riskIndex].description = e.target.value;
+                          setRiskidata(updated);
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      ))}
+    
+    <button onClick={handleAddCustomSection} className="btn btn-outline-primary">
+        ➕ Lisää uusi osio
+      </button>
+      {/* Excel */}
+      <div className="border p-4 rounded shadow-sm">
+        <ExcelTabs ref={hotTableRef} />
+      </div>
+      <div className="flex justify-center mt-6">
+        <button onClick={handleExportPdf} className="btn btn-primary">
+          Lataa Raportti
+        </button>
+      </div>
     </div>
-  ); 
+  );
 };
 
 export default PropertyDetailsForm;
