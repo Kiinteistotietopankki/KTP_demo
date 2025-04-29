@@ -134,7 +134,8 @@ function Resultdisplay({ data, setMapCoords }) {
                         />
 
                         
-                        Rakennus {rakennus.properties.yleistiedot.Rakennustunnus?.value || ''} - {Array.isArray(rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value) ? rakennus.properties.yleistiedot["Kohteen osoitteet"].value.join(", ") : rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value || ''} {rakennus.properties.yleistiedot["Toimipaikka"]?.value || ''}
+                        Rakennus {rakennus.properties.yleistiedot.Rakennustunnus?.value || ''} - {Array.isArray(rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value) ? rakennus.properties.yleistiedot["Kohteen osoitteet"].value.join(", ") : rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value || ''}
+                        {" "}{rakennus.properties.yleistiedot["Toimipaikka"]?.value || ''}{` (${rakennus.properties?.rakennustiedot["Rakennusluokitus"].value})`}
 
                       </label>
 
