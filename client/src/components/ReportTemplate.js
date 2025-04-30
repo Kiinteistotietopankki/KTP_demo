@@ -4,14 +4,16 @@ import 'handsontable/dist/handsontable.full.min.css';
 import ExcelTabs from '../assets/exceltoReport';
 import { Riskidataa } from '../assets/Riskidata';
 import html2canvas from 'html2canvas';
-
+import { useEffect } from 'react';
 const PropertyDetailsForm = ({ rakennus }) => {
-  const [title, setTitle] = useState('');
-  const [customText, setCustomText] = useState('');
-  const [PropertyName, setPropertyName] = useState('');
-  const [coverImage, setCoverImage] = useState(null);
-  const [riskidata, setRiskidata] = useState(Riskidataa);
-  const [sections, setSections] = useState([
+  const savedData = JSON.parse(localStorage.getItem('reportFormData')) || {};
+
+  const [title, setTitle] = useState(savedData.title || '');
+  const [customText, setCustomText] = useState(savedData.customText || '');
+  const [PropertyName, setPropertyName] = useState(savedData.PropertyName || '');
+  const [coverImage, setCoverImage] = useState(savedData.coverImage || null);
+  const [riskidata, setRiskidata] = useState(savedData.riskidata || Riskidataa);
+  const [sections, setSections] = useState(savedData.sections || [
     { key: 'johdanto', label: '📝 Johdanto', content: '', include: false, images: [] },
     { key: 'jarjestelma', label: '⚙️ Järjestelmäkuvaukset ja Riskiluokitus', content: '', include: false, images: [] },
     { key: 'rakennetekniikka', label: '🏗️ Rakennetekniikkan Kuvat', content: '', include: false, images: [] },
@@ -19,6 +21,48 @@ const PropertyDetailsForm = ({ rakennus }) => {
     { key: 'sahko', label: '⚡ Sähköjärjestelmien Kuvat', content: '', include: false, images: [] },
   ]);
   
+  
+  
+  const resetForm = () => {
+    setTitle('');
+    setCustomText('');
+    setPropertyName('');
+    setCoverImage(null);
+    setRiskidata(Riskidataa);
+    setSections([
+      { key: 'johdanto', label: '📝 Johdanto', content: '', include: false, images: [] },
+      { key: 'jarjestelma', label: '⚙️ Järjestelmäkuvaukset ja Riskiluokitus', content: '', include: false, images: [] },
+      { key: 'rakennetekniikka', label: '🏗️ Rakennetekniikkan Kuvat', content: '', include: false, images: [] },
+      { key: 'lvi', label: '💧 LVI-Tekniikan Kuvat', content: '', include: false, images: [] },
+      { key: 'sahko', label: '⚡ Sähköjärjestelmien Kuvat', content: '', include: false, images: [] },
+    ]);
+    localStorage.removeItem('reportFormData');
+  };
+
+
+  useEffect(() => {
+  const savedData = localStorage.getItem('reportFormData');
+  if (savedData) {
+    const parsed = JSON.parse(savedData);
+    setTitle(parsed.title || '');
+    setCustomText(parsed.customText || '');
+    setPropertyName(parsed.PropertyName || '');
+    setCoverImage(parsed.coverImage || null);
+    setRiskidata(parsed.riskidata || Riskidataa);
+    setSections(parsed.sections || []);
+  }
+}, []);
+useEffect(() => {
+  const formData = {
+    title,
+    customText,
+    PropertyName,
+    coverImage,
+    riskidata,
+    sections,
+  };
+  localStorage.setItem('reportFormData', JSON.stringify(formData));
+}, [title, customText, PropertyName, coverImage, riskidata, sections]);
  
   const handleAddCustomSection = () => {
     const header = prompt('Anna uuden osion otsikko:');
@@ -276,6 +320,7 @@ Object.entries(allDetails).forEach(([key, value], index) => {
     }
 
     doc.save('report.pdf');
+    resetForm();
   };
 
   const handleCoverImageUpload = (e) => {
@@ -434,33 +479,35 @@ style={{
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   <h4 className="text-md font-semibold mb-2">Riskidata</h4>
                   {riskidata.map((item, riskIndex) => (
-                    <div key={item.id} className="flex gap-4 items-center mb-2">
-                      <select
-                        className="py-1 rounded text-sm w-1/3"
-                        value={item.risk}
-                        onChange={(e) => {
-                          const updated = [...riskidata];
-                          updated[riskIndex].risk = e.target.value;
-                          setRiskidata(updated);
-                        }}
-                      >
-                        <option value="low">✅ Matala riski</option>
-                        <option value="medium">🟡 Keskitason riski</option>
+                   <div key={item.id} className="flex gap-4 items-center mb-2">
+                     <div className="w-1/3 font-semibold">{item.label}</div> {/* SHOWS THE RISKINIMI */}
+                          <select
+                     className="py-1 rounded text-sm w-1/4"
+                       value={item.risk}
+                      onChange={(e) => {
+                         const updated = [...riskidata];
+                       updated[riskIndex].risk = e.target.value;
+                     setRiskidata(updated);
+                     }}
+                       >
+                       <option value="low">✅ Matala riski</option>
+                      <option value="medium">🟡 Keskitason riski</option>
                         <option value="high">🔴 Korkea riski</option>
-                      </select>
-                      <input
-                        type="text"
-                        className="form-input border px-2 py-1 rounded text-sm w-2/3"
-                        placeholder="Kirjoita selite..."
-                        value={item.description || ''}
-                        onChange={(e) => {
-                          const updated = [...riskidata];
-                          updated[riskIndex].description = e.target.value;
-                          setRiskidata(updated);
+                        </select>
+            <input
+             type="text"
+            className="form-input border px-2 py-1 rounded text-sm w-2/4"
+            placeholder="Kirjoita selite..."
+              value={item.description || ''}
+              onChange={(e) => {
+                const updated = [...riskidata];
+                  updated[riskIndex].description = e.target.value;
+                    setRiskidata(updated);
                         }}
-                      />
-                    </div>
-                  ))}
+                          />
+                           </div>
+                         ))}
+
                 </div>
               )}
             </>
