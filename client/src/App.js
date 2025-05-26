@@ -10,6 +10,7 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider, useMsal } from '@azure/msal-react';
 import { useEffect } from 'react';
 import Badge from 'react-bootstrap/Badge';
+import Kiinteistokortit from './pages/Kiinteistokortit';
 
 const msalInstance = new PublicClientApplication({
   auth: {
@@ -50,8 +51,9 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/about" element={<About />} />
+                        <Route path="/taloyhtiokortit" element={<Kiinteistokortit/>} />
                         <Route path="/contact" element={<Contact />} />
-                      <Route path="/logout" element={<Logout />} />
+                        <Route path="/logout" element={<Logout />} />
                     </Routes>
                   //</ProtectedRoute>
                 }
