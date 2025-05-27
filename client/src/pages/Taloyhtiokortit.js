@@ -36,7 +36,7 @@ function Taloyhtiokortit() {
             <input
               type="text"
               className="form-control"
-              placeholder="Kiinteistötunnus tai osoite"
+              placeholder="Kiinteistötunnus, osoite tai paikkakunta"
               aria-label="Search"
               aria-describedby="button-addon2"
             />
