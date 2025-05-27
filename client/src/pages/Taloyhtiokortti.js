@@ -3,6 +3,7 @@ import Badge from 'react-bootstrap/Badge';
 import { useParams } from 'react-router-dom';
 import MapVisual from '../components/MapVisual';
 import { Tab, Tabs } from 'react-bootstrap';
+import StickyAfterScroll from '../components/Stickyafterscroll';
 
 function Taloyhtiokortti() {
     const { id } = useParams();
@@ -10,10 +11,29 @@ function Taloyhtiokortti() {
   
     useEffect(() => {
       // Simulate an API call with mock data
-      const mockData = {
+    const mockData = {
         1: { title: 'Card One', description: 'Details about Card One' },
         2: { title: 'Card Two', description: 'Details about Card Two' },
-      };
+        3: { title: 'Card Three', description: 'Details about Card Three' },
+        4: { title: 'Card Four', description: 'Details about Card Four' },
+        5: { title: 'Card Five', description: 'Details about Card Five' },
+        6: { title: 'Card Six', description: 'Details about Card Six' },
+        7: { title: 'Card Seven', description: 'Details about Card Seven' },
+        8: { title: 'Card Eight', description: 'Details about Card Eight' },
+        9: { title: 'Card Nine', description: 'Details about Card Nine' },
+        10: { title: 'Card Ten', description: 'Details about Card Ten' },
+        11: { title: 'Card Eleven', description: 'Details about Card Eleven' },
+        12: { title: 'Card Twelve', description: 'Details about Card Twelve' },
+        13: { title: 'Card Thirteen', description: 'Details about Card Thirteen' },
+        14: { title: 'Card Fourteen', description: 'Details about Card Fourteen' },
+        15: { title: 'Card Fifteen', description: 'Details about Card Fifteen' },
+        16: { title: 'Card Sixteen', description: 'Details about Card Sixteen' },
+        17: { title: 'Card Seventeen', description: 'Details about Card Seventeen' },
+        18: { title: 'Card Eighteen', description: 'Details about Card Eighteen' },
+        19: { title: 'Card Nineteen', description: 'Details about Card Nineteen' },
+        20: { title: 'Card Twenty', description: 'Details about Card Twenty' }
+    };
+
       setCard(mockData[id]);
     }, [id]);
   
@@ -30,6 +50,7 @@ function Taloyhtiokortti() {
                 <div class="col-md-6 border border-primary">            
                 <h1>{card.title}</h1> 
                 <p>{card.description}</p>
+                {/* <StickyAfterScroll></StickyAfterScroll> */}
             </div>
                 <div class="col-md-6 border border-primary"><MapVisual pos={[65.00816937, 25.46030678]} coords={[65.00816937, 25.46030678]}/></div>
             </div>

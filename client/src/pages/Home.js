@@ -35,7 +35,7 @@ function Home() {
 
   const [coordinates, setCoordinates] = useState([])
 
-  const setMapCoords = (coords) =>{http://localhost:3000/?kiinteistotunnus=205-2-47-1&osoite=L%C3%B6nnrotinkatu%201c&paikkakunta=
+  const setMapCoords = (coords) =>{
     setCoordinates([coords[1],coords[0]])
   }
 
