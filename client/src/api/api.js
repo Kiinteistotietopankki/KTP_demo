@@ -9,3 +9,16 @@ export const getKiinteistot = () =>
       'x-api-key': API_KEY 
     }
   });
+
+
+export const createKiinteisto = (data) =>
+  axios.post(
+    `${API_BASE}/api/kiinteistot/create`,
+    data, // JSON payload
+    {
+      headers: {
+        'x-api-key': API_KEY,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
