@@ -8,6 +8,7 @@ import Modal from 'react-bootstrap/Modal';
 import '../App.css';
 import { jsonToModelFormat } from '../assets/jsonToDBmodel';
 import { prettifyJson } from '../assets/prettifyJson';
+import { createKiinteisto } from '../api/api';
 
 function Resultdisplay({ data, setMapCoords }) {
   const [kiinteistot, setKiinteistot] = useState([]);
@@ -18,13 +19,25 @@ function Resultdisplay({ data, setMapCoords }) {
 
   const [korttiNappi, setKorttiNappi] = useState(false)
 
+
+
   //For alt ui 
   const [selectedRakennus, setSelectedRakennus] = useState({});
   const [selectedRakennusPerKiinteisto, setSelectedRakennusPerKiinteisto] = useState({});
 
 
+  const [response, setResponse] = useState({})
 
-    useEffect(() => {
+  // useEffect(() => {
+  //     createKiinteisto()
+  //       .then(res => setKiinteistot(res.data.items))
+  //       .catch(err => console.error('Api error', err))
+  
+  //   }, []);
+
+
+
+  useEffect(() => {
         if (data.length > 0){
             // console.log(data)
             setKiinteistot(data);
@@ -99,6 +112,21 @@ function Resultdisplay({ data, setMapCoords }) {
     }
   };
 
+  const luoKortti = (kiinteisto) => {
+
+    const modelFormatKiinteisto = jsonToModelFormat(kiinteisto)
+    
+    console.log('Payload:', JSON.stringify(modelFormatKiinteisto, null, 2));
+    
+        createKiinteisto(modelFormatKiinteisto)
+        .then(res =>{
+          console.log('Raw response:', res);
+          console.log('Response data:', res.data);
+          setResponse(res.data)})
+        .catch(err => console.error('Api error', err))
+  }
+
+
   return (
     <div className="mt-4">
 
@@ -111,12 +139,15 @@ function Resultdisplay({ data, setMapCoords }) {
               </button>
             </p>
 
-            <button type="button" className="btn btn-success mt-2" onClick={() => setKorttiNappi(prev => !prev)}> 
+            <button type="button" className="btn btn-success mt-2" onClick={() => luoKortti(kiinteisto)}> 
                 Luo taloyhtiökortti
             </button>
-            {korttiNappi && (<p>{prettifyJson(kiinteisto)}</p>)}
+
+            <div>{response.length > 0 && (<>{JSON.stringify(response)}</>)}</div>
+
+            {/* {korttiNappi && (<p>{prettifyJson(kiinteisto)}</p>)}
             <div>SPACE</div>
-            {korttiNappi && (<p>{prettifyJson(jsonToModelFormat(kiinteisto))}</p>)}
+            {korttiNappi && (<p>{prettifyJson(jsonToModelFormat(kiinteisto))}</p>)} */}
           </div>
 
           {kiinteisto.rakennukset?.length > 0 ? (
