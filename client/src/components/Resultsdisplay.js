@@ -6,6 +6,8 @@ import exportToPdf from './Pdfexport';
 import EditableReport from './ReportTemplate';
 import Modal from 'react-bootstrap/Modal';
 import '../App.css';
+import { jsonToModelFormat } from '../assets/jsonToDBmodel';
+import { prettifyJson } from '../assets/prettifyJson';
 
 function Resultdisplay({ data, setMapCoords }) {
   const [kiinteistot, setKiinteistot] = useState([]);
@@ -13,6 +15,8 @@ function Resultdisplay({ data, setMapCoords }) {
   
   const [showReport, setShowReport] = useState(false);
   const [reportRakennus, setReportRakennus] = useState(null);
+
+  const [korttiNappi, setKorttiNappi] = useState(false)
 
   //For alt ui 
   const [selectedRakennus, setSelectedRakennus] = useState({});
@@ -100,11 +104,19 @@ function Resultdisplay({ data, setMapCoords }) {
 
       {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
         <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary bg-dark text-white p-1">
-          <div className="card-header align-items-center">
-            <p className="h4 text-center">Kiinteistö <span className='text-decoration-underline'>{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}</span></p>
-            <button className="btn btn-outline-secondary btn-sm align-items-center" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>
-              <i className="bi bi-clipboard me-2"></i> Kopioi
+          <div className="card-header d-flex flex-column align-items-center">
+            <p className="h4 text-center">Kiinteistö <span className='text-decoration-underline'>{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}</span>
+              <button className="btn btn-outline-secondary btn-sm align-items-center ms-2" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>
+                <i className="bi bi-clipboard me-2"></i> Kopioi
+              </button>
+            </p>
+
+            <button type="button" className="btn btn-success mt-2" onClick={() => setKorttiNappi(prev => !prev)}> 
+                Luo taloyhtiökortti
             </button>
+            {korttiNappi && (<p>{prettifyJson(kiinteisto)}</p>)}
+            <div>SPACE</div>
+            {korttiNappi && (<p>{prettifyJson(jsonToModelFormat(kiinteisto))}</p>)}
           </div>
 
           {kiinteisto.rakennukset?.length > 0 ? (
