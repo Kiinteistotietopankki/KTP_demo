@@ -10,6 +10,13 @@ export const getKiinteistot = () =>
     }
   });
 
+export const getKiinteistoWhole = (id) =>
+  axios.get(`${API_BASE}/api/kiinteistot/full/${id}`, {
+    headers: {
+      'x-api-key' : API_KEY
+    }
+  })
+
 
 export const createKiinteisto = (data) =>
   axios.post(
