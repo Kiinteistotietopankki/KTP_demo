@@ -1,22 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import Tabletemplate from './Tabletemplate';
-import { Accordion } from 'react-bootstrap';
+import { Accordion, Button, Card, Col, Container, ListGroup, Row, Tab, Tabs } from 'react-bootstrap';
 import exportToExcel from './Excelexport';
 import exportToPdf from './Pdfexport';
 import EditableReport from './ReportTemplate';
 import Modal from 'react-bootstrap/Modal';
 import '../App.css';
+import { jsonToModelFormat } from '../assets/jsonToDBmodel';
+import { prettifyJson } from '../assets/prettifyJson';
+import { createKiinteisto } from '../api/api';
 
 function Resultdisplay({ data, setMapCoords }) {
   const [kiinteistot, setKiinteistot] = useState([]);
   const [selectedRakennukset, setSelectedRakennukset] = useState({});
+  
   const [showReport, setShowReport] = useState(false);
   const [reportRakennus, setReportRakennus] = useState(null);
 
+  const [korttiNappi, setKorttiNappi] = useState(false)
 
 
-    useEffect(() => {
+
+  //For alt ui 
+  const [selectedRakennus, setSelectedRakennus] = useState({});
+  const [selectedRakennusPerKiinteisto, setSelectedRakennusPerKiinteisto] = useState({});
+
+
+  const [response, setResponse] = useState({})
+
+  // useEffect(() => {
+  //     createKiinteisto()
+  //       .then(res => setKiinteistot(res.data.items))
+  //       .catch(err => console.error('Api error', err))
+  
+  //   }, []);
+
+
+
+  useEffect(() => {
         if (data.length > 0){
+            // console.log(data)
             setKiinteistot(data);
         }
     }, [data]);
@@ -89,37 +112,48 @@ function Resultdisplay({ data, setMapCoords }) {
     }
   };
 
+  const luoKortti = (kiinteisto) => {
+
+    const modelFormatKiinteisto = jsonToModelFormat(kiinteisto)
+    
+    console.log('Payload:', JSON.stringify(modelFormatKiinteisto, null, 2));
+    
+        createKiinteisto(modelFormatKiinteisto)
+        .then(res =>{
+          console.log('Raw response:', res);
+          console.log('Response data:', res.data);
+          setResponse(res.data)})
+        .catch(err => console.error('Api error', err))
+  }
+
+
   return (
     <div className="mt-4">
+
       {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
         <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary bg-dark text-white p-1">
-          <div className="card-header d-flex gap-3 align-items-center ms-2">
-            <p className="h4">Kiinteistö <span className='text-decoration-underline'>{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}</span></p>
-            <button className="btn btn-outline-secondary btn-sm d-flex align-items-center" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>
-              <i className="bi bi-clipboard me-2"></i> Kopioi
+          <div className="card-header d-flex flex-column align-items-center">
+            <p className="h4 text-center">Kiinteistö <span className='text-decoration-underline'>{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}</span>
+              <button className="btn btn-outline-secondary btn-sm align-items-center ms-2" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>
+                <i className="bi bi-clipboard me-2"></i> Kopioi
+              </button>
+            </p>
+
+            <button type="button" className="btn btn-success mt-2" onClick={() => luoKortti(kiinteisto)}> 
+                Luo taloyhtiökortti
             </button>
+
+            <div>{response.length > 0 && (<>{JSON.stringify(response)}</>)}</div>
+
+            {/* {korttiNappi && (<p>{prettifyJson(kiinteisto)}</p>)}
+            <div>SPACE</div>
+            {korttiNappi && (<p>{prettifyJson(jsonToModelFormat(kiinteisto))}</p>)} */}
           </div>
 
           {kiinteisto.rakennukset?.length > 0 ? (
             <>
               <div className="d-flex justify-content-between align-items-center p-2">
-                <label className="d-flex align-items-center gap-2 ms-4">
-                    <input
-                        type="checkbox"
-                    checked={
-                    kiinteisto.rakennukset.every(rakennus => selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value])
-                        }
-                        onChange={handleSelectAll}
-                        />
 
-                    
-                    Valitse kaikki rakennukset
-                </label>
-                <div className="d-flex gap-2">
-                  <button className="export-button" onClick={handleCreateReport}>Luo raportti</button>
-                  <button className="export-button" onClick={handleExport}>Tallenna Excel</button>
-                 
-                </div>
               </div>
 
               {kiinteisto.rakennukset.map((rakennus, rakennusIndex) => (
@@ -127,13 +161,7 @@ function Resultdisplay({ data, setMapCoords }) {
                   <div className="card-body">
                     <div className="card-header d-flex justify-content-between align-items-center">
                       <label className="d-flex align-items-center gap-2">
-                      <input
-                type="checkbox"
-                    checked={!!selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value]}
-                    onChange={() => handleCheckboxChange(rakennus.properties.yleistiedot.Rakennustunnus?.value)}
-                        />
 
-                        
                         Rakennus {rakennus.properties.yleistiedot.Rakennustunnus?.value || ''} - {Array.isArray(rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value) ? rakennus.properties.yleistiedot["Kohteen osoitteet"].value.join(", ") : rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value || ''}
                         {" "}{rakennus.properties.yleistiedot["Toimipaikka"]?.value || ''}{` (${rakennus.properties?.rakennustiedot["Rakennusluokitus"].value})`}
 
