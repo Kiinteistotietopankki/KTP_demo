@@ -28,17 +28,9 @@ function Resultdisplay({ data, setMapCoords }) {
 
   const [response, setResponse] = useState({})
 
-  // useEffect(() => {
-  //     createKiinteisto()
-  //       .then(res => setKiinteistot(res.data.items))
-  //       .catch(err => console.error('Api error', err))
-  
-  //   }, []);
-
-
 
   useEffect(() => {
-        if (data.length > 0){
+        if (data[0]?.rakennukset.length){
             // console.log(data)
             setKiinteistot(data);
         }
@@ -46,7 +38,7 @@ function Resultdisplay({ data, setMapCoords }) {
 
     // Initial map view
     useEffect(() => {
-        if (kiinteistot.length > 0){
+        if (Array.isArray(kiinteistot) && kiinteistot[0]?.rakennukset?.[0]?.geometry?.coordinates){
             setMapCoords(kiinteistot[0]?.rakennukset[0]?.geometry?.coordinates)
         }
     }, [kiinteistot]);
@@ -116,12 +108,12 @@ function Resultdisplay({ data, setMapCoords }) {
 
     const modelFormatKiinteisto = jsonToModelFormat(kiinteisto)
     
-    console.log('Payload:', JSON.stringify(modelFormatKiinteisto, null, 2));
+    // console.log('Payload:', JSON.stringify(modelFormatKiinteisto, null, 2));
     
         createKiinteisto(modelFormatKiinteisto)
         .then(res =>{
-          console.log('Raw response:', res);
-          console.log('Response data:', res.data);
+          // console.log('Raw response:', res);
+          // console.log('Response data:', res.data);
           setResponse(res.data)})
         .catch(err => console.error('Api error', err))
   }

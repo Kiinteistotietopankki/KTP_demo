@@ -51,7 +51,7 @@ function Search({afterSearch}) {
   };
 
   const setResponseCount = (response) =>{
-    setKiinteistoCount(response.length)
+    setKiinteistoCount(response[0]?.rakennukset.length > 0 ? response.length : 0)
   }
 
 
