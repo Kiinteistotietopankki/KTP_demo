@@ -131,7 +131,7 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
       };
 
       // Add default layer
-      layerBasePublic.addTo(map);
+      layerBaseMap.addTo(map);
 
       L.control.layers(baseMaps, overlayMaps, { collapsed: true }).addTo(map);
 

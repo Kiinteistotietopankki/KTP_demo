@@ -48,14 +48,12 @@ function Taloyhtiokortti() {
 
             <div className='row border border-danger mt-3'>
                 <Tabs
-                    defaultActiveKey="dokumentit"
+                    defaultActiveKey="perustiedot"
                     id="fill-tab-example"
                     className="mb-3"
                     fill
                 >
-                    <Tab eventKey="dokumentit" title="Dokumentit ja raportit">
-                        Tab content for Dokumentit ja raportit
-                    </Tab>
+ 
                     <Tab eventKey="perustiedot" title="Perustiedot">
                         <table class="table">
                                 <thead>
@@ -121,6 +119,9 @@ function Taloyhtiokortti() {
                                     })()}
                                 </tbody>
                             </table>
+                    </Tab>
+                    <Tab eventKey="dokumentit" title="Dokumentit ja raportit">
+                        Tab content for Dokumentit ja raportit
                     </Tab>
                     <Tab eventKey="kiinteistotiedot" title="Kiinteistotiedot">
                         Tab content for Kiinteistotiedot
