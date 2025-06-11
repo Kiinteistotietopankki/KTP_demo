@@ -10,8 +10,8 @@ export const getKiinteistot = () =>
     }
   });
 
-export const getKiinteistotWithData = (order='DESC', page=1) =>
-  axios.get(`${API_BASE}/api/kiinteistot/withdata?page=${page}&pageSize=5&order=${order}`, {
+export const getKiinteistotWithData = (order='DESC', page=1, searchTerm='') =>
+  axios.get(`${API_BASE}/api/kiinteistot/withdata?page=${page}&pageSize=5&order=${order}&searchTerm=${searchTerm}`, {
     headers: {
       'x-api-key': API_KEY 
     }

@@ -59,8 +59,8 @@ function Taloyhtiokortti() {
                                 <thead>
                                     <tr>
                                         <th scope="col">Tunnus</th>
-                                        <th scope="col">Rakennusvuosi</th>
-                                        <th scope="col">Kerroksia</th>
+                                        {/* <th scope="col">Rakennusvuosi</th>
+                                        <th scope="col">Kerroksia</th> */}
                                         <th scope="col">Kokonaisala m²</th>
                                         <th scope="col">Kerrosala m²</th>
                                         <th scope="col">Huoneistoala m²</th>
@@ -92,8 +92,8 @@ function Taloyhtiokortti() {
                                             return (
                                                 <tr key={rakennus.id_rakennus}>
                                                     <th scope="row">{rakennus.rakennustunnus}</th>
-                                                    <td>{tiedot.rakennusvuosi || 'Ei tiedossa'}</td>
-                                                    <td>{kerroksia}</td>
+                                                    {/* <td>{tiedot.rakennusvuosi || 'Ei tiedossa'}</td>
+                                                    <td>{kerroksia}</td> */}
                                                     <td>{kokonaisala}</td>
                                                     <td>{kerrosala}</td>
                                                     <td>{huoneistoala}</td>
@@ -107,8 +107,8 @@ function Taloyhtiokortti() {
                                                 {rows}
                                                 <tr>
                                                     <th scope="row">Yhteensä</th>
-                                                    <td>-</td>
-                                                    <td>-</td>
+                                                    {/* <td>-</td>
+                                                    <td>-</td> */}
                                                     <td>{totalKokonaisala}</td>
                                                     <td>{totalKerrosala}</td>
                                                     <td>{totalHuoneistoala}</td>

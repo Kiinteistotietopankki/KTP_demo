@@ -8,8 +8,11 @@ function Taloyhtiokortit() {
 
 
   const [kiinteistot, setKiinteistot] = useState()
+
   const [resultOrder, setResultOrder] = useState('DESC')
   const [page, setPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState('')
+
   const [totalPages, setTotalPages] = useState(0)
   const [totalItems, setTotalItems] = useState(0)
 
@@ -24,6 +27,19 @@ function Taloyhtiokortit() {
       .catch(err => console.error('Api error', err))
 
   }, [resultOrder, page]);
+
+  const handleSearch = () =>{
+    console.log("handlesearch with search term: ", searchTerm)
+    getKiinteistotWithData(resultOrder, page, searchTerm)
+      .then(res => {
+        setKiinteistot(res.data.items);
+        setTotalPages(res.data.totalPages);
+        setTotalItems(res.data.totalItems);
+        console.log(res.data)
+
+      })
+      .catch(err => console.error('Api error', err))
+  }
 
   const increasePage = () =>{
     if (page < totalPages){
@@ -50,7 +66,17 @@ function Taloyhtiokortit() {
               placeholder="Kiinteistötunnus, osoite tai paikkakunta"
               aria-label="Search"
               aria-describedby="button-addon2"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
+            <button
+              className="btn btn-primary"
+              type="button"
+              id="button-addon2"
+              onClick={handleSearch}
+            >
+              Hae
+            </button>
 
 
           </div>
@@ -70,10 +96,16 @@ function Taloyhtiokortit() {
 
 
           <nav aria-label="Page navigation example" className="d-flex justify-content-center">
-            <ul class="pagination">
-              <li class="page-item" onClick={decreasePage}><a class="page-link" href="#">Edellinen</a></li>
-              <li class="page-item disabled"><a class="page-link" href="#">{page}</a></li>
-              <li class="page-item" onClick={increasePage}><a class="page-link" href="#">Seuraava</a></li>
+            <ul className="pagination">
+              <li className="page-item">
+                <button className="page-link" onClick={decreasePage}>Edellinen</button>
+              </li>
+              <li className="page-item disabled">
+                <span className="page-link">{page}</span>
+              </li>
+              <li className="page-item">
+                <button className="page-link" onClick={increasePage}>Seuraava</button>
+              </li>
             </ul>
           </nav>
 
