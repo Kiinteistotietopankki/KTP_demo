@@ -17,7 +17,7 @@ function Taloyhtiokortit() {
   const [totalItems, setTotalItems] = useState(0)
 
   useEffect(() => {
-    getKiinteistotWithData(resultOrder, page)
+    getKiinteistotWithData(resultOrder, page, searchTerm)
       .then(res => {
         setKiinteistot(res.data.items);
         setTotalPages(res.data.totalPages);
@@ -53,6 +53,12 @@ function Taloyhtiokortit() {
     }
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch(); // Trigger search on Enter key
+    }
+  };
+
   return (
     <>
         <h1 className="otsikko text-primary mb-1 mx-auto">
@@ -67,6 +73,7 @@ function Taloyhtiokortit() {
               aria-label="Search"
               aria-describedby="button-addon2"
               value={searchTerm}
+              onKeyDown={handleKeyDown}  // search on enter press also
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <button
