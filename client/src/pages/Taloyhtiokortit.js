@@ -8,13 +8,34 @@ function Taloyhtiokortit() {
 
 
   const [kiinteistot, setKiinteistot] = useState()
+  const [resultOrder, setResultOrder] = useState('DESC')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalItems, setTotalItems] = useState(0)
 
   useEffect(() => {
-    getKiinteistotWithData()
-      .then(res => setKiinteistot(res.data.items))
+    getKiinteistotWithData(resultOrder, page)
+      .then(res => {
+        setKiinteistot(res.data.items);
+        setTotalPages(res.data.totalPages);
+        setTotalItems(res.data.totalItems);
+
+      })
       .catch(err => console.error('Api error', err))
 
-  }, []);
+  }, [resultOrder, page]);
+
+  const increasePage = () =>{
+    if (page < totalPages){
+      setPage(page+1)
+    }
+  }
+
+  const decreasePage = () =>{
+    if (page > 1){
+       setPage(page-1)
+    }
+  }
 
   return (
     <>
@@ -34,19 +55,29 @@ function Taloyhtiokortit() {
 
           </div>
 
+          <select
+            className="mx-auto mb-3 form-select w-50"
+            aria-label="Filter"
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === 'latest') setResultOrder('DESC');
+              else if (value === 'oldest') setResultOrder('ASC');
+            }}
+          >
+            <option value="latest">Uusimmat</option>
+            <option value="oldest">Vanhimmat</option>
+          </select>
+
+
           <nav aria-label="Page navigation example" className="d-flex justify-content-center">
             <ul class="pagination">
-              <li class="page-item"><a class="page-link" href="#">Edellinen</a></li>
-              <li class="page-item disabled"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">Seuraava</a></li>
+              <li class="page-item" onClick={decreasePage}><a class="page-link" href="#">Edellinen</a></li>
+              <li class="page-item disabled"><a class="page-link" href="#">{page}</a></li>
+              <li class="page-item" onClick={increasePage}><a class="page-link" href="#">Seuraava</a></li>
             </ul>
           </nav>
 
-            <select className="mx-auto mb-3 form-select w-50" aria-label="Filter">
-              <option value="latest">Uusimmat</option>
-              <option value="oldest">Vanhimmat</option>
-              <option value="alphabetical">Aakkosjärjestys</option>
-            </select>
+           <div className="d-flex justify-content-center">Kortteja: {totalItems} Sivuja: {totalPages}</div>
 
 
           <div className=''>
