@@ -10,6 +10,14 @@ export const getKiinteistot = () =>
     }
   });
 
+export const getKiinteistotWithData = () =>
+  axios.get(`${API_BASE}/api/kiinteistot/withdata`, {
+    headers: {
+      'x-api-key': API_KEY 
+    }
+  });
+
+
 export const getKiinteistoWhole = (id) =>
   axios.get(`${API_BASE}/api/kiinteistot/full/${id}`, {
     headers: {

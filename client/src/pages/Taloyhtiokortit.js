@@ -1,7 +1,7 @@
 import { Button, Card } from 'react-bootstrap';
 import Badge from 'react-bootstrap/Badge';
 import { Link } from 'react-router-dom';
-import { getKiinteistot } from '../api/api'; 
+import { getKiinteistot, getKiinteistotWithData } from '../api/api'; 
 import { useEffect, useState } from 'react';
 
 function Taloyhtiokortit() {
@@ -10,7 +10,7 @@ function Taloyhtiokortit() {
   const [kiinteistot, setKiinteistot] = useState()
 
   useEffect(() => {
-    getKiinteistot()
+    getKiinteistotWithData()
       .then(res => setKiinteistot(res.data.items))
       .catch(err => console.error('Api error', err))
 
@@ -52,11 +52,11 @@ function Taloyhtiokortit() {
           <div className=''>
               {kiinteistot?.map(kiinteisto => (
                 <Card key={kiinteisto.id_kiinteisto} className="mt-3">
-                  <Card.Header>{kiinteisto.kiinteistotunnus}</Card.Header>
+                  <Card.Header>{kiinteisto.osoite} | {kiinteisto.toimipaikka} {kiinteisto.postinumero}</Card.Header>
                   <Card.Body>
-                    <Card.Title>Kiinteistö...</Card.Title>
+                    <Card.Title>{kiinteisto.kiinteistotunnus}</Card.Title>
                     <Card.Text>
-                      Tämä on taloyhtiökortti...
+                      
                     </Card.Text>
                     
                     <Link key={kiinteisto.id_kiinteisto} to={`/taloyhtiokortti/${kiinteisto.id_kiinteisto}`}>
