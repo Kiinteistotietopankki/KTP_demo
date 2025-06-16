@@ -16,15 +16,23 @@ function Taloyhtiokortit() {
   const [totalPages, setTotalPages] = useState(0)
   const [totalItems, setTotalItems] = useState(0)
 
+  const [errMessage, setErrMessage] = useState('')
+
   useEffect(() => {
     getKiinteistotWithData(resultOrder, page, searchTerm)
       .then(res => {
         setKiinteistot(res.data.items);
         setTotalPages(res.data.totalPages);
         setTotalItems(res.data.totalItems);
+        // setErrMessage(res.response.data)
 
       })
-      .catch(err => console.error('Api error', err))
+      .catch(err => {
+        // console.error('Api error', err)
+        setErrMessage(err.response.data.error)
+      }
+    
+    )
 
   }, [resultOrder, page]);
 
@@ -116,8 +124,14 @@ function Taloyhtiokortit() {
             </ul>
           </nav>
 
-           <div className="d-flex justify-content-center">Kortteja: {totalItems} Sivuja: {totalPages}</div>
-
+            <div className="d-flex justify-content-center">Kortteja: {totalItems} Sivuja: {totalPages}</div>
+            <div className="d-flex justify-content-center mt-1">
+              {errMessage && (
+                <span className="badge bg-danger">
+                  {errMessage}
+                </span>
+              )}
+            </div>
 
           <div className=''>
               {kiinteistot?.map(kiinteisto => (
