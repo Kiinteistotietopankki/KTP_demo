@@ -44,6 +44,7 @@ function Taloyhtiokortit() {
         setTotalPages(res.data.totalPages);
         setTotalItems(res.data.totalItems);
         console.log(res.data)
+        
 
       })
       .catch(err => console.error('Api error', err))
