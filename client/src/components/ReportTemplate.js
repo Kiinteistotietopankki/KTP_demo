@@ -251,17 +251,17 @@ if (section.images.length) {
     if (section.key === 'jarjestelma') {
       content.push(
         { text: '     Riskiluokitus', fontSize: 14, semibold: true, margin: [0, 10, 0, 10] },
-        {
-          text: [
-            { text: '√ ', color: 'green', fontSize: 15 },
-            { text: ' Matala riski\n', fontSize: 11 },
-            { text: '√ ', color: 'orange', fontSize: 15 },
-            { text: ' Keskitason riski\n', fontSize: 11 },
-            { text: '√ ', color: 'red', fontSize: 15 },
-            { text: ' Korkea riski', fontSize: 11 }
-          ],
-          margin: [0, 0, 0, 10]
-        }
+     {
+  text: [
+      { text: '√ ', color: '#04aa00', fontSize: 15 },
+      { text: ' Matala riski\n', fontSize: 11 },
+      { text: '√ ', color: '#d0c407', fontSize: 15 },
+      { text: ' Keskitason riski\n', fontSize: 11 },
+      { text: '√ ', color: '#ba3b46', fontSize: 15 },
+      { text: ' Korkea riski', fontSize: 11 }
+  ],
+  margin: [0, 0, 0, 10]
+}
       );
 
       const tableLayout = {
