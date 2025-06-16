@@ -1,6 +1,6 @@
 export const config = {
-  appId: '6ac8e653-12ea-426a-b3b0-dc1078e34bb2', //(client) ID
-  redirectUri: 'https://ktp-demo-static.onrender.com/?searchQuery=&searchType=kiinteist%C3%B6tunnuksella', 
+  appId: 'e9e3688f-df1a-4f99-b541-9a09640647dd', //(client) ID
+  redirectUri: 'https://ktp-demo-static.onrender.com/?kiinteistotunnus=&osoite=&paikkakunta=' ,
   scopes: ['user.read'],
   authority: 'https://login.microsoftonline.com/waativa.fi',
 };
