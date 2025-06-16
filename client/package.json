@@ -39,6 +39,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build"
   },
+  "engines": {
+  "node": "18.x"
+},
   "eslintConfig": {
     "extends": [
       "react-app",
