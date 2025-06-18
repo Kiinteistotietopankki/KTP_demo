@@ -1,90 +1,48 @@
-import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import './App.css';
 import Home from './pages/Home';
-import Login from './pages/Login'; // Import Login page
+import Login from './pages/Login';
 import Logout from './pages/Logout';
 import Profile from './pages/profile';
-import { config } from './Config';
-import { PublicClientApplication } from '@azure/msal-browser';
-import { MsalProvider, useMsal } from '@azure/msal-react';
 import { useEffect } from 'react';
 import Badge from 'react-bootstrap/Badge';
 
-const msalInstance = new PublicClientApplication({
-  auth: {
-    clientId: config.appId,
-    authority: config.authority,
-    redirectUri: config.redirectUri,
-  },
-  
-});
-
-// suojattu reitti
-function ProtectedRoute({ children }) {
-  const { accounts } = useMsal();
-  return accounts.length > 0 ? children : <Navigate to="/login" replace />;
-}
-
-
 function App() {
   return (
-    <MsalProvider instance={msalInstance}>
-      <Router>
-        <ScrollToTop />
-
+    <Router>
+      <ScrollToTop />
       <div className="layout">
-          <Sidebar />
-          
+        <Sidebar />
         <div className="app-container">
-            <Routes>
-              <Route path="/login" element={<Login />} />
-
-              
-              <Route
-                path="/*"
-                element={
-                  //<ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on kirjautunut sisään */}
-                    
-                      <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/about" element={<About />} />
-                        <Route path="/contact" element={<Contact />} />
-                      <Route path="/logout" element={<Logout />} />
-                    </Routes>
-                  //</ProtectedRoute>
-                }
-              />
-              </Routes>
-          </div>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/logout" element={<Logout />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/" element={<Home />} />
+          </Routes>
         </div>
-      </Router>
-    </MsalProvider>
+      </div>
+    </Router>
   );
 }
 
-
 function ScrollToTop() {
-  const location = useLocation(); // Access the current route
-
-  // Scroll to top when the location changes (i.e., route changes)
+  const location = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0); // Scroll to top of the page
-  }, [location]); // Trigger when the route changes
-
-  return null; // This component does not need to render anything
+    window.scrollTo(0, 0);
+  }, [location]);
+  return null;
 }
-
 
 function About() {
-  return <h2 className='text-primary'>Ohjeet <Badge bg="secondary">Tulossa</Badge></h2>;
+  return <h2 className="text-primary">Ohjeet <Badge bg="secondary">Tulossa</Badge></h2>;
 }
-
 
 function Contact() {
-  return <h2 className='text-primary'>Ota yhteyttä <Badge bg="secondary">Tulossa</Badge></h2>;
+  return <h2 className="text-primary">Ota yhteyttä <Badge bg="secondary">Tulossa</Badge></h2>;
 }
-
 
 export default App;

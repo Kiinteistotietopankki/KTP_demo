@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import Profiledata from '../components/Profiledatafetch';
 import '../App.css';
 function Profile() {
-  const [userData, setUserData] = useState(null); // To store the fetched user data
+  const [userData, setUserData] = useState(null);
 
   return (
-    <div className="profile-container">
-    <Profiledata setUserData={setUserData} />
+    <div>
+      <h1>Profile</h1>
+      <Profiledata setUserData={setUserData} />
 
-    
-    {userData && (
-      <div className="profile-card">
-        <h3>Käyttäjätiedot</h3>
-        <div className="profile-info">
-          <p><strong>Nimi:</strong> {userData.displayName}</p>
-          <p><strong>Sähköposti:</strong> {userData.mail || 'Ei sähköpostia'}</p>
-          <p><strong>Puh.num:</strong> {userData.mobilePhone || 'Ei puhelinnumeroa'}</p>
+      {userData ? (
+        <div>
+          <p><strong>Name:</strong> {userData.displayName}</p>
+          <p><strong>Email:</strong> {userData.mail || userData.userPrincipalName}</p>
         </div>
-      </div>
-    )}
-  </div>
-);
+      ) : (
+        <p>Loading profile...</p>
+      )}
+    </div>
+  );
 }
 
 export default Profile;
