@@ -29,7 +29,7 @@ export const getKiinteistoWhole = (id) =>
 
 export const createKiinteisto = (data) =>
   axios.post(
-    `${API_URL}/api/kiinteistot/default`,
+    `${API_URL}/api/kiinteistot/full`,
     data, // JSON payload
     {
       headers: {
