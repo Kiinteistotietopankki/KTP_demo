@@ -1,20 +1,11 @@
 import { useEffect } from 'react';
 
 function Profiledata({ setUserData }) {
-  const fetchMicrosoftUserData = async () => {
-    const token = localStorage.getItem('accessToken'); // Or use cookie/session if backend handles auth
-
-    if (!token) {
-      console.error('No token found. Please log in.');
-      return;
-    }
-
+  const fetchUserData = async () => {
     try {
-      const response = await fetch('https://graph.microsoft.com/v1.0/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      const response = await fetch('http://localhost:3001/me', {
+        method: 'GET',
+        credentials: 'include', // ✅ include the session cookie in the request
       });
 
       if (!response.ok) {
@@ -22,18 +13,18 @@ function Profiledata({ setUserData }) {
       }
 
       const data = await response.json();
-      console.log('User Profile Data:', data);
-      setUserData(data); // Update parent component with fetched data
+      console.log('✅ User Profile Data:', data);
+      setUserData(data);
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('❌ Error fetching user data:', error);
     }
   };
 
   useEffect(() => {
-    fetchMicrosoftUserData();
+    fetchUserData();
   }, []);
 
-  return null; // 👈 No UI here; only data fetching side-effect
+  return null;
 }
 
 export default Profiledata;
