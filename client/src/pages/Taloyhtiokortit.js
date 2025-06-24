@@ -1,7 +1,7 @@
 import { Button, Card } from 'react-bootstrap';
 import Badge from 'react-bootstrap/Badge';
 import { Link } from 'react-router-dom';
-import { getKiinteistot, getKiinteistotWithData } from '../api/api'; 
+import {getKiinteistotWithData } from '../api/api'; 
 import { useEffect, useState } from 'react';
 
 function Taloyhtiokortit() {
@@ -44,7 +44,7 @@ function Taloyhtiokortit() {
         setTotalPages(res.data.totalPages);
         setTotalItems(res.data.totalItems);
         console.log(res.data)
-        
+
 
       })
       .catch(err => console.error('Api error', err))
