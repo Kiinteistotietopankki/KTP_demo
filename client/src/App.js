@@ -7,6 +7,8 @@ import Logout from './pages/Logout';
 import Profile from './pages/profile';
 import { useEffect } from 'react';
 import Badge from 'react-bootstrap/Badge';
+import Taloyhtiokortti from './pages/Taloyhtiokortti';
+import Taloyhtiokortit from './pages/Taloyhtiokortit';
 
 function App() {
   return (
@@ -15,16 +17,31 @@ function App() {
       <div className="layout">
         <Sidebar />
         <div className="app-container">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/logout" element={<Logout />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/" element={<Home />} />
-          </Routes>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+
+              
+              <Route
+                path="/*"
+                element={
+                  //<ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on kirjautunut sisään */}
+                    
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/taloyhtiokortit" element={<Taloyhtiokortit/>} />
+                        <Route path="/taloyhtiokortti/:id" element={<Taloyhtiokortti/>} />
+                        
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/logout" element={<Logout />} />
+                    </Routes>
+                  //</ProtectedRoute>
+                }
+              />
+              </Routes>
+          </div>
         </div>
-      </div>
     </Router>
   );
 }

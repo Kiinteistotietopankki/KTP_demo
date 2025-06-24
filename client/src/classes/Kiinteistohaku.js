@@ -125,8 +125,8 @@ export default class KiinteistoHaku {
     const tunnuksetWithAdressKeys =  kiinteistotunnusArray.map((val, index) => [val, akList[index]]);
 
 
-    const kiinteistot = tunnuksetWithAdressKeys.map(([buildingKey, addressKey]) =>
-      new Kiinteisto(buildingKey, addressKey)
+    const kiinteistot = tunnuksetWithAdressKeys.map(([kt, addressKey]) =>
+      new Kiinteisto(kt, addressKey)
     );
   
     // Call init on each
@@ -140,7 +140,7 @@ export default class KiinteistoHaku {
     const kiinteistotunnusArray = typeof kiinteistotunnukset === 'string' ? [kiinteistotunnukset] : Array.from(kiinteistotunnukset);
   
 
-    const kiinteistot = kiinteistotunnusArray.map(tunnus => new Kiinteisto(tunnus)); // Vanha, ilman addresskeyta
+    const kiinteistot = kiinteistotunnusArray.map(tunnus => new Kiinteisto(tunnus)); 
 
     // const kiinteistot = tunnuksetWithAdressKeys.map(([buildingKey, addressKey]) =>
     //   new Kiinteisto(buildingKey, addressKey)
