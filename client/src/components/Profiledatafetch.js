@@ -1,22 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useMsal } from '@azure/msal-react';
+import { useEffect } from 'react';
 
 function Profiledata({ setUserData }) {
-  const fetchMicrosoftUserData = async () => {
-    const token = localStorage.getItem('accessToken'); // Retrieve token from localStorage
-
-    if (!token) {
-      console.error('No token found. Please log in.');
-      return;
-    }
-
+  const fetchUserData = async () => {
     try {
-      const response = await fetch('https://graph.microsoft.com/v1.0/me', {
+      const response = await fetch('http://localhost:3001/me', {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`, 
-          'Content-Type': 'application/json',
-        },
+        credentials: 'include', // ✅ include the session cookie in the request
       });
 
       if (!response.ok) {
@@ -24,20 +13,18 @@ function Profiledata({ setUserData }) {
       }
 
       const data = await response.json();
-      console.log('User Profile Data:', data);
-      setUserData(data); // Updating user data in the parent component
-      
+      console.log('✅ User Profile Data:', data);
+      setUserData(data);
     } catch (error) {
-      console.error('Error fetching user data:', error);
-     
+      console.error('❌ Error fetching user data:', error);
     }
   };
 
   useEffect(() => {
-    fetchMicrosoftUserData(); 
+    fetchUserData();
   }, []);
 
- 
+  return null;
 }
 
 export default Profiledata;
