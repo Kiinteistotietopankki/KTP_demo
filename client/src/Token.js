@@ -1,4 +1,4 @@
-const TOKEN_KEY = 'accessToken'; // Key to store in localStorage
+const TOKEN_KEY = 'accessToken'; 
 
 
 export const saveToken = (token) => {

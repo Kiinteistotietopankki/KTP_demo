@@ -1,40 +1,49 @@
-// import { Navbar, Nav } from 'react-bootstrap';  // Importing the necessary Bootstrap components
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav'
-import React from 'react';
-import { Link,useNavigate } from 'react-router-dom';
-import { useMsal } from '@azure/msal-react';
-import '../App.css';
-
+import { useEffect, useState } from 'react';
+import { Navbar, Nav } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 function Sidebar() {
-  const { instance, accounts } = useMsal();
-  const navigate = useNavigate();
-  const accessToken = localStorage.getItem('accessToken')
-  const isAuthenticated = !!accessToken;
-  return (
-        <Navbar
-            bg="dark"
-            data-bs-theme="dark"
-            className="sidebar"
-            // expand="lg"
-        >
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-                <Nav className="flex-md-column flex-row">
-                    <Nav.Link as={Link} to="/" className="nav-item mt-md-3">Kiinteistöhaku</Nav.Link>
-                    <Nav.Link as={Link} to="/taloyhtiokortit" className="nav-item mt-md-3">Taloyhtiökortit</Nav.Link>
-                    <Nav.Link as={Link} to="/about" className="nav-item mt-md-1">Ohjeet</Nav.Link>
-                    <Nav.Link as={Link} to="/contact" className="nav-item mt-md-1">Ota yhteyttä</Nav.Link>
-                    <Nav.Link as={Link} to="/Profile" className="nav-item mt-md-1">Omat tiedot</Nav.Link>
-                
-                 {!isAuthenticated ? (
+  const checkAuth = () => {
+    fetch('http://localhost:3001/me', {
+      credentials: 'include',
+    })
+      .then(res => setIsAuthenticated(res.ok))
+      .catch(() => setIsAuthenticated(false));
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch('http://localhost:3001/auth/logout', {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    checkAuth(); // 🔁 Refresh auth state after logout
+  };
+
+  return (
+    <Navbar bg="dark" data-bs-theme="dark" className="sidebar">
+      <Nav className="flex-md-column flex-row">
+        <Nav.Link as={Link} to="/" className="nav-item mt-md-3">Kiinteistöhaku</Nav.Link>
+        <Nav.Link as={Link} to="/taloyhtiokortit" className="nav-item mt-md-3">Taloyhtiökortit</Nav.Link>
+        <Nav.Link as={Link} to="/about" className="nav-item mt-md-1">Ohjeet</Nav.Link>
+        <Nav.Link as={Link} to="/contact" className="nav-item mt-md-1">Ota yhteyttä</Nav.Link>
+        <Nav.Link as={Link} to="/Profile" className="nav-item mt-md-1">Omat tiedot</Nav.Link>
+
+        {!isAuthenticated ? (
           <Nav.Link as={Link} to="/login" className="nav-item">Kirjaudu</Nav.Link>
-        ): (
-          <Nav.Link as={Link} to="/logout" className="nav-item">Kirjaudu ulos</Nav.Link> 
+        ) : (
+          <Nav.Link as="button" onClick={handleLogout} className="nav-item btn btn-link">Kirjaudu ulos</Nav.Link>
         )}
-                </Nav>
-        </Navbar>
+      </Nav>
+    </Navbar>
   );
 }
+
 
 export default Sidebar;
