@@ -23,7 +23,8 @@ function Sidebar() {
       credentials: 'include',
     });
 
-    checkAuth(); // 🔁 Refresh auth state after logout
+    // checkAuth(); // 🔁 Refresh auth state after logout
+    window.location.reload();
   };
 
   return (

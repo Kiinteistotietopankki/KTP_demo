@@ -55,7 +55,7 @@ function Taloyhtiokortti() {
                 >
  
                     <Tab eventKey="perustiedot" title="Perustiedot">
-                        <table class="table">
+                        <table className="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">Tunnus</th>
