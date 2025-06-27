@@ -9,7 +9,7 @@ Toimeksiantaja:
 
 Tämä raportti on laadittu Insinööritoimisto Waativan toimesta. Tämän raportin ja siihen liittyvät tarkastukset on tehnyt seuraavat henkilöt:
 
-Koordinaattori:                                                 Insinööritoimisto Waativa
+Koordinaattori:                                                Insinööritoimisto Waativa
 Rakennustekniikka:                                       Insinööritoimisto Waativa
 LVIA-järjestelmät:                                          Insinööritoimisto Waativa
 Sähköjärjestelmät:                                         Insinööritoimisto Waativa
