@@ -5,11 +5,14 @@ import MapVisual from '../components/MapVisual';
 import { Tab, Tabs } from 'react-bootstrap';
 import StickyAfterScroll from '../components/Stickyafterscroll';
 import { getKiinteistoWhole } from '../api/api';
+import PropertyDetailsForm from '../components/ReportTemplate'; 
+import Modal from 'react-bootstrap/Modal';
 
 function Taloyhtiokortti() {
     const { id } = useParams();
     const [card, setCard] = useState(null);
-  
+    const [selectedRakennusForReport, setSelectedRakennusForReport] = useState(null);
+    const [showReportModal, setShowReportModal] = useState(false);
     useEffect(() => {
 
         getKiinteistoWhole(id)
@@ -98,6 +101,17 @@ function Taloyhtiokortti() {
                                                     <td>{kerrosala}</td>
                                                     <td>{huoneistoala}</td>
                                                     <td>{tilavuus}</td>
+                                                    <td>
+                                                    <button
+                                                    className="btn btn-sm btn-outline-primary"
+                                                    onClick={() => {
+                                                        setSelectedRakennusForReport(rakennus);
+                                                        setShowReportModal(true);
+                                                    }}
+                                                    >
+                                                    Luo raportti
+                                                    </button>
+                                                     </td>
                                                 </tr>
                                             );
                                         });
@@ -119,6 +133,22 @@ function Taloyhtiokortti() {
                                     })()}
                                 </tbody>
                             </table>
+                            <Modal
+                                    show={showReportModal}
+                                    onHide={() => setShowReportModal(false)}
+                                    size="xl"
+                                    backdrop="static"
+                                    >
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Luo raportti</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        {selectedRakennusForReport && (
+                                        <PropertyDetailsForm rakennus={selectedRakennusForReport} />
+                                        )}
+                                    </Modal.Body>
+                                    </Modal>
+
                     </Tab>
                     <Tab eventKey="dokumentit" title="Dokumentit ja raportit">
                         Tab content for Dokumentit ja raportit

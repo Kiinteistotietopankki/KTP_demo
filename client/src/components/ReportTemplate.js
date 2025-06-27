@@ -245,8 +245,25 @@ if (section.images.length) {
   content.push(...imageRows);
   content.push({ text: '', margin: [0, 10] });
 }
+content.push({
+  text: 'SISÄLLYSLUETTELO',
+  style: 'heading',
+  pageBreak: 'before',
+  margin: [0, 20, 0, 10]
+});
 
-
+let pageCounter = 3; // Adjust as needed
+sections.forEach((section, index) => {
+  if (section.include && section.key !== 'johdanto') {
+    const label = section.label.replace(/^(\W*\s*)/, ''); // Clean emoji
+    content.push({
+      columns: [
+        { text: `${index + 1}. ${label}`, style: 'paragraph', margin: [0, 2] },
+        { text: `${pageCounter++}`, alignment: 'right', style: 'paragraph', margin: [0, 2] }
+      ]
+    });
+  }
+});
 
     if (section.key === 'jarjestelma') {
       content.push(
