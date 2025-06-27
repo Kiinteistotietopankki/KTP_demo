@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import { useParams } from 'react-router-dom';
 import MapVisual from '../components/MapVisual';
@@ -10,19 +10,21 @@ function Taloyhtiokortti() {
     const { id } = useParams();
     const [card, setCard] = useState(null);
   
+    const hasFetched = useRef(false); //Ei api kutsua kahdesti jos haettu jo. Tuplapäivitys johtuu <StricMode> asetuksesta
+
     useEffect(() => {
+        if (hasFetched.current) return;  // Skip if already fetched
+        hasFetched.current = true;
 
         getKiinteistoWhole(id)
-            .then(res => {
-                setCard(res.data);
-                console.log(res.data)
-                console.log("SIJAINTI" , card?.rakennukset[0]?.rakennustiedot[0]?.sijainti?.coordinates)
-                // console.log("SIJAINTI" , card.rakennukset[0].rakennustiedot.sijainti.coordinates)
-            })
-            .catch(err => console.error('Api error', err))
+        .then(res => {
+            setCard(res.data);
+            console.log(res.data);
+            console.log("SIJAINTI", res.data?.rakennukset[0]?.rakennustiedot[0]?.sijainti?.coordinates);
+        })
+        .catch(err => console.error('Api error', err));
+    }, [id]);
 
-        }, [id]);
-    
     if (!card) return <div>Loading...</div>;
 
   return (
@@ -55,7 +57,7 @@ function Taloyhtiokortti() {
                 >
  
                     <Tab eventKey="perustiedot" title="Perustiedot">
-                        <table class="table">
+                        <table className="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">Tunnus</th>
