@@ -29,7 +29,7 @@ function Sidebar() {
   };
 
   return (
-    <nav class="navbar navbar-expand-lg navbar-light bg-light flex-column p-2">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light flex-column p-2 navbar-light bg-light border rounded shadow-sm">
         <a className="navbar-brand" href="#">      
           <img
             src={logo}
