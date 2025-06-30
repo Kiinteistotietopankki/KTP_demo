@@ -12,6 +12,8 @@ function Taloyhtiokortti() {
   
     const hasFetched = useRef(false); //Ei api kutsua kahdesti jos haettu jo. Tuplapäivitys johtuu <StricMode> asetuksesta
 
+    const [mapCoords, setMapCoords] = useState([])
+
     useEffect(() => {
         if (hasFetched.current) return;  // Skip if already fetched
         hasFetched.current = true;
@@ -20,7 +22,7 @@ function Taloyhtiokortti() {
         .then(res => {
             setCard(res.data);
             console.log(res.data);
-            console.log("SIJAINTI", res.data?.rakennukset[0]?.rakennustiedot[0]?.sijainti?.coordinates);
+            setMapCoords([res.data?.rakennukset[0]?.rakennustiedot[0]?.sijainti?.coordinates[1],res.data?.rakennukset[0]?.rakennustiedot[0]?.sijainti?.coordinates[0]])
         })
         .catch(err => console.error('Api error', err));
     }, [id]);
@@ -45,7 +47,7 @@ function Taloyhtiokortti() {
                     
                 
                 </div>
-                <div className="col-md-6 border border-primary"><MapVisual pos={[65.00816937, 25.46030678]} coords={[card?.rakennukset[0]?.rakennustiedot[0]?.sijainti?.coordinates[1],card?.rakennukset[0]?.rakennustiedot[0]?.sijainti?.coordinates[0]]}/></div>
+                <div className="col-md-6 border border-primary"><MapVisual pos={[65.00816937, 25.46030678]} coords={mapCoords}/></div>
             </div>
 
             <div className='row border border-danger mt-3'>
@@ -93,7 +95,14 @@ function Taloyhtiokortti() {
 
                                             return (
                                                 <tr key={rakennus.id_rakennus}>
-                                                    <th scope="row">{rakennus.rakennustunnus}</th>
+                                                    <th scope="row">
+                                                        <button
+                                                        className="btn btn-outline-primary btn-sm p-1 justify-content-center align-items-center p-2 me-2"
+                                                        onClick={() => setMapCoords([rakennus.rakennustiedot[0]?.sijainti?.coordinates[1],rakennus.rakennustiedot[0]?.sijainti?.coordinates[0]])}
+                                                        >
+                                                        <i className="bi bi-geo-alt-fill"></i>
+                                                        </button>
+                                                         {rakennus.rakennusluokitukset[0].rakennusluokitus} | {rakennus.rakennustunnus}</th>
                                                     {/* <td>{tiedot.rakennusvuosi || 'Ei tiedossa'}</td>
                                                     <td>{kerroksia}</td> */}
                                                     <td>{kokonaisala}</td>
