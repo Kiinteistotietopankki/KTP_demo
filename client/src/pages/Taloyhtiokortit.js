@@ -70,9 +70,9 @@ function Taloyhtiokortit() {
 
   return (
     <>
-        <h1 className="otsikko text-primary mb-1 mx-auto">
+        {/* <h1 className="otsikko text-primary mb-1 mx-auto">
             Kiinteistötietopankki <Badge bg="secondary">DEMO</Badge>
-        </h1>
+        </h1> */}
         <div className="container mt-3">
           <div className="input-group mb-3">
             <input
