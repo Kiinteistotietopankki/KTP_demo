@@ -171,7 +171,7 @@ useEffect(() => {
  const handleExportPdf = async () => {
   const content = [];
 
-  // Cover Page (no manual banner here)
+  // ➡️ Cover page
   content.push(
     { text: title || 'Raportin Otsikko', style: 'title', margin: [0, 60, 0, 20] },
     coverImage
@@ -179,13 +179,13 @@ useEffect(() => {
           image: coverImage,
           width: 300,
           alignment: 'center',
-          margin: [0, 0, 0, 20]
+          margin: [0, 0, 0, 20],
         }
       : {},
     { text: `Tarkastuspäivämäärä: ${customText}`, fontSize: 12, margin: [0, 0, 0, 40] }
   );
 
-
+  // ➡️ Kohteen perustiedot
   const yleistiedot = rakennusData?.properties?.yleistiedot || {};
   const teknisettiedot = rakennusData?.properties?.teknisettiedot || {};
   const allDetails = { ...yleistiedot, ...teknisettiedot };
@@ -195,15 +195,13 @@ useEffect(() => {
   const detailsTable = Object.entries(allDetails).map(([key, value]) => {
     const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
     let formattedValue = '';
-    let source = '';
-if (typeof value === 'object' && value !== null) {
-  formattedValue = typeof value.value === 'string' || typeof value.value === 'number' ? value.value : '';
-  source = value.source ?? '-';
-} else {
-  formattedValue = typeof value === 'string' || typeof value === 'number' ? value : '';
-  source = '-';
-}
-
+    let source = '-';
+    if (typeof value === 'object' && value !== null) {
+      formattedValue = value.value || '';
+      source = value.source || '-';
+    } else {
+      formattedValue = value || '';
+    }
     return [formattedKey, formattedValue, source];
   });
 
@@ -218,8 +216,53 @@ if (typeof value === 'object' && value !== null) {
     });
   }
 
+  // ➡️ Render Johdanto first (if included)
+  const johdantoSection = sections.find((s) => s.key === 'johdanto' && s.include);
+  if (johdantoSection) {
+    content.push(
+      { text: johdantoSection.label.toUpperCase(), style: 'sectionTitle', pageBreak: 'before', margin: [0, 10, 0, 5] },
+      { text: johdantoSection.content, style: 'paragraph', margin: [0, 0, 0, 10] }
+    );
+  }
+
+  // ➡️ Insert Sisällysluettelo (TOC) only once after Johdanto
+  content.push({
+    text: 'SISÄLLYSLUETTELO',
+    style: 'heading',
+    pageBreak: 'before',
+    margin: [0, 20, 0, 10],
+  });
+
+  let pageCounter = 3; // Adjust as needed
+
+  // ➡️ Include Johdanto in TOC
+  let tocIndex = 1;
+  if (johdantoSection) {
+    const label = johdantoSection.label.replace(/^(\W*\s*)/, '');
+    content.push({
+      columns: [
+        { text: `${tocIndex++}. ${label}`, style: 'paragraph', margin: [0, 2] },
+        { text: `${pageCounter++}`, alignment: 'right', style: 'paragraph', margin: [0, 2] },
+      ],
+    });
+  }
+
+  // ➡️ Add remaining sections to TOC
+  sections.forEach((section) => {
+    if (section.include && section.key !== 'johdanto') {
+      const label = section.label.replace(/^(\W*\s*)/, '');
+      content.push({
+        columns: [
+          { text: `${tocIndex++}. ${label}`, style: 'paragraph', margin: [0, 2] },
+          { text: `${pageCounter++}`, alignment: 'right', style: 'paragraph', margin: [0, 2] },
+        ],
+      });
+    }
+  });
+
+  // ➡️ Render remaining sections after TOC
   for (const section of sections) {
-    if (!section.include) continue;
+    if (!section.include || section.key === 'johdanto') continue;
 
     content.push(
       { text: section.label.toUpperCase(), style: 'sectionTitle', pageBreak: 'before', margin: [0, 10, 0, 5] }
@@ -228,57 +271,39 @@ if (typeof value === 'object' && value !== null) {
     if (section.content) {
       content.push({ text: section.content, style: 'paragraph', margin: [0, 0, 0, 10] });
     }
-    
-if (section.images.length) {
-  const imagesPerRow = 3;
-  const imageRows = [];
 
-  for (let i = 0; i < section.images.length; i += imagesPerRow) {
-    const rowImages = section.images.slice(i, i + imagesPerRow).map(img => ({
-      image: img,
-      width: 160,
-      margin: [5, 5, 5, 5]
-    }));
-    imageRows.push({ columns: rowImages, columnGap: 10 });
-  }
+    if (section.images && section.images.length) {
+      const imagesPerRow = 3;
+      const imageRows = [];
 
-  content.push(...imageRows);
-  content.push({ text: '', margin: [0, 10] });
-}
-content.push({
-  text: 'SISÄLLYSLUETTELO',
-  style: 'heading',
-  pageBreak: 'before',
-  margin: [0, 20, 0, 10]
-});
+      for (let i = 0; i < section.images.length; i += imagesPerRow) {
+        const rowImages = section.images.slice(i, i + imagesPerRow).map((img) => ({
+          image: img,
+          width: 160,
+          margin: [5, 5, 5, 5],
+        }));
+        imageRows.push({ columns: rowImages, columnGap: 10 });
+      }
 
-let pageCounter = 3; // Adjust as needed
-sections.forEach((section, index) => {
-  if (section.include && section.key !== 'johdanto') {
-    const label = section.label.replace(/^(\W*\s*)/, ''); // Clean emoji
-    content.push({
-      columns: [
-        { text: `${index + 1}. ${label}`, style: 'paragraph', margin: [0, 2] },
-        { text: `${pageCounter++}`, alignment: 'right', style: 'paragraph', margin: [0, 2] }
-      ]
-    });
-  }
-});
+      content.push(...imageRows);
+      content.push({ text: '', margin: [0, 10] });
+    }
 
+    // ➡️ If Jarjestelma section, render riskidata
     if (section.key === 'jarjestelma') {
       content.push(
         { text: '     Riskiluokitus', fontSize: 14, semibold: true, margin: [0, 10, 0, 10] },
-     {
-  text: [
-      { text: '√ ', color: '#04aa00', fontSize: 15 },
-      { text: ' Matala riski\n', fontSize: 11 },
-      { text: '√ ', color: '#d0c407', fontSize: 15 },
-      { text: ' Keskitason riski\n', fontSize: 11 },
-      { text: '√ ', color: '#ba3b46', fontSize: 15 },
-      { text: ' Korkea riski', fontSize: 11 }
-  ],
-  margin: [0, 0, 0, 10]
-}
+        {
+          text: [
+            { text: '√ ', color: '#04aa00', fontSize: 15 },
+            { text: ' Matala riski\n', fontSize: 11 },
+            { text: '√ ', color: '#d0c407', fontSize: 15 },
+            { text: ' Keskitason riski\n', fontSize: 11 },
+            { text: '√ ', color: '#ba3b46', fontSize: 15 },
+            { text: ' Korkea riski', fontSize: 11 },
+          ],
+          margin: [0, 0, 0, 10],
+        }
       );
 
       const tableLayout = {
@@ -301,32 +326,33 @@ sections.forEach((section, index) => {
           { text: category.toUpperCase(), fontSize: 14, semibold: true, margin: [0, 10, 0, 5] },
           {
             canvas: [
-              { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1.5, lineColor: '#008000' }
+              { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1.5, lineColor: '#008000' },
             ],
-            margin: [0, 0, 0, 5]
+            margin: [0, 0, 0, 5],
           }
         );
 
-        const tableBody = items.map(item => [
+        const tableBody = items.map((item) => [
           { text: item.label, fontSize: 11 },
           {
             columns: [
               { text: '√', color: item.risk === 'low' ? 'green' : item.risk === 'medium' ? 'orange' : 'red', fontSize: 11 },
-              { text: item.description || '', fontSize: 11 }
+              { text: item.description || '', fontSize: 11 },
             ],
-            columnGap: 6
-          }
+            columnGap: 6,
+          },
         ]);
 
         content.push({
           table: { widths: ['30%', '70%'], body: tableBody },
           layout: tableLayout,
-          margin: [0, 0, 0, 10]
+          margin: [0, 0, 0, 10],
         });
       }
     }
   }
 
+  // ➡️ Render Handsontable screenshot if exists
   if (hotTableRef.current) {
     const tableContainer = hotTableRef.current.hotInstance.rootElement;
     const canvas = await html2canvas(tableContainer);
@@ -336,42 +362,40 @@ sections.forEach((section, index) => {
       { image: imgData, width: 500 }
     );
   }
-pdfMake.createPdf({
-  content,
-  pageMargins: [30, 50, 30, 40], // Jätä tilaa bannerille yläosaan
-  defaultStyle: { font: 'Lato', fontSize: 12 },
-  styles: {
-    title: { font: 'JosefinSans', fontSize: 36, semibold: true },
-    heading: { font: 'JosefinSans', fontSize: 18, semibold: true },
-    sectionTitle: { font: 'JosefinSans', fontSize: 16, Regular: true },
-    paragraph: { font: 'Lato', fontSize: 11 },
-    tableHeader: { font: 'JosefinSans', fontSize: 12, bold: true },
-    tableCell: { font: 'Lato', fontSize: 10 },
-  },
-  header: (currentPage, pageCount) => {
-    const sidePadding = 30;
-    const bannerWidth = 595 - 2 * sidePadding;
 
-    return {
-      margin: [0, 0, 0, 10],
-      stack: [
-        {
-          canvas: [
-            { type: 'rect', x: sidePadding, y: 0, w: bannerWidth, h: 20, color: '#008000' },
-          ],
-        },
-        {
-          text: `${new Date().toLocaleDateString('fi-FI')}  |  ${PropertyName || 'ASUNTO OY MALLILIA'}`,
-          fontSize: 9,
-          color: 'white',
-          absolutePosition: { x: sidePadding + 5, y: 5 },
-        },
-      ],
-    };
-  },
-}).download(`${templates[selectedTemplate].name}_${PropertyName || 'Kohde'}.pdf`);
+  // ➡️ Create PDF
+  pdfMake.createPdf({
+    content,
+    pageMargins: [30, 50, 30, 40],
+    defaultStyle: { font: 'Lato', fontSize: 12 },
+    styles: {
+      title: { font: 'JosefinSans', fontSize: 36, semibold: true },
+      heading: { font: 'JosefinSans', fontSize: 18, semibold: true },
+      sectionTitle: { font: 'JosefinSans', fontSize: 16, Regular: true },
+      paragraph: { font: 'Lato', fontSize: 11 },
+    },
+    header: (currentPage, pageCount) => {
+      const sidePadding = 30;
+      const bannerWidth = 595 - 2 * sidePadding;
 
-
+      return {
+        margin: [0, 0, 0, 10],
+        stack: [
+          {
+            canvas: [
+              { type: 'rect', x: sidePadding, y: 0, w: bannerWidth, h: 20, color: '#008000' },
+            ],
+          },
+          {
+            text: `${new Date().toLocaleDateString('fi-FI')}  |  ${PropertyName || 'ASUNTO OY MALLILIA'}`,
+            fontSize: 9,
+            color: 'white',
+            absolutePosition: { x: sidePadding + 5, y: 5 },
+          },
+        ],
+      };
+    },
+  }).download(`${templates[selectedTemplate].name}_${PropertyName || 'Kohde'}.pdf`);
 
   resetForm();
 };
@@ -541,204 +565,185 @@ pdfMake.createPdf({
 
   
 
-      {/* osiott */}
-      {sections.map((section, index) => (
-        <div key={section.key} className="border p-4 rounded shadow-sm">
-          <div className="flex justify-between items-center mb-2">
-  <div
-    className="text-lg font-semibold cursor-pointer select-none"
-  onClick={() => {
-  const updated = [...sections];
-  updated[index].include = !updated[index].include;
+{sections.map((section, index) => (
+  <div key={section.key} className="border p-4 rounded shadow-sm">
+    <div className="flex justify-between items-center mb-2">
+      <div
+        className="text-lg font-semibold cursor-pointer select-none"
+        onClick={() => {
+          const updated = [...sections];
+          updated[index].include = !updated[index].include;
 
-  // If they turn on 'johdanto' and it's empty, auto-fill with JohdantoText
-  if (updated[index].include && section.key === 'johdanto' && !updated[index].content) {
-    updated[index].content = JohdantoText.Option1; // Set the content here!
-  }
-    if (updated[index].include && section.key === 'jarjestelma' && !updated[index].content) {
-    updated[index].content = Jarjestelmakuvaus.option1;
-  }
+          if (updated[index].include && section.key === 'johdanto' && !updated[index].content) {
+            updated[index].content = JohdantoText.Option1;
+          }
+          if (updated[index].include && section.key === 'jarjestelma' && !updated[index].content) {
+            updated[index].content = Jarjestelmakuvaus.option1;
+          }
 
-  setSections(updated);
-}}
+          setSections(updated);
+        }}
+      >
+        {section.label} {section.include ? '▼' : '▶️'}
+      </div>
+    </div>
 
+    {section.include && (
+      <>
+        <textarea
+          className="form-control mt-2"
+          rows="10"
+          value={section.content}
+          onChange={(e) => {
+            const updated = [...sections];
+            updated[index].content = e.target.value;
+            setSections(updated);
+          }}
+        />
 
-  >
-    {section.label} {section.include ? '▼' : '▶️'}
-  </div>
-
-  
-
-</div>
-
-
-{section.include && (
-  <>
-    <textarea
-      className="form-control mt-2"
-      rows="10"
-      value={section.content}
-      onChange={(e) => {
-        const updated = [...sections];
-        updated[index].content = e.target.value;
-        setSections(updated);
-      }}
-    />
-
-                      {/* kuvan lisäys*/}
-              <div className="mt-2">
-                <button
-                  className="btn btn-sm btn-outline-primary"
-                  onClick={() => document.getElementById(`file-${section.key}`).click()}
-                >
-                  ➕ Lisää kuva
-                </button>
-                <input
-                  type="file"
-                  id={`file-${section.key}`}
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  multiple
-                  onChange={(e) => {
-                   const files = Array.from(e.target.files);
-                      const convertToBase64 = (file) =>
-                      new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result); // result will be a data URL
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                      });
-
-                    Promise.all(files.map(convertToBase64)).then((base64Images) => {
-                      const updated = [...sections];
-                      updated[index].images.push(...base64Images);
-                      setSections(updated);
+        {/* Image upload for 'kuvat' sections */}
+        {(section.key.toLowerCase().includes('kuvat') || section.label.toLowerCase().includes('kuvat')) && (
+          <>
+            <div className="mt-2">
+              <button
+                className="btn btn-sm btn-outline-primary"
+                onClick={() => document.getElementById(`file-${section.key}`).click()}
+              >
+                ➕ Lisää kuva
+              </button>
+              <input
+                type="file"
+                id={`file-${section.key}`}
+                accept="image/*"
+                style={{ display: 'none' }}
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files);
+                  const convertToBase64 = (file) =>
+                    new Promise((resolve, reject) => {
+                      const reader = new FileReader();
+                      reader.onload = () => resolve(reader.result);
+                      reader.onerror = reject;
+                      reader.readAsDataURL(file);
                     });
-                   }}
-                />
-                </div>
-              <div
 
-style={{
-  display: 'grid',
-  gridTemplateColumns: 'repeat(3, 1fr)',
-  gap: '8px',
-  marginTop: '8px'
-}}
->
-{section.images.map((img, i) => (
-  <div key={i} style={{ position: 'relative' }}>
-    <img
-      src={img}
-      alt="Section"
-      style={{
-        width: '100px',
-        height: '100px',
-        objectFit: 'cover',
-        borderRadius: '4px'
-      }}
-    />
-    <button
-      type="button"
-      style={{
-        position: 'absolute',
-        top: '2px',
-        right: '90px',
-        background: '#ef4444',
-        color: 'white',
-        borderRadius: '9999px',
-        padding: '2px 6px',
-        fontSize: '10px',
-        opacity: 0.75,
-        border: 'none'
-      }}
-      onClick={() => {
-        const updated = [...sections];
-        updated[index].images = updated[index].images.filter((_, imgIndex) => imgIndex !== i);
-        setSections(updated);
-      }}
-    >
-      ❌
-    </button>
+                  Promise.all(files.map(convertToBase64)).then((base64Images) => {
+                    const updated = [...sections];
+                    updated[index].images.push(...base64Images);
+                    setSections(updated);
+                  });
+                }}
+              />
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '8px',
+                marginTop: '8px',
+              }}
+            >
+              {section.images.map((img, i) => (
+                <div key={i} style={{ position: 'relative' }}>
+                  <img
+                    src={img}
+                    alt="Section"
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      objectFit: 'cover',
+                      borderRadius: '4px',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    style={{
+                      position: 'absolute',
+                      top: '2px',
+                      right: '2px',
+                      background: '#ef4444',
+                      color: 'white',
+                      borderRadius: '9999px',
+                      padding: '2px 6px',
+                      fontSize: '10px',
+                      opacity: 0.75,
+                      border: 'none',
+                    }}
+                    onClick={() => {
+                      const updated = [...sections];
+                      updated[index].images = updated[index].images.filter((_, imgIndex) => imgIndex !== i);
+                      setSections(updated);
+                    }}
+                  >
+                    ❌
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Risk table for jarjestelma */}
+        {section.key === 'jarjestelma' && (
+          <div className="mt-4 space-y-2">
+            <h4 className="text-md font-semibold mb-2">Riskitaulu</h4>
+            {riskidata.map((item, riskIndex) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-4 border-b border-gray-300 pb-2"
+              >
+                <div className="w-1/4 font-semibold">{item.label}</div>
+                <div className="flex items-center gap-3 flex-1">
+                  <span
+                    style={{
+                      color:
+                        item.risk === 'low'
+                          ? 'green'
+                          : item.risk === 'medium'
+                          ? 'orange'
+                          : 'red',
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    √
+                  </span>
+
+                  <select
+                    className="form-input border px-2 py-1 rounded text-sm w-32 text-center"
+                    value={item.risk}
+                    onChange={(e) => {
+                      const updated = [...riskidata];
+                      updated[riskIndex].risk = e.target.value;
+                      setRiskidata(updated);
+                    }}
+                  >
+                    <option value="low">Matala riski</option>
+                    <option value="medium">Keskitason riski</option>
+                    <option value="high">Korkea riski</option>
+                  </select>
+
+                  <input
+                    type="text"
+                    className="form-input border px-2 py-1 rounded text-sm flex-1"
+                    placeholder="Kirjoita selite..."
+                    value={item.description || ''}
+                    onChange={(e) => {
+                      const updated = [...riskidata];
+                      updated[riskIndex].description = e.target.value;
+                      setRiskidata(updated);
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </>
+    )}
   </div>
 ))}
-</div>
 
-{section.key === 'jarjestelma' && (
-  <div className="mt-4 space-y-2">
-    <h4 className="text-md font-semibold mb-2">Riskitaulu</h4>
-    {riskidata.map((item, riskIndex) => (
-      <div
-        key={item.id}
-        className="flex items-center gap-4 border-b border-gray-300 pb-2"
-      >
-        {/* Riskin nimi */}
-        <div className="w-1/4 font-semibold">{item.label}</div>
-
-        {/* Riski + Selite (same row) */}
-        <div className="flex items-center gap-3 flex-1">
-          {/* Colored checkmark */}
-          <span
-            style={{
-              color:
-                item.risk === 'low'
-                  ? 'green'
-                  : item.risk === 'medium'
-                  ? 'orange'
-                  : 'red',
-              fontSize: '1.2rem',
-            }}
-          >
-            √
-          </span>
-
-          {/* Select with only colored checkmarks */}
-         <select
-  className="form-input border px-2 py-1 rounded text-sm w-32 text-center"
-  value={item.risk}
-  onChange={(e) => {
-    const updated = [...riskidata];
-    updated[riskIndex].risk = e.target.value;
-  if (updated[riskIndex].include && section.key === 'johdanto' && !updated[riskIndex].content) {
-    updated[riskIndex].content = JohdantoText.Option1; // Set the content here!
-  }
-    // Optional: prefill description if empty
-
-    setRiskidata(updated);
-  }}
->
-            <option value="low" style={{ color: 'green' }}>Matala riski</option>
-            <option value="medium" style={{ color: 'orange' }}>Keskitason riski</option>
-            <option value="high" style={{ color: 'red' }}>Korkea riski</option>
-          </select>
-
-          {/* Selite input */}
-          <input
-            type="text"
-            className="form-input border px-2 py-1 rounded text-sm flex-1"
-            placeholder="Kirjoita selite..."
-            value={item.description || ''}
-            onChange={(e) => {
-              const updated = [...riskidata];
-              updated[riskIndex].description = e.target.value;
-              setRiskidata(updated);
-            }}
-          />
-        </div>
-      </div>
-    ))}
-    
-  </div>
-)}
-
-
-
-
-
-            </>
-          )}
-        </div>
-      ))}
     
     <button onClick={handleAddCustomSection} className="btn btn-outline-primary">
         ➕ Lisää uusi osio
