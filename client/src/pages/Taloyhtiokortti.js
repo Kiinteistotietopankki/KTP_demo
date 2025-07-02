@@ -5,6 +5,7 @@ import MapVisual from '../components/MapVisual';
 import { Tab, Tabs } from 'react-bootstrap';
 import StickyAfterScroll from '../components/Stickyafterscroll';
 import { getKiinteistoWhole } from '../api/api';
+import PerustiedotAccordion from '../components/PerustiedotAccordion';
 
 function Taloyhtiokortti() {
     const { id } = useParams();
@@ -59,10 +60,7 @@ function Taloyhtiokortti() {
                 >
  
                     <Tab eventKey="perustiedot" title="Perustiedot">
-{/* 
-                            <div>
-                                <pre className="mb-0">{JSON.stringify(card, null, 2)}</pre>
-                            </div> */}
+                        <PerustiedotAccordion kiinteisto={card} setMapCoodinates={setMapCoords}></PerustiedotAccordion>
                     </Tab>
                     <Tab eventKey="dokumentit" title="Dokumentit ja raportit">
                         Tab content for Dokumentit ja raportit
