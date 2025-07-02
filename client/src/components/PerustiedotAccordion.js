@@ -13,11 +13,11 @@ export default function PerustiedotAccordion( {kiinteisto, setMapCoodinates} ) {
         {kiinteisto?.rakennukset.map(rakennus => (
             <div className="accordion-item">
                 <h2 className="accordion-header">
-                    <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target={`#perustiedot${rakennus.id_rakennus}`} aria-expanded="true" aria-controls={`perustiedot${rakennus.id_rakennus}`}>
+                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#perustiedot${rakennus.id_rakennus}`} aria-expanded="false" aria-controls={`perustiedot${rakennus.id_rakennus}`}>
                         {rakennus.osoite} | {rakennus.rakennusluokitukset[0].rakennusluokitus} | {rakennus.rakennustunnus}
                     </button>
                 </h2>
-                <div id={`perustiedot${rakennus.id_rakennus}`} className="accordion-collapse collapse show">
+                <div id={`perustiedot${rakennus.id_rakennus}`} className="accordion-collapse collapse">
                     <div className="accordion-body">
                         <div className="row">
                             <dl className="col-6">
@@ -41,23 +41,23 @@ export default function PerustiedotAccordion( {kiinteisto, setMapCoodinates} ) {
                                 </button>
 
                                 <div className="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                <div className="modal-dialog modal-dialog-centered" role="document">
-                                    <div className="modal-content">
-                                    <div className="modal-header">
-                                        <h5 className="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                                        <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                        </button>
+                                    <div className="modal-dialog modal-dialog-centered" role="document">
+                                        <div className="modal-content">
+                                        <div className="modal-header">
+                                            <h5 className="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                                            <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ...
+                                        </div>
+                                        <div className="modal-footer">
+                                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="button" className="btn btn-primary">Save changes</button>
+                                        </div>
+                                        </div>
                                     </div>
-                                    <div class="modal-body">
-                                        ...
-                                    </div>
-                                    <div className="modal-footer">
-                                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="button" className="btn btn-primary">Save changes</button>
-                                    </div>
-                                    </div>
-                                </div>
                                 </div>
 
 
