@@ -42,17 +42,16 @@ export default function PerustiedotAccordion( {kiinteisto, setMapCoodinates} ) {
                             <dl className="col-6">
 
 
-                                <dt className="col-sm-3">Rakennustunnus</dt>
-                                <dd>{rakennus.rakennustunnus} <br />
-                                    <small className="text-muted">Lähde: {rakennus?.metadata[0]?.metadata?.rakennustunnus?.source}</small>
-                                </dd>
+                                <RakennustietoRow otsikko='Rakennustunnus' data={rakennus.rakennustunnus} 
+                                    source={rakennus?.metadata[0]?.metadata?.rakennustunnus?.source} showEdit={false}/>
+
 
                                 <RakennustietoRow otsikko='Rakennusvuosi' data={rakennus.rakennustiedot[0].rakennusvuosi} 
-                                    source={rakennus?.metadata[0]?.metadata?.rakennustiedotArray[0]?.rakennusvuosi?.source}/>
+                                    source={rakennus?.metadata[0]?.metadata?.rakennustiedotArray[0]?.rakennusvuosi?.source} showEdit={false}/>
 
 
                                 <RakennustietoRow otsikko='Sijainti' data={`${rakennus.rakennustiedot[0]?.sijainti?.coordinates[1]}, ${rakennus.rakennustiedot[0]?.sijainti?.coordinates[0]}`} 
-                                    source={rakennus?.metadata[0]?.metadata?.rakennustiedotArray[0]?.sijainti?.source}/>
+                                    source={rakennus?.metadata[0]?.metadata?.rakennustiedotArray[0]?.sijainti?.source} showEdit={false}/>
                                     <button
                                         className="btn btn-outline-primary btn-sm"
                                         onClick={() => setMapCoords(rakennus.rakennustiedot[0]?.sijainti?.coordinates)}
