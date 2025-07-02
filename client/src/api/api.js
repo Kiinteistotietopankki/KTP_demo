@@ -13,7 +13,7 @@ export const getKiinteistot = () =>
   });
 
 export const getKiinteistotWithData = (order='DESC', page=1, searchTerm='') =>
-  axios.get(`${API_URL}/api/kiinteistot/basic-data?page=${page}&pageSize=5&order=${order}&searchTerm=${searchTerm}`, {
+  axios.get(`${API_URL}/api/kiinteistot/basic-data?page=${page}&pageSize=6&order=${order}&searchTerm=${searchTerm}`, {
     headers: {
       'x-api-key': API_KEY 
     },

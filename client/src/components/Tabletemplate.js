@@ -1,41 +1,41 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-const Tabletemplate = ({ properties, tableTitle }) => {
-    // Fallback in case properties is null or undefined
-    const safeProperties = properties || {};
-
-    // Dynamically generate headers from properties keys
-    const headers = Object.keys(safeProperties).map((key) => ({
+const TableTemplate = ({ properties = {}, tableTitle }) => {
+    const headers = Object.keys(properties).map((key) => ({
         key,
-        label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())  // Convert camelCase to human-readable text
+        label: key
+            .replace(/([A-Z])/g, ' $1') // Insert space before capital letters
+            .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
     }));
 
     return (
-        <div className="mb-3">
-            {tableTitle && <h6>{tableTitle}</h6>}
-            <Table striped bordered responsive hover style={{ fontSize: '0.8em' }}>
-                <thead>
+        <div className="mb-4">
+            {tableTitle && (
+                <h5 className="mb-3 text-primary fw-semibold">{tableTitle}</h5>
+            )}
+            <Table striped bordered hover responsive className="table-sm shadow-sm">
+                <thead className="table-light">
                     <tr>
-                        <th>Ominaisuus</th>
-                        <th>Arvo</th>
-                        <th>Lähde</th>
+                        <th style={{ width: '30%' }}>Ominaisuus</th>
+                        <th style={{ width: '50%' }}>Arvo</th>
+                        <th style={{ width: '20%' }}>Lähde</th>
                     </tr>
                 </thead>
                 <tbody>
                     {headers.map(({ key, label }) => {
-                        const property = safeProperties[key];
-
-                        const rawValue = property?.value;
-                        const value = Array.isArray(rawValue) ? rawValue.join(", ") : rawValue ?? '-';
-                        const source = rawValue ? property.source : '-';
+                        const { value, source } = properties[key] || {};
+                        const displayValue = Array.isArray(value)
+                            ? value.join(', ')
+                            : value ?? '-';
+                        const displaySource = value ? source : '-';
 
                         return (
-                        <tr key={key}>
-                            <td>{label}</td>
-                            <td>{value}</td>
-                            <td>{source}</td>
-                        </tr>
+                            <tr key={key}>
+                                <td className="fw-medium">{label}</td>
+                                <td>{displayValue}</td>
+                                <td className="text-muted small">{displaySource}</td>
+                            </tr>
                         );
                     })}
                 </tbody>
@@ -44,4 +44,4 @@ const Tabletemplate = ({ properties, tableTitle }) => {
     );
 };
 
-export default Tabletemplate;
+export default TableTemplate;
