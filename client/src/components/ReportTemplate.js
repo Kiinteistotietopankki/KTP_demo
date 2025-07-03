@@ -21,7 +21,8 @@ const PropertyDetailsForm = ({ rakennus }) => {
   const [PropertyName, setPropertyName] = useState(savedData.PropertyName || '');
   const [coverImage, setCoverImage] = useState(savedData.coverImage || null);
   const [riskidata, setRiskidata] = useState(savedData.riskidata || Riskidataa);
-
+const [previewUrl, setPreviewUrl] = useState(null);
+const [showPreviewModal, setShowPreviewModal] = useState(false);
 
 // raporttipohjat
 const templates = {
@@ -168,7 +169,7 @@ useEffect(() => {
 
 
 
- const handleExportPdf = async () => {
+  const buildPdfContent = async () => {
   const content = [];
 
   // ➡️ Cover page
@@ -181,7 +182,7 @@ useEffect(() => {
           alignment: 'center',
           margin: [0, 0, 0, 20],
         }
-      : {},
+      : null,
     { text: `Tarkastuspäivämäärä: ${customText}`, fontSize: 12, margin: [0, 0, 0, 40] }
   );
 
@@ -225,7 +226,7 @@ useEffect(() => {
     );
   }
 
-  // ➡️ Insert Sisällysluettelo (TOC) only once after Johdanto
+  // ➡️ Insert Sisällysluettelo (TOC)
   content.push({
     text: 'SISÄLLYSLUETTELO',
     style: 'heading',
@@ -233,10 +234,9 @@ useEffect(() => {
     margin: [0, 20, 0, 10],
   });
 
-  let pageCounter = 3; // Adjust as needed
-
-  // ➡️ Include Johdanto in TOC
+  let pageCounter = 3;
   let tocIndex = 1;
+
   if (johdantoSection) {
     const label = johdantoSection.label.replace(/^(\W*\s*)/, '');
     content.push({
@@ -247,7 +247,6 @@ useEffect(() => {
     });
   }
 
-  // ➡️ Add remaining sections to TOC
   sections.forEach((section) => {
     if (section.include && section.key !== 'johdanto') {
       const label = section.label.replace(/^(\W*\s*)/, '');
@@ -260,13 +259,19 @@ useEffect(() => {
     }
   });
 
-  // ➡️ Render remaining sections after TOC
+  // ➡️ Render remaining sections with only first page break
+  let first = true;
   for (const section of sections) {
-    if (!section.include || section.key === 'johdanto') continue;
+    if (!section.include) continue;
 
-    content.push(
-      { text: section.label.toUpperCase(), style: 'sectionTitle', pageBreak: 'before', margin: [0, 10, 0, 5] }
-    );
+    content.push({
+      text: section.label.toUpperCase(),
+      style: 'sectionTitle',
+      pageBreak:'before',
+      margin: [0, 10, 0, 5]
+    });
+
+    first = false;
 
     if (section.content) {
       content.push({ text: section.content, style: 'paragraph', margin: [0, 0, 0, 10] });
@@ -285,14 +290,12 @@ useEffect(() => {
         imageRows.push({ columns: rowImages, columnGap: 10 });
       }
 
-      content.push(...imageRows);
-      content.push({ text: '', margin: [0, 10] });
+      content.push(...imageRows, { text: '', margin: [0, 10] });
     }
 
-    // ➡️ If Jarjestelma section, render riskidata
     if (section.key === 'jarjestelma') {
       content.push(
-        { text: '     Riskiluokitus', fontSize: 14, semibold: true, margin: [0, 10, 0, 10] },
+        { text: 'Riskiluokitus', fontSize: 14, semibold: true, margin: [0, 10, 0, 10] },
         {
           text: [
             { text: '√ ', color: '#04aa00', fontSize: 15 },
@@ -321,50 +324,57 @@ useEffect(() => {
         return acc;
       }, {});
 
-      for (const [category, items] of Object.entries(grouped)) {
-        content.push(
-          { text: category.toUpperCase(), fontSize: 14, semibold: true, margin: [0, 10, 0, 5] },
-          {
-            canvas: [
-              { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1.5, lineColor: '#008000' },
-            ],
-            margin: [0, 0, 0, 5],
-          }
-        );
-
-        const tableBody = items.map((item) => [
-          { text: item.label, fontSize: 11 },
-          {
-            columns: [
-              { text: '√', color: item.risk === 'low' ? 'green' : item.risk === 'medium' ? 'orange' : 'red', fontSize: 11 },
-              { text: item.description || '', fontSize: 11 },
-            ],
-            columnGap: 6,
-          },
-        ]);
-
-        content.push({
-          table: { widths: ['30%', '70%'], body: tableBody },
-          layout: tableLayout,
-          margin: [0, 0, 0, 10],
-        });
-      }
+for (const [category, items] of Object.entries(grouped)) {
+  const tableBody = items.map(item => [
+    { text: item.label, fontSize: 11 },
+    {
+      columns: [
+        {
+          text: '√',
+          color:
+            item.risk === 'low' ? 'green' :
+            item.risk === 'medium' ? 'orange' : 'red',
+          fontSize: 11
+        },
+        { text: item.description || '', fontSize: 11 }
+      ],
+      columnGap: 6
     }
-  }
+  ]);
 
-  // ➡️ Render Handsontable screenshot if exists
-  if (hotTableRef.current) {
-    const tableContainer = hotTableRef.current.hotInstance.rootElement;
-    const canvas = await html2canvas(tableContainer);
-    const imgData = canvas.toDataURL('image/png');
-    content.push(
-      { text: 'PTS-ehdotukset', fontSize: 16, semibold: true, margin: [0, 20, 0, 10] },
-      { image: imgData, width: 500 }
-    );
-  }
+ content.push({
+  stack: [
+    {
+      text: category.toUpperCase(),
+      fontSize: 14,
+      bold: true,
+      margin: [0, 2, 0, 0] // reduced bottom margin from 2 to 0
+    },
+    {
+      canvas: [
+        {
+          type: 'line',
+          x1: 0,
+          y1: 0,
+          x2: 515,
+          y2: 0,
+          lineWidth: 1,
+          lineColor: '#008000'
+        }
+      ],
+      margin: [0, 2, 0, 2] // reduced top and bottom margin
+    },
+    {
+      table: { widths: ['30%', '70%'], body: tableBody },
+      layout: tableLayout,
+      margin: [0, 0, 0, 4] // reduced bottom spacing for next block
+    }
+  ],
+  unbreakable: true
+});
+}}}
 
-  // ➡️ Create PDF
-  pdfMake.createPdf({
+  const docDefinition = {
     content,
     pageMargins: [30, 50, 30, 40],
     defaultStyle: { font: 'Lato', fontSize: 12 },
@@ -377,7 +387,6 @@ useEffect(() => {
     header: (currentPage, pageCount) => {
       const sidePadding = 30;
       const bannerWidth = 595 - 2 * sidePadding;
-
       return {
         margin: [0, 0, 0, 10],
         stack: [
@@ -395,14 +404,50 @@ useEffect(() => {
         ],
       };
     },
-  }).download(`${templates[selectedTemplate].name}_${PropertyName || 'Kohde'}.pdf`);
+  };
 
-  resetForm();
+  return docDefinition;
 };
 
+   const handleExportPdf = async () => {
+  const docDefinition = await buildPdfContent();
+  const pdfDocGenerator = pdfMake.createPdf(docDefinition);
 
+  pdfDocGenerator.getBlob(async (blob) => {
+    try {
+      const formData = new FormData();
+      const templateName = templates[selectedTemplate]?.name || 'Raportti';
+      const fileName = `${templateName}_${PropertyName || 'Kohde'}.pdf`;
 
+      formData.append('pdf', blob, fileName);
 
+      const response = await fetch('http://localhost:3001/uploadpdf', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log('✅ Upload to SharePoint result:', data);
+    } catch (err) {
+      console.error('❌ Upload error:', err);
+    }
+
+    const templateName = templates[selectedTemplate]?.name || 'Raportti';
+    const fileName = `${templateName}_${PropertyName || 'Kohde'}.pdf`;
+    pdfDocGenerator.download(fileName);
+  });
+};
+
+const handlePreviewPdf = async () => {
+  const docDefinition = await buildPdfContent();
+  const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+
+  pdfDocGenerator.getBlob((blob) => {
+    const blobUrl = URL.createObjectURL(blob);
+    setPreviewUrl(blobUrl);
+    setShowPreviewModal(true);
+  });
+};
   const handleCoverImageUpload = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -421,7 +466,7 @@ useEffect(() => {
     onChange={(e) => {
       const newKey = e.target.value;
       setSelectedTemplate(newKey);
-      setSections(templates[newKey].defaultSections); // Replace sections with selected template
+      setSections(templates[newKey].defaultSections);
     }}
   >
     {Object.entries(templates).map(([key, tpl]) => (
@@ -749,11 +794,34 @@ useEffect(() => {
         ➕ Lisää uusi osio
       </button>
       {/* Excel */}
-      <div className="flex justify-center mt-6">
-        <button onClick={handleExportPdf} className="btn btn-primary">
-          Lataa Raportti
-        </button>
-      </div>
+<div className="flex justify-center mt-6 gap-4">
+  <button onClick={handlePreviewPdf} className="btn btn-secondary">
+    Esikatsele Raportti
+  </button>
+  <button onClick={handleExportPdf} className="btn btn-primary">
+    Lataa Raportti
+  </button>
+</div>
+{showPreviewModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+    <div className="bg-white p-2 rounded shadow-md w-[90vw] h-[90vh] relative">
+      <button
+        className="absolute top-2 right-2 text-black bg-gray-200 rounded px-2 py-1"
+        onClick={() => {
+          URL.revokeObjectURL(previewUrl);
+          setShowPreviewModal(false);
+        }}
+      >
+        ❌ Close
+      </button>
+      <embed
+        src={previewUrl}
+        type="application/pdf"
+        className="w-full h-full"
+      />
+    </div>
+  </div>
+)}
     </div>
     </div>
   );
