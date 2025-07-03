@@ -10,12 +10,15 @@ export default function RakennustietoRow( {otsikko, data, source, showEdit=true}
         {data === null ? "Ei tiedossa" : data}
         {showEdit && (            
             <button
-                onClick={()=> alert(`Muokkaa ${otsikko}`)}
+                // onClick={()=> alert(`Muokkaa ${otsikko}`)}
                 style={{ border: "none", background: "transparent", cursor: "pointer" }}
                 aria-label={`Edit ${otsikko}`}
                 title="Muokkaa"
+                data-bs-toggle="modal"
+                data-bs-target="#editModal"
                 >
                 <i className="bi bi-pencil-square"></i>
+
             </button> 
         )}
 

@@ -3,6 +3,7 @@ import Badge from 'react-bootstrap/Badge';
 import { Link } from 'react-router-dom';
 import { getKiinteistotWithData } from '../api/api';
 import { useEffect, useState } from 'react';
+import PageSizeSelector from '../components/PageSizeSelector';
 
 function Taloyhtiokortit() {
   const [kiinteistot, setKiinteistot] = useState();
@@ -10,11 +11,13 @@ function Taloyhtiokortit() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalPages, setTotalPages] = useState(0);
+  const [pageSize, setPageSize] = useState(6)
   const [totalItems, setTotalItems] = useState(0);
   const [errMessage, setErrMessage] = useState('');
 
+
   useEffect(() => {
-    getKiinteistotWithData(resultOrder, page, searchTerm)
+    getKiinteistotWithData(resultOrder, page, searchTerm, pageSize)
       .then(res => {
         setKiinteistot(res.data.items);
         setTotalPages(res.data.totalPages);
@@ -23,10 +26,10 @@ function Taloyhtiokortit() {
       .catch(err => {
         setErrMessage(err.response?.data?.error || 'Virhe haussa');
       });
-  }, [resultOrder, page]);
+  }, [resultOrder, page, pageSize]);
 
   const handleSearch = () => {
-    getKiinteistotWithData(resultOrder, page, searchTerm)
+    getKiinteistotWithData(resultOrder, page, searchTerm, pageSize)
       .then(res => {
         setKiinteistot(res.data.items);
         setTotalPages(res.data.totalPages);
@@ -100,6 +103,7 @@ function Taloyhtiokortit() {
 
         <div className="text-center mb-3 fw-semibold">
           Kortteja: {totalItems} | Sivuja: {totalPages}
+          {/* <PageSizeSelector pageSize={pageSize} setPageSize={setPageSize}></PageSizeSelector> */}
         </div>
 
         {errMessage && (

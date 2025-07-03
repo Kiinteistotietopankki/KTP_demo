@@ -12,8 +12,8 @@ export const getKiinteistot = () =>
     withCredentials: true
   });
 
-export const getKiinteistotWithData = (order='DESC', page=1, searchTerm='') =>
-  axios.get(`${API_URL}/api/kiinteistot/basic-data?page=${page}&pageSize=6&order=${order}&searchTerm=${searchTerm}`, {
+export const getKiinteistotWithData = (order='DESC', page=1, searchTerm='', pageSize=6) =>
+  axios.get(`${API_URL}/api/kiinteistot/basic-data?page=${page}&pageSize=${pageSize}&order=${order}&searchTerm=${searchTerm}`, {
     headers: {
       'x-api-key': API_KEY 
     },

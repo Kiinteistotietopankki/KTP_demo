@@ -37,11 +37,11 @@ export default function PerustiedotAccordion( {kiinteisto, setMapCoodinates} ) {
                                     <small className="text-muted">Lähde: {rakennus?.metadata[0]?.metadata?.toimipaikka?.source}</small>
                                 </dd>
 
-                                <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">
+                                {/* <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">
                                     Launch demo modal
-                                </button>
+                                </button> 
                                 
-                                <EditModal></EditModal>
+                                <EditModal></EditModal> */}
 
 
 
