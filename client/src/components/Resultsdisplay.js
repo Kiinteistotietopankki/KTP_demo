@@ -108,6 +108,7 @@ function Resultdisplay({ data, setMapCoords }) {
 
   const luoKortti = (kiinteisto) => {
     const modelFormatKiinteisto = jsonToModelFormat(kiinteisto);
+    console.log('DB FORMAT:', modelFormatKiinteisto)
 
     createKiinteisto(modelFormatKiinteisto)
       .then(res => {

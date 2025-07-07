@@ -12,14 +12,24 @@ export const getKiinteistot = () =>
     withCredentials: true
   });
 
-export const getKiinteistotWithData = (order='DESC', page=1, searchTerm='', pageSize=6) =>
-  axios.get(`${API_URL}/api/kiinteistot/basic-data?page=${page}&pageSize=${pageSize}&order=${order}&searchTerm=${searchTerm}`, {
+export const getKiinteistotWithRakennukset = (
+  page = 1,
+  limit = 6,
+  orderBy = 'id_kiinteisto',
+  orderDir = 'ASC'
+) => 
+  axios.get(`${API_URL}/api/kiinteistot/with-rakennukset`, {
     headers: {
-      'x-api-key': API_KEY 
+      'x-api-key': API_KEY,
     },
-    withCredentials: true
+    withCredentials: true,
+    params: {
+      page,
+      limit,
+      orderBy,
+      orderDir,
+    },
   });
-
 
 export const getKiinteistoWhole = (id) =>
   axios.get(`${API_URL}/api/kiinteistot/full/${id}`, {
@@ -32,14 +42,13 @@ export const getKiinteistoWhole = (id) =>
 
 export const createKiinteisto = (data) =>
   axios.post(
-    `${API_URL}/api/kiinteistot/full`,
-    data, // JSON payload
+    `${API_URL}/api/kiinteistot/with-rakennukset`,
+    data,
     {
       headers: {
         'x-api-key': API_KEY,
         'Content-Type': 'application/json',
       },
-      withCredentials: true
-    },
-
+      withCredentials: true,
+    }
   );

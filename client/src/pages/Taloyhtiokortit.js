@@ -1,45 +1,38 @@
 import { Button, Card, Form, InputGroup } from 'react-bootstrap';
 import Badge from 'react-bootstrap/Badge';
 import { Link } from 'react-router-dom';
-import { getKiinteistotWithData } from '../api/api';
+import { getKiinteistotWithRakennukset } from '../api/api'; // your updated api function
 import { useEffect, useState } from 'react';
-import PageSizeSelector from '../components/PageSizeSelector';
 
 function Taloyhtiokortit() {
-  const [kiinteistot, setKiinteistot] = useState();
-  const [resultOrder, setResultOrder] = useState('DESC');
+  const [kiinteistot, setKiinteistot] = useState([]);
+  const [resultOrder, setResultOrder] = useState('ASC'); // default ASC matches your API default
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalPages, setTotalPages] = useState(0);
-  const [pageSize, setPageSize] = useState(6)
+  const [pageSize, setPageSize] = useState(6);
   const [totalItems, setTotalItems] = useState(0);
   const [errMessage, setErrMessage] = useState('');
 
+  // Fetch data function
+  const fetchData = async () => {
+    try {
+      setErrMessage('');
+      // Assuming your API currently does not support searchTerm yet; if it does, add to params
+      const response = await getKiinteistotWithRakennukset(page, pageSize, 'id_kiinteisto', resultOrder);
+      const { data, totalPages, totalItems } = response.data;
+      console.log("data", data)
+      setKiinteistot(data);
+      setTotalPages(totalPages);
+      setTotalItems(totalItems);
+    } catch (error) {
+      setErrMessage(error.message || 'Error fetching data');
+    }
+  };
 
   useEffect(() => {
-    getKiinteistotWithData(resultOrder, page, searchTerm, pageSize)
-      .then(res => {
-        setKiinteistot(res.data.items);
-        setTotalPages(res.data.totalPages);
-        setTotalItems(res.data.totalItems);
-      })
-      .catch(err => {
-        setErrMessage(err.response?.data?.error || 'Virhe haussa');
-      });
-  }, [resultOrder, page, pageSize]);
-
-  const handleSearch = () => {
-    getKiinteistotWithData(resultOrder, page, searchTerm, pageSize)
-      .then(res => {
-        setKiinteistot(res.data.items);
-        setTotalPages(res.data.totalPages);
-        setTotalItems(res.data.totalItems);
-        setErrMessage('');
-      })
-      .catch(err => {
-        setErrMessage(err.response?.data?.error || 'Virhe haussa');
-      });
-  };
+    fetchData();
+  }, [page, pageSize, resultOrder]); // re-fetch when these change
 
   const increasePage = () => {
     if (page < totalPages) setPage(page + 1);
@@ -47,6 +40,12 @@ function Taloyhtiokortit() {
 
   const decreasePage = () => {
     if (page > 1) setPage(page - 1);
+  };
+
+  const handleSearch = () => {
+    setPage(1);
+    // TODO: If your API supports searchTerm, pass it here and in fetchData
+    fetchData();
   };
 
   const handleKeyDown = (e) => {
@@ -103,7 +102,6 @@ function Taloyhtiokortit() {
 
         <div className="text-center mb-3 fw-semibold">
           Kortteja: {totalItems} | Sivuja: {totalPages}
-          {/* <PageSizeSelector pageSize={pageSize} setPageSize={setPageSize}></PageSizeSelector> */}
         </div>
 
         {errMessage && (
@@ -119,7 +117,7 @@ function Taloyhtiokortit() {
             <div key={kiinteisto.id_kiinteisto} className="col-md-6 col-lg-4">
               <Card className="h-100 shadow-sm border-primary hover-shadow transition">
                 <Card.Header className="bg-primary text-white fw-bold fs-5">
-                  {kiinteisto.osoite} | {kiinteisto.toimipaikka} {kiinteisto.postinumero}
+                  {kiinteisto.rakennukset_fulls[0]?.osoite} | {kiinteisto.toimipaikka} {kiinteisto.postinumero}
                 </Card.Header>
                 <Card.Body className="d-flex flex-column justify-content-between">
                   <Card.Title className="fs-6 text-secondary">
