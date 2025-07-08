@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 function Taloyhtiokortit() {
   const [kiinteistot, setKiinteistot] = useState([]);
-  const [resultOrder, setResultOrder] = useState('ASC'); // default ASC matches your API default
+  const [resultOrder, setResultOrder] = useState('DESC'); // default ASC matches your API default
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalPages, setTotalPages] = useState(0);
@@ -18,10 +18,14 @@ function Taloyhtiokortit() {
   const fetchData = async () => {
     try {
       setErrMessage('');
-      // Assuming your API currently does not support searchTerm yet; if it does, add to params
-      const response = await getKiinteistotWithRakennukset(page, pageSize, 'id_kiinteisto', resultOrder);
+      const response = await getKiinteistotWithRakennukset(
+        page,
+        pageSize,
+        'id_kiinteisto',
+        resultOrder,
+        searchTerm // 🔹 New parameter passed to API
+      );
       const { data, totalPages, totalItems } = response.data;
-      console.log("data", data)
       setKiinteistot(data);
       setTotalPages(totalPages);
       setTotalItems(totalItems);
@@ -32,7 +36,8 @@ function Taloyhtiokortit() {
 
   useEffect(() => {
     fetchData();
-  }, [page, pageSize, resultOrder]); // re-fetch when these change
+  }, [page, pageSize, resultOrder]); 
+
 
   const increasePage = () => {
     if (page < totalPages) setPage(page + 1);
@@ -44,8 +49,7 @@ function Taloyhtiokortit() {
 
   const handleSearch = () => {
     setPage(1);
-    // TODO: If your API supports searchTerm, pass it here and in fetchData
-    fetchData();
+    fetchData(); // Trigger search
   };
 
   const handleKeyDown = (e) => {
@@ -117,7 +121,7 @@ function Taloyhtiokortit() {
             <div key={kiinteisto.id_kiinteisto} className="col-md-6 col-lg-4">
               <Card className="h-100 shadow-sm border-primary hover-shadow transition">
                 <Card.Header className="bg-primary text-white fw-bold fs-5">
-                  {kiinteisto.rakennukset_fulls[0]?.osoite} | {kiinteisto.toimipaikka} {kiinteisto.postinumero}
+                  {kiinteisto.rakennukset_fulls[0]?.osoite} | {kiinteisto.rakennukset_fulls[0]?.toimipaikka} {kiinteisto.rakennukset_fulls[0]?.postinumero}
                 </Card.Header>
                 <Card.Body className="d-flex flex-column justify-content-between">
                   <Card.Title className="fs-6 text-secondary">

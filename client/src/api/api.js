@@ -16,8 +16,9 @@ export const getKiinteistotWithRakennukset = (
   page = 1,
   limit = 6,
   orderBy = 'id_kiinteisto',
-  orderDir = 'ASC'
-) => 
+  orderDir = 'ASC',
+  searchTerm = '' // new param with default empty string
+) =>
   axios.get(`${API_URL}/api/kiinteistot/with-rakennukset`, {
     headers: {
       'x-api-key': API_KEY,
@@ -28,6 +29,7 @@ export const getKiinteistotWithRakennukset = (
       limit,
       orderBy,
       orderDir,
+      searchTerm: searchTerm,  // add search param here
     },
   });
 
