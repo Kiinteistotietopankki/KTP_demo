@@ -13,6 +13,10 @@ export default function PerustiedotAccordion({ kiinteisto, setMapCoodinates }) {
         // TODO: call API or update state here
     }
 
+    const parseSource = (rakennus, field) => {
+        return rakennus.metadata?.[field]?.source || '';
+    };  
+
     return (
         <div className="accordion" id="accordionPanelsStayOpenExample">
             {kiinteisto?.rakennukset_fulls.map(rakennus => (
@@ -48,7 +52,7 @@ export default function PerustiedotAccordion({ kiinteisto, setMapCoodinates }) {
                                     <RakennustietoRow
                                         otsikko='Sijainti'
                                         data={`${rakennus.sijainti?.coordinates[1]}, ${rakennus.sijainti?.coordinates[0]}`}
-                                        source=""
+                                        source={parseSource(rakennus,'sijainti')}
                                         editable={false} 
                                         showEdit={false}
                                     />
@@ -66,60 +70,60 @@ export default function PerustiedotAccordion({ kiinteisto, setMapCoodinates }) {
                                     <RakennustietoRow
                                         otsikko='Rakennusluokitus'
                                         data={rakennus.rakennusluokitus}
-                                        source=""
+                                        source={parseSource(rakennus,'rakennusluokitus')}
                                         editable={true}
                                         onSave={(newValue) => handleSave(rakennus.id_rakennus, 'rakennusluokitus', newValue)}
                                     />
                                     <RakennustietoRow
                                         otsikko='Runkotapa'
                                         data={rakennus.runkotapa}
-                                        source=""
+                                        source={parseSource(rakennus,'runkotapa')}
                                         editable={true}
                                         onSave={(newValue) => handleSave(rakennus.id_rakennus, 'runkotapa', newValue)}
                                     />
                                     <RakennustietoRow
                                         otsikko='Käyttötilanne'
                                         data={rakennus.kayttotilanne}
-                                        source=""
+                                        source={parseSource(rakennus,'kayttotilanne')}
                                         editable={true}
                                         onSave={(newValue) => handleSave(rakennus.id_rakennus, 'kayttotilanne', newValue)}
                                     />
                                     <RakennustietoRow
                                         otsikko='Julkisivumateriaali'
                                         data={rakennus.julkisivumateriaali}
-                                        source=""
+                                        source={parseSource(rakennus,'julkisivumateriaali')}
                                         editable={true}
                                         onSave={(newValue) => handleSave(rakennus.id_rakennus, 'julkisivumateriaali', newValue)}
                                     />
                                     <RakennustietoRow
                                         otsikko='Lämmitystapa'
                                         data={rakennus.lammitystapa}
-                                        source=""
+                                        source={parseSource(rakennus,'lammitystapa')}
                                         editable={true}
                                         onSave={(newValue) => handleSave(rakennus.id_rakennus, 'lammitystapa', newValue)}
                                     />
                                     <RakennustietoRow
                                         otsikko='Lämmitysenergianlähde'
                                         data={rakennus.lammitysenergialahde}
-                                        source=""
+                                        source={parseSource(rakennus,'lammitysenergialahde')}
                                         editable={true}
                                         onSave={(newValue) => handleSave(rakennus.id_rakennus, 'lammitysenergialahde', newValue)}
                                     />
                                     <RakennustietoRow
                                         otsikko='Rakennusaine'
                                         data={rakennus.rakennusaine}
-                                        source=""
+                                        source={parseSource(rakennus,'rakennusaine')}
                                         editable={true}
                                         onSave={(newValue) => handleSave(rakennus.id_rakennus, 'rakennusaine', newValue)}
                                     />
                                 </dl>
 
                                 <dl className="col-6">
-                                    <RakennustietoRow otsikko='Kokonaisala' data={rakennus.kokonaisala} source="" />
-                                    <RakennustietoRow otsikko='Kerrosala' data={rakennus.kerrosala} source="" />
-                                    <RakennustietoRow otsikko='Huoneistoala' data={rakennus.huoneistoala} source="" />
-                                    <RakennustietoRow otsikko='Tilavuus' data={rakennus.tilavuus} source="" />
-                                    <RakennustietoRow otsikko='Kerroksia' data={rakennus.kerroksia} source="" />
+                                    <RakennustietoRow otsikko='Kokonaisala' data={rakennus.kokonaisala} source={parseSource(rakennus,'kokonaisala')} />
+                                    <RakennustietoRow otsikko='Kerrosala' data={rakennus.kerrosala} source={parseSource(rakennus,'kerrosala')} />
+                                    <RakennustietoRow otsikko='Huoneistoala' data={rakennus.huoneistoala} source={parseSource(rakennus,'huoneistoala')} />
+                                    <RakennustietoRow otsikko='Tilavuus' data={rakennus.tilavuus} source={parseSource(rakennus,'tilavuus')} />
+                                    <RakennustietoRow otsikko='Kerroksia' data={rakennus.kerroksia} source={parseSource(rakennus,'kerroksia')} />
                                 </dl>
                             </div>
                         </div>
