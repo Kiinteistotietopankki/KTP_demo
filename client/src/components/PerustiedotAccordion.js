@@ -1,11 +1,16 @@
-import React from 'react'
-import RakennustietoRow from './RakennustietoRow'
-import EditModal from './EditModal'
+import React from 'react';
+import RakennustietoRow from './RakennustietoRow';
 
 export default function PerustiedotAccordion({ kiinteisto, setMapCoodinates }) {
 
     const setMapCoords = (coords) => {
         setMapCoodinates([coords[1], coords[0]])
+    }
+
+    // Example save handler, adapt to your needs
+    const handleSave = (id, field, newValue) => {
+        console.log(`Saving ${field} for rakennus ${id}:`, newValue);
+        // TODO: call API or update state here
     }
 
     return (
@@ -38,12 +43,13 @@ export default function PerustiedotAccordion({ kiinteisto, setMapCoodinates }) {
                                 </dl>
 
                                 <dl className="col-6">
-                                    <RakennustietoRow otsikko='Rakennustunnus' data={rakennus.rakennustunnus} source="" showEdit={false} />
-                                    <RakennustietoRow otsikko='Rakennusvuosi' data={rakennus.rakennusvuosi} source="" showEdit={false} />
+                                    <RakennustietoRow otsikko='Rakennustunnus' data={rakennus.rakennustunnus} editable={false} source="" showEdit={false} />
+                                    <RakennustietoRow otsikko='Rakennusvuosi' data={rakennus.rakennusvuosi} editable={false}   source="" showEdit={false} />
                                     <RakennustietoRow
                                         otsikko='Sijainti'
                                         data={`${rakennus.sijainti?.coordinates[1]}, ${rakennus.sijainti?.coordinates[0]}`}
                                         source=""
+                                        editable={false} 
                                         showEdit={false}
                                     />
                                     <button
@@ -57,110 +63,55 @@ export default function PerustiedotAccordion({ kiinteisto, setMapCoodinates }) {
                                 <hr className="my-4" />
 
                                 <dl className="col-6">
-                                    <>
-                                        <RakennustietoRow
-                                            otsikko='Rakennusluokitus'
-                                            data={rakennus.rakennusluokitus}
-                                            source=""
-                                            modalId={`editModal-${rakennus.id_rakennus}-rakennusluokitus`}
-                                        />
-                                        <EditModal
-                                            modalId={`editModal-${rakennus.id_rakennus}-rakennusluokitus`}
-                                            name="Rakennusluokitus"
-                                            value={rakennus.rakennusluokitus}
-                                            onSave={(newValue) => console.log(`Saving rakennusluokitus for ${rakennus.id_rakennus}:`, newValue)}
-                                        />
-                                    </>
-
-                                    <>
-                                        <RakennustietoRow
-                                            otsikko='Runkotapa'
-                                            data={rakennus.runkotapa}
-                                            source=""
-                                            modalId={`editModal-${rakennus.id_rakennus}-runkotapa`}
-                                        />
-                                        <EditModal
-                                            modalId={`editModal-${rakennus.id_rakennus}-runkotapa`}
-                                            name="Runkotapa"
-                                            value={rakennus.runkotapa}
-                                            onSave={(newValue) => console.log(`Saving runkotapa for ${rakennus.id_rakennus}:`, newValue)}
-                                        />
-                                    </>
-
-                                    <>
-                                        <RakennustietoRow
-                                            otsikko='Käyttötilanne'
-                                            data={rakennus.kayttotilanne}
-                                            source=""
-                                            modalId={`editModal-${rakennus.id_rakennus}-kayttotilanne`}
-                                        />
-                                        <EditModal
-                                            modalId={`editModal-${rakennus.id_rakennus}-kayttotilanne`}
-                                            name="Käyttötilanne"
-                                            value={rakennus.kayttotilanne}
-                                            onSave={(newValue) => console.log(`Saving käyttötilanne for ${rakennus.id_rakennus}:`, newValue)}
-                                        />
-                                    </>
-
-                                    <>
-                                        <RakennustietoRow
-                                            otsikko='Julkisivumateriaali'
-                                            data={rakennus.julkisivumateriaali}
-                                            source=""
-                                            modalId={`editModal-${rakennus.id_rakennus}-julkisivumateriaali`}
-                                        />
-                                        <EditModal
-                                            modalId={`editModal-${rakennus.id_rakennus}-julkisivumateriaali`}
-                                            name="Julkisivumateriaali"
-                                            value={rakennus.julkisivumateriaali}
-                                            onSave={(newValue) => console.log(`Saving julkisivumateriaali for ${rakennus.id_rakennus}:`, newValue)}
-                                        />
-                                    </>
-
-                                    <>
-                                        <RakennustietoRow
-                                            otsikko='Lämmitystapa'
-                                            data={rakennus.lammitystapa}
-                                            source=""
-                                            modalId={`editModal-${rakennus.id_rakennus}-lammitystapa`}
-                                        />
-                                        <EditModal
-                                            modalId={`editModal-${rakennus.id_rakennus}-lammitystapa`}
-                                            name="Lämmitystapa"
-                                            value={rakennus.lammitystapa}
-                                            onSave={(newValue) => console.log(`Saving lämmitystapa for ${rakennus.id_rakennus}:`, newValue)}
-                                        />
-                                    </>
-
-                                    <>
-                                        <RakennustietoRow
-                                            otsikko='Lämmitysenergianlähde'
-                                            data={rakennus.lammitysenergialahde}
-                                            source=""
-                                            modalId={`editModal-${rakennus.id_rakennus}-lammitysenergialahde`}
-                                        />
-                                        <EditModal
-                                            modalId={`editModal-${rakennus.id_rakennus}-lammitysenergialahde`}
-                                            name="Lämmitysenergianlähde"
-                                            value={rakennus.lammitysenergialahde}
-                                            onSave={(newValue) => console.log(`Saving lämmitysenergialähde for ${rakennus.id_rakennus}:`, newValue)}
-                                        />
-                                    </>
-
-                                    <>
-                                        <RakennustietoRow
-                                            otsikko='Rakennusaine'
-                                            data={rakennus.rakennusaine}
-                                            source=""
-                                            modalId={`editModal-${rakennus.id_rakennus}-rakennusaine`}
-                                        />
-                                        <EditModal
-                                            modalId={`editModal-${rakennus.id_rakennus}-rakennusaine`}
-                                            name="Rakennusaine"
-                                            value={rakennus.rakennusaine}
-                                            onSave={(newValue) => console.log(`Saving rakennusaine for ${rakennus.id_rakennus}:`, newValue)}
-                                        />
-                                    </>
+                                    <RakennustietoRow
+                                        otsikko='Rakennusluokitus'
+                                        data={rakennus.rakennusluokitus}
+                                        source=""
+                                        editable={true}
+                                        onSave={(newValue) => handleSave(rakennus.id_rakennus, 'rakennusluokitus', newValue)}
+                                    />
+                                    <RakennustietoRow
+                                        otsikko='Runkotapa'
+                                        data={rakennus.runkotapa}
+                                        source=""
+                                        editable={true}
+                                        onSave={(newValue) => handleSave(rakennus.id_rakennus, 'runkotapa', newValue)}
+                                    />
+                                    <RakennustietoRow
+                                        otsikko='Käyttötilanne'
+                                        data={rakennus.kayttotilanne}
+                                        source=""
+                                        editable={true}
+                                        onSave={(newValue) => handleSave(rakennus.id_rakennus, 'kayttotilanne', newValue)}
+                                    />
+                                    <RakennustietoRow
+                                        otsikko='Julkisivumateriaali'
+                                        data={rakennus.julkisivumateriaali}
+                                        source=""
+                                        editable={true}
+                                        onSave={(newValue) => handleSave(rakennus.id_rakennus, 'julkisivumateriaali', newValue)}
+                                    />
+                                    <RakennustietoRow
+                                        otsikko='Lämmitystapa'
+                                        data={rakennus.lammitystapa}
+                                        source=""
+                                        editable={true}
+                                        onSave={(newValue) => handleSave(rakennus.id_rakennus, 'lammitystapa', newValue)}
+                                    />
+                                    <RakennustietoRow
+                                        otsikko='Lämmitysenergianlähde'
+                                        data={rakennus.lammitysenergialahde}
+                                        source=""
+                                        editable={true}
+                                        onSave={(newValue) => handleSave(rakennus.id_rakennus, 'lammitysenergialahde', newValue)}
+                                    />
+                                    <RakennustietoRow
+                                        otsikko='Rakennusaine'
+                                        data={rakennus.rakennusaine}
+                                        source=""
+                                        editable={true}
+                                        onSave={(newValue) => handleSave(rakennus.id_rakennus, 'rakennusaine', newValue)}
+                                    />
                                 </dl>
 
                                 <dl className="col-6">
