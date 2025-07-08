@@ -21,7 +21,7 @@ function Taloyhtiokortti() {
     getKiinteistoWhole(id)
       .then(res => {
         setCard(res.data);
-        const coords = res.data?.rakennukset[0]?.rakennustiedot[0]?.sijainti?.coordinates;
+        const coords = res.data?.rakennukset_fulls[0]?.sijainti?.coordinates;
         if (coords) setMapCoords([coords[1], coords[0]]);
       })
       .catch(err => console.error('API error:', err));
@@ -29,7 +29,7 @@ function Taloyhtiokortti() {
 
   if (!card) return <div className="text-center mt-5">Ladataan tietoja...</div>;
 
-  const rakennus = card.rakennukset[0];
+  const rakennus = card.rakennukset_fulls[0];
 
   return (
     <div className="container py-4">

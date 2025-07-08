@@ -34,7 +34,7 @@ export const getKiinteistotWithRakennukset = (
   });
 
 export const getKiinteistoWhole = (id) =>
-  axios.get(`${API_URL}/api/kiinteistot/full/${id}`, {
+  axios.get(`${API_URL}/api/kiinteistot/with-rakennukset/by/id/${id}`, {
     headers: {
       'x-api-key' : API_KEY
     },

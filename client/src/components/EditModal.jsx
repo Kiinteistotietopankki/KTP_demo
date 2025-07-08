@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 
-export default function EditModal({ value, name , onSave }) {
+export default function EditModal({ value, name, onSave }) {
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
-    setInputValue(value); // Set initial value when modal is shown
+    setInputValue(value);
   }, [value]);
 
   const handleChange = (e) => {
@@ -12,18 +12,16 @@ export default function EditModal({ value, name , onSave }) {
   };
 
   const handleSave = () => {
-    onSave(inputValue); // Call parent with updated value
+    onSave(inputValue);
   };
 
   return (
-    <div className="modal fade" id="editModal" tabIndex="-1" role="dialog" aria-labelledby="editModalTitle" aria-hidden="true">
+    <div className="modal fade" id="editModal" tabIndex="-1" aria-labelledby="editModalTitle" aria-hidden="true">
       <div className="modal-dialog modal-dialog-centered" role="document">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title" id="editModalLongTitle">{name}</h5>
-            <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+            <h5 className="modal-title" id="editModalTitle">{name}</h5>
+            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div className="modal-body">
             <input
