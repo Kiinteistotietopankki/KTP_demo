@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { updateRakennus } from '../api/api'; // your updated api function
 
 export default function RakennustietoRow({
   otsikko,
   rakennus,
   field,
   editable = true,
-  onSave,
   showSource = true,
 }) {
   const valueFromData = rakennus?.[field] ?? '';
@@ -21,10 +21,20 @@ export default function RakennustietoRow({
     setIsEditing(false);
   };
 
-  const saveEdit = () => {
+  const saveEdit = async () => {
     setIsEditing(false);
-    if (onSave && value !== valueFromData) {
-      onSave(value);
+    if (value !== valueFromData) {
+      try {
+        await updateRakennus(rakennus.id_rakennus, { [field]: value });
+        console.log(`Updated ${field} successfully`);
+        // Optionally: add success UI feedback here
+      } catch (err) {
+        alert(
+          `Kentän "${otsikko}" tallennus epäonnistui: ${
+            err.response?.data?.message || err.message
+          }`
+        );
+      }
     }
   };
 

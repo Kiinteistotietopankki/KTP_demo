@@ -54,3 +54,16 @@ export const createKiinteisto = (data) =>
       withCredentials: true,
     }
   );
+
+export const updateRakennus = (id, data) =>
+  axios.put(
+    `${API_URL}/api/rakennukset_full/${id}`,
+    data,
+    {
+      headers: {
+        'x-api-key': API_KEY,
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true,
+    }
+  );

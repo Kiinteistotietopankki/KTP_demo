@@ -1,14 +1,11 @@
 import React from 'react';
 import RakennustietoRow from './RakennustietoRow';
 
+
+
 export default function PerustiedotAccordion({ kiinteisto, setMapCoodinates }) {
   const setMapCoords = (coords) => {
     setMapCoodinates([coords[1], coords[0]]);
-  };
-
-  const handleSave = (id, field, newValue) => {
-    console.log(`Saving ${field} for rakennus ${id}:`, newValue);
-    // TODO: implement save logic
   };
 
   return (
@@ -66,7 +63,6 @@ export default function PerustiedotAccordion({ kiinteisto, setMapCoodinates }) {
                       otsikko={field[0].toUpperCase() + field.slice(1).replace(/_/g, ' ')}
                       field={field}
                       rakennus={rakennus}
-                      onSave={(newValue) => handleSave(rakennus.id_rakennus, field, newValue)}
                     />
                   ))}
                 </dl>
