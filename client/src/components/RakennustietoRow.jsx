@@ -9,34 +9,64 @@ export default function RakennustietoRow({
   showSource = true,
 }) {
   const valueFromData = rakennus?.[field] ?? '';
-  const source = rakennus?.metadata?.[field]?.source ?? '';
+  const sourceFromData = rakennus?.metadata?.[field]?.source ?? '';
 
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(valueFromData);
+  const [source, setSource] = useState(sourceFromData);
 
   const startEdit = () => setIsEditing(true);
 
   const cancelEdit = () => {
     setValue(valueFromData);
+    setSource(sourceFromData);
     setIsEditing(false);
   };
 
   const saveEdit = async () => {
     setIsEditing(false);
+
+    const updates = [];
+
     if (value !== valueFromData) {
-      try {
-        await updateRakennus(rakennus.id_rakennus, { [field]: value });
-        console.log(`Updated ${field} successfully`);
-        // Optionally: add success UI feedback here
-      } catch (err) {
-        alert(
-          `Kentän "${otsikko}" tallennus epäonnistui: ${
-            err.response?.data?.message || err.message
-          }`
-        );
+      const obj = {
+        [field]: value
+      };
+
+      if (source !== sourceFromData) {
+        // Wrap source inside metadata under the field key
+        obj.metadata = {
+          [field]: { source }
+        };
       }
+
+      updates.push(obj);
+    }
+
+    // If only source changed but value stayed the same
+    if (value === valueFromData && source !== sourceFromData) {
+      updates.push({
+        [field]: valueFromData,
+        metadata: {
+          [field]: { source }
+        }
+      });
+    }
+
+    if (updates.length === 0) return;
+
+    try {
+      await updateRakennus(rakennus.id_rakennus, updates);
+      console.log(`Updated ${field} and/or its source successfully`);
+    } catch (err) {
+      alert(
+        `Kentän "${otsikko}" tallennus epäonnistui: ${
+          err.response?.data?.message || err.message
+        }`
+      );
     }
   };
+
 
   return (
     <>
@@ -53,21 +83,32 @@ export default function RakennustietoRow({
           <>
             <input
               type="text"
-              className="form-control form-control-sm d-inline-block w-auto"
+              className="form-control form-control-sm d-inline-block w-auto mb-1"
               value={value}
               onChange={(e) => setValue(e.target.value)}
               autoFocus
               style={{ verticalAlign: 'middle' }}
             />
+            {showSource && (
+              <input
+                type="text"
+                className="form-control form-control-sm d-inline-block w-auto ms-2 mb-1"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                placeholder="Lähde"
+                style={{ verticalAlign: 'middle' }}
+              />
+            )}
+            <br />
             <button
-              className="btn btn-sm btn-primary ms-2"
+              className="btn btn-sm btn-primary me-2"
               onClick={saveEdit}
               type="button"
             >
               Save
             </button>
             <button
-              className="btn btn-sm btn-secondary ms-1"
+              className="btn btn-sm btn-secondary"
               onClick={cancelEdit}
               type="button"
             >
@@ -93,12 +134,12 @@ export default function RakennustietoRow({
                 <i className="bi bi-pencil-square"></i>
               </button>
             )}
-          </>
-        )}
-        {showSource && (
-          <>
-            <br />
-            <small className="text-muted">Lähde: {source}</small>
+            {showSource && (
+              <>
+                <br />
+                <small className="text-muted">Lähde: {sourceFromData}</small>
+              </>
+            )}
           </>
         )}
       </dd>

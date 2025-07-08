@@ -55,9 +55,11 @@ export const createKiinteisto = (data) =>
     }
   );
 
-export const updateRakennus = (id, data) =>
-  axios.put(
-    `${API_URL}/api/rakennukset_full/${id}`,
+export const updateRakennus = (id, data) => {
+  console.log('updateRakennus payload:', data);
+
+  return axios.put(
+    `${API_URL}/api/rakennukset_full/${id}/with-metadata`,  // <-- use template literal correctly here
     data,
     {
       headers: {
@@ -67,3 +69,4 @@ export const updateRakennus = (id, data) =>
       withCredentials: true,
     }
   );
+};
