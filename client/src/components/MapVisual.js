@@ -42,7 +42,7 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
       console.log('POSTION SET UEF')
       const map = L.map('map', {
         center: position,
-        zoom: 16,
+        zoom: 17,
         minZoom: 15,
         maxZoom: 17,
         dragging: false,

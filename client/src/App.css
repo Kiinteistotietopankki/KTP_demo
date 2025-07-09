@@ -13,16 +13,17 @@
   }
 
   .sidebar{
-    display: flex;
+    /* display: flex;
     flex-direction: row;
     position: fixed;
     min-width: 100vw;
-    flex-wrap: wrap;
+    flex-wrap: wrap; */
   }
 
 
   .app-container{
-    margin-top: 10vh;
+    /* margin-top: 10vh; */
+    width: 100%;
   }
 }
 
@@ -37,6 +38,7 @@
   min-height: 100vh;
   border-radius: 0.5rem;  /* Rounded corners */
   flex: 0.75;
+  width: 100%;
 
   flex-direction: column;
 }

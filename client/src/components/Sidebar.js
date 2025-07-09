@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import logo from '../assets/images/waativalogo.png'
 
 function Sidebar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -23,25 +24,52 @@ function Sidebar() {
       credentials: 'include',
     });
 
-    checkAuth(); // 🔁 Refresh auth state after logout
+    // checkAuth(); // 🔁 Refresh auth state after logout
+    window.location.reload();
   };
 
   return (
-    <Navbar bg="dark" data-bs-theme="dark" className="sidebar">
-      <Nav className="flex-md-column flex-row">
-        <Nav.Link as={Link} to="/" className="nav-item mt-md-3">Kiinteistöhaku</Nav.Link>
-        <Nav.Link as={Link} to="/taloyhtiokortit" className="nav-item mt-md-3">Taloyhtiökortit</Nav.Link>
-        <Nav.Link as={Link} to="/about" className="nav-item mt-md-1">Ohjeet</Nav.Link>
-        <Nav.Link as={Link} to="/contact" className="nav-item mt-md-1">Ota yhteyttä</Nav.Link>
-        <Nav.Link as={Link} to="/Profile" className="nav-item mt-md-1">Omat tiedot</Nav.Link>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light flex-column p-2 navbar-light bg-light border rounded shadow-sm">
+        <a className="navbar-brand" href="#">      
+          <img
+            src={logo}
+            width="30"
+            height="30"
+            className="d-inline-block align-top"
+            alt="Logo"
+          /> WAATIVA
+        </a>
+      <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span className="navbar-toggler-icon"></span>
+      </button>
 
-        {!isAuthenticated ? (
-          <Nav.Link as={Link} to="/login" className="nav-item">Kirjaudu</Nav.Link>
-        ) : (
-          <Nav.Link as="button" onClick={handleLogout} className="nav-item btn btn-link">Kirjaudu ulos</Nav.Link>
-        )}
-      </Nav>
-    </Navbar>
+        <div className="collapse navbar-collapse flex-column text-center" id="navbarSupportedContent">
+          <ul className="navbar-nav mr-auto flex-column gap-3">
+            <li className="nav-item active mt-3">
+              <a className="nav-link border rounded px-2 mx-1 border border-success" href="/">Haku</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link border rounded px-2 mx-1 border border-success" href="/taloyhtiokortit">Kortit</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link border rounded px-2 mx-1 border border-success" href="/about">Ohjeet</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link border rounded px-2 mx-1 border border-success" href="/Profile">Omat tiedot</a>
+            </li>
+            <li className="nav-item">
+              {!isAuthenticated ? (
+                  <a className="nav-link border rounded px-2 mx-1 border border-success" href="/login">Kirjaudu</a>
+                ):(
+                  <a className="nav-link border rounded px-2 mx-1 border border-danger" onClick={handleLogout}>Kirjaudu ulos</a>
+                )}
+            </li>
+
+
+
+          </ul>
+        </div>
+      </nav>
   );
 }
 
