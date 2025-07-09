@@ -166,6 +166,31 @@ function Resultdisplay({ data, setMapCoords }) {
                         <i className="bi bi-geo-alt-fill me-1"></i> Näytä kartalla
                       </button>
                     </div>
+                    <div className="card-header d-flex justify-content-between align-items-center">
+  <label className="d-flex align-items-center gap-2">
+    Rakennus {rakennus.properties.yleistiedot.Rakennustunnus?.value || ''} ...
+  </label>
+
+  <div className="d-flex gap-2">
+    <button
+      className="btn btn-outline-primary btn-sm"
+      onClick={() => setMapCoords(rakennus.geometry?.coordinates)}
+    >
+      <i className="bi bi-geo-alt-fill me-1"></i> Näytä kartalla
+    </button>
+
+    <button
+      className="btn btn-sm btn-outline-success"
+      onClick={() => {
+        setReportRakennus(rakennus);
+        setShowReport(true);
+      }}
+    >
+      Luo raportti
+    </button>
+  </div>
+</div>
+
 
                     <Accordion>
                       <Accordion.Item eventKey="0">
