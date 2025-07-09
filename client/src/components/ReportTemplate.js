@@ -1,37 +1,43 @@
 import React, { useState, useRef } from 'react';
 import 'handsontable/dist/handsontable.full.min.css';
-import ExcelTabs from '../assets/exceltoReport';
 import { Riskidataa } from '../assets/Riskidata';
-import html2canvas from 'html2canvas';
 import { useEffect } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake'
 import '../fonts/josefin-fonts.js';
 import'../fonts/Lato-fonts.js';
-import Select from 'react-select';
+
 import JohdantoText from '../Static/johdando';
 import Jarjestelmakuvaus from '../Static/Jarjestelmariskikuvaus';
+import PTSLongTermTable from './PTS/PTSLongTermTable.js';
+import { Tab, Tabs } from 'react-bootstrap';
+import ImageUploadCategorizer from './ImageUpload.js';
 
 
-const PropertyDetailsForm = ({ rakennus }) => {
+const PropertyDetailsForm = ({ rakennus, kiinteistotunnus, initialTab }) => {
   const savedData = JSON.parse(localStorage.getItem('reportFormData')) || {};
-
+  useEffect(() => {
+    console.log('🔍 Kiinteistötunnus received:', kiinteistotunnus);
+  }, [kiinteistotunnus]);
+  const [activeTab, setActiveTab] = useState(initialTab || 'report');
   const [title, setTitle] = useState(savedData.title || '');
   const [customText, setCustomText] = useState(savedData.customText || '');
   const [rakennusData, setRakennusData] = useState(rakennus);
   const [PropertyName, setPropertyName] = useState(savedData.PropertyName || '');
+  const [propertyId, setPropertyId] = useState(kiinteistotunnus);
   const [coverImage, setCoverImage] = useState(savedData.coverImage || null);
   const [riskidata, setRiskidata] = useState(savedData.riskidata || Riskidataa);
 const [previewUrl, setPreviewUrl] = useState(null);
 const [showPreviewModal, setShowPreviewModal] = useState(false);
+const [zoomLevel, setZoomLevel] = useState(1); // 1 = 100%
 
 // raporttipohjat
 const templates = {
   wpts: {
     name: 'W-PTS Katselmus',
     defaultSections: [
+      { key: 'kohteenkuvat', label: '📷 Ota kuvia kohteesta'},
       { key: 'johdanto', label: '📝 Johdanto', content: JohdantoText.Option1, include: true, images: [] },
       { key: 'jarjestelma', label: '⚙️ Järjestelmäkuvaukset ja Riskiluokitus', content: Jarjestelmakuvaus.option1, include: true, images: [] },
-      { key: 'kuvat', label: 'Kohteen kuvat', content: '', include: false, images: [] },
       { key: 'rakennetekniikka', label: '🏗️ Rakennetekniikkan Kuvat', content: '', include: false, images: [] },
       { key: 'lvi', label: '💧 LVI-Tekniikan Kuvat', content: '', include: false, images: [] },
       { key: 'sahko', label: '⚡ Sähköjärjestelmien Kuvat', content: '', include: false, images: [] },
@@ -44,6 +50,7 @@ const templates = {
   wk1: {
     name: 'Kuntoarvio WK1',
     defaultSections: [
+      { key: 'kohteenkuvat', label: '📷 Ota kuvia kohteesta'},
       { key: 'johdanto', label: '📘 Yleiskuvaus', content: '', include: true, images: [] },
       { key: 'kuntoarvio', label: '🔎 Kuntoarviointi', content: '', include: true, images: [] },
       { key: 'riskit', label: '⚠️ Riskit ja Huomiot', content: '', include: true, images: [] },
@@ -54,6 +61,7 @@ const templates = {
     Markatila: {
     name: 'Märkätila WK1',
     defaultSections: [
+      { key: 'kohteenkuvat', label: '📷 Ota kuvia kohteesta'},
       { key: 'johdanto', label: '📘 Yleiskuvaus', content: '', include: true, images: [] },
       { key: 'kuntoarvio', label: '🔎 Kuntoarviointi', content: '', include: true, images: [] },
       { key: 'riskit', label: '⚠️ Riskit ja Huomiot', content: '', include: true, images: [] },
@@ -64,6 +72,7 @@ const templates = {
     wk3: {
     name: 'Kuntoarvio WK3',
     defaultSections: [
+      { key: 'kohteenkuvat', label: '📷 Ota kuvia kohteesta'},
       { key: 'johdanto', label: '📘 Yleiskuvaus', content: '', include: true, images: [] },
       { key: 'kuntoarvio', label: '🔎 Kuntoarviointi', content: '', include: true, images: [] },
       { key: 'riskit', label: '⚠️ Riskit ja Huomiot', content: '', include: true, images: [] },
@@ -89,8 +98,8 @@ const [sections, setSections] = useState(savedData.sections || templates[default
     setSections([
       { key: 'johdanto', label: '📝 Johdanto', content: '', include: false, images: [] },
       { key: 'jarjestelma', label: '⚙️ Järjestelmäkuvaukset ja Riskiluokitus', content: '', include: false, images: [] },
+      { key: 'kohteenkuvat', label: 'Kohteen Kuvat', content: '', include: false, images: [] },
       { key: 'rakennetekniikka', label: '🏗️ Rakennetekniikkan Kuvat', content: '', include: false, images: [] },
-      { key: 'kohteenkuvat', label: 'Kohteenkuvat Kuvat', content: '', include: false, images: [] },
       { key: 'lvi', label: '💧 LVI-Tekniikan Kuvat', content: '', include: false, images: [] },
       { key: 'sahko', label: '⚡ Sähköjärjestelmien Kuvat', content: '', include: false, images: [] },
       { key: 'lähtötiedot', label: 'Lähtötiedot', content: '', include: false, images: [] },
@@ -112,6 +121,20 @@ useEffect(() => {
     setSections(templates[defaultTemplateKey].defaultSections);
   }
 }, []);
+useEffect(() => {
+  if (activeTab === 'preview') {
+    const generatePreview = async () => {
+      const docDefinition = await buildPdfContent();
+      const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+      pdfDocGenerator.getBlob((blob) => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl); // cleanup
+        const blobUrl = URL.createObjectURL(blob);
+        setPreviewUrl(blobUrl);
+      });
+    };
+    generatePreview();
+  }
+}, [activeTab]);
 
 useEffect(() => {
   const formData = {
@@ -122,10 +145,20 @@ useEffect(() => {
     riskidata,
     sections,
     selectedTemplate,
+    sections: sections.map(section => ({
+      ...section,
+      images: [],
+    }))
   };
-  localStorage.setItem('reportFormData', JSON.stringify(formData));
+
+  try {
+    localStorage.setItem('reportFormData', JSON.stringify(formData));
+  } catch (error) {
+    console.warn('⚠️ Could not save to localStorage:', error);
+  }
 }, [title, customText, PropertyName, coverImage, riskidata, sections, selectedTemplate]);
 
+  
  
   const handleAddCustomSection = () => {
     const header = prompt('Anna uuden osion otsikko:');
@@ -163,16 +196,10 @@ useEffect(() => {
   
   
   const hotTableRef = useRef(null);
-
-
-
-
-
-
   const buildPdfContent = async () => {
   const content = [];
 
-  // ➡️ Cover page
+  // Otsikkosivu
   content.push(
     { text: title || 'Raportin Otsikko', style: 'title', margin: [0, 60, 0, 20] },
     coverImage
@@ -217,7 +244,7 @@ useEffect(() => {
     });
   }
 
-  // ➡️ Render Johdanto first (if included)
+
   const johdantoSection = sections.find((s) => s.key === 'johdanto' && s.include);
   if (johdantoSection) {
     content.push(
@@ -226,7 +253,7 @@ useEffect(() => {
     );
   }
 
-  // ➡️ Insert Sisällysluettelo (TOC)
+
   content.push({
     text: 'SISÄLLYSLUETTELO',
     style: 'heading',
@@ -259,7 +286,7 @@ useEffect(() => {
     }
   });
 
-  // ➡️ Render remaining sections with only first page break
+
   let first = true;
   for (const section of sections) {
     if (!section.include) continue;
@@ -282,13 +309,26 @@ useEffect(() => {
       const imageRows = [];
 
       for (let i = 0; i < section.images.length; i += imagesPerRow) {
-        const rowImages = section.images.slice(i, i + imagesPerRow).map((img) => ({
-          image: img,
-          width: 160,
-          margin: [5, 5, 5, 5],
-        }));
-        imageRows.push({ columns: rowImages, columnGap: 10 });
-      }
+ const rowImages = section.images.slice(i, i + imagesPerRow).map((img) => ({
+  stack: [
+    {
+      image: img.url,
+      width: 160,
+      margin: [0, 0, 0, 4],
+    },
+    {
+      text: img.caption || '',
+      fontSize: 9,
+      alignment: 'center',
+      margin: [0, 2, 0, 0],
+    }
+  ],
+  width: 'auto', 
+}));
+
+  imageRows.push({ columns: rowImages, columnGap: 10 });
+}
+
 
       content.push(...imageRows, { text: '', margin: [0, 10] });
     }
@@ -348,7 +388,7 @@ for (const [category, items] of Object.entries(grouped)) {
       text: category.toUpperCase(),
       fontSize: 14,
       bold: true,
-      margin: [0, 2, 0, 0] // reduced bottom margin from 2 to 0
+      margin: [0, 2, 0, 0] 
     },
     {
       canvas: [
@@ -362,12 +402,12 @@ for (const [category, items] of Object.entries(grouped)) {
           lineColor: '#008000'
         }
       ],
-      margin: [0, 2, 0, 2] // reduced top and bottom margin
+      margin: [0, 2, 0, 2] 
     },
     {
       table: { widths: ['30%', '70%'], body: tableBody },
       layout: tableLayout,
-      margin: [0, 0, 0, 4] // reduced bottom spacing for next block
+      margin: [0, 0, 0, 4] 
     }
   ],
   unbreakable: true
@@ -436,18 +476,9 @@ for (const [category, items] of Object.entries(grouped)) {
     const fileName = `${templateName}_${PropertyName || 'Kohde'}.pdf`;
     pdfDocGenerator.download(fileName);
   });
+  resetForm();
 };
 
-const handlePreviewPdf = async () => {
-  const docDefinition = await buildPdfContent();
-  const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-
-  pdfDocGenerator.getBlob((blob) => {
-    const blobUrl = URL.createObjectURL(blob);
-    setPreviewUrl(blobUrl);
-    setShowPreviewModal(true);
-  });
-};
   const handleCoverImageUpload = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -456,375 +487,323 @@ const handlePreviewPdf = async () => {
     };
     if (file) reader.readAsDataURL(file);
   };
-
-  return (
-    <div className="mb-4">
-  <label className="font-semibold text-sm">Valitse raporttipohja:</label>
-  <select
-    className="form-select mt-1"
-    value={selectedTemplate}
-    onChange={(e) => {
-      const newKey = e.target.value;
-      setSelectedTemplate(newKey);
-      setSections(templates[newKey].defaultSections);
-    }}
-  >
-    {Object.entries(templates).map(([key, tpl]) => (
-      <option key={key} value={key}>{tpl.name}</option>
-    ))}
-  </select>
-
-    <div className="p-4 space-y-6">
-      {/* Kansisivu */}
-      <div className="border p-4 rounded shadow-sm">
-        <h3 className="text-xl font-semibold mb-4">📄 Kansisivu</h3>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Raportin otsikko"
-          className="form-control mb-3"
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleCoverImageUpload}
-          className="form-control mb-3"
-        />
-        <input
-          type="text"
-          value={PropertyName}
-          onChange={(e) => setPropertyName(e.target.value)}
-          placeholder="Kohteen nimi"
-          className="form-control mb-3"
-        />
-        <input
-          type="text"
-          value={customText}
-          onChange={(e) => setCustomText(e.target.value)}
-          placeholder="Tarkastuspäivämäärä"
-          className="form-control"
-        />
-      </div>
-
-      
-<div className="border p-4 rounded shadow-sm">
-  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-    🏡 Kohteen Perustiedot <span className="text-sm text-gray-500"></span>
-  </h3>
-
-  {/* Yleistiedot */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {Object.entries(rakennusData?.properties?.yleistiedot || {}).map(([key, value]) => (
-      <div key={key} className="flex flex-col">
-        <label className="text-sm font-medium mb-1 capitalize">
-          {key.replace(/([A-Z])/g, ' $1')}
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            className="form-input border px-2 py-1 rounded text-sm flex-1"
-            value={typeof value === 'object' && value !== null ? value.value || '' : value || ''}
-            onChange={(e) => {
-              const newValue = e.target.value;
-              setRakennusData((prev) => {
-                const updated = { ...prev };
-                if (!updated.properties) updated.properties = {};
-                if (!updated.properties.yleistiedot) updated.properties.yleistiedot = {};
-                const existing = updated.properties.yleistiedot[key] || {};
-                updated.properties.yleistiedot[key] = { ...existing, value: newValue };
-                return updated;
-              });
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Lähde"
-            className="form-input border px-2 py-1 rounded text-sm w-24"
-            value={typeof value === 'object' && value !== null ? value.source || '' : ''}
-            onChange={(e) => {
-              const newSource = e.target.value;
-              setRakennusData((prev) => {
-                const updated = { ...prev };
-                if (!updated.properties) updated.properties = {};
-                if (!updated.properties.yleistiedot) updated.properties.yleistiedot = {};
-                const existing = updated.properties.yleistiedot[key] || {};
-                updated.properties.yleistiedot[key] = { ...existing, source: newSource };
-                return updated;
-              });
-            }}
-          />
-        </div>
-      </div>
-    ))}
-
-    {/* Tekniset tiedot */}
-    {Object.entries(rakennusData?.properties?.teknisettiedot || {}).map(([key, value]) => (
-      <div key={key} className="flex flex-col">
-        <label className="text-sm font-medium mb-1 capitalize">
-          {key.replace(/([A-Z])/g, ' $1')}
-        </label>
-        <div className="flex gap-2">
-          
-          <input
-            type="text"
-            className="form-input border px-2 py-1 rounded text-sm flex-1"
-            value={typeof value === 'object' && value !== null ? value.value || value : value || ''}
-            onChange={(e) => {
-              const newValue = e.target.value;
-              setRakennusData((prev) => {
-                const updated = { ...prev };
-                
-                if (!updated.properties) updated.properties = {};
-                if (!updated.properties.teknisettiedot) updated.properties.teknisettiedot = {};
-                const existing = updated.properties.teknisettiedot[key] || {};
-                updated.properties.teknisettiedot[key] = { ...existing, value: newValue };
-                return updated;
-              });
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Lähde"
-            className="form-input border px-2 py-1 rounded text-sm w-24"
-            value={typeof value === 'object' && value !== null ? value.source || '' : ''}
-            onChange={(e) => {
-              const newSource = e.target.value;
-              setRakennusData((prev) => {
-                const updated = { ...prev };
-                if (!updated.properties) updated.properties = {};
-                if (!updated.properties.teknisettiedot) updated.properties.teknisettiedot = {};
-                const existing = updated.properties.teknisettiedot[key] || {};
-                updated.properties.teknisettiedot[key] = { ...existing, source: newSource };
-                return updated;
-              });
-            }}
-          />
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
-
-
-
-  
-
-{sections.map((section, index) => (
-  <div key={section.key} className="border p-4 rounded shadow-sm">
-    <div className="flex justify-between items-center mb-2">
-      <div
-        className="text-lg font-semibold cursor-pointer select-none"
-        onClick={() => {
-          const updated = [...sections];
-          updated[index].include = !updated[index].include;
-
-          if (updated[index].include && section.key === 'johdanto' && !updated[index].content) {
-            updated[index].content = JohdantoText.Option1;
-          }
-          if (updated[index].include && section.key === 'jarjestelma' && !updated[index].content) {
-            updated[index].content = Jarjestelmakuvaus.option1;
-          }
-
-          setSections(updated);
-        }}
-      >
-        {section.label} {section.include ? '▼' : '▶️'}
-      </div>
-    </div>
-
-    {section.include && (
-      <>
-        <textarea
-          className="form-control mt-2"
-          rows="10"
-          value={section.content}
+return (
+  <Tabs
+  activeKey={activeTab}
+  onSelect={(k) => setActiveTab(k)}
+  id="report-tabs"
+  className="mb-3"
+>
+    <Tab eventKey="report" title="Raportti">
+      <div className="p-4 space-y-6">
+        <label className="font-semibold text-sm">Valitse raporttipohja:</label>
+        <select
+          className="form-select mt-1"
+          value={selectedTemplate}
           onChange={(e) => {
+            const newKey = e.target.value;
+            setSelectedTemplate(newKey);
+            setSections(templates[newKey].defaultSections);
+          }}
+        >
+          {Object.entries(templates).map(([key, tpl]) => (
+            <option key={key} value={key}>{tpl.name}</option>
+          ))}
+        </select>
+
+        <div className="p-4 space-y-6">
+          {/* Kansisivu */}
+          <div className="border p-4 rounded shadow-sm">
+            <h3 className="text-xl font-semibold mb-4">📄 Kansisivu</h3>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Raportin otsikko"
+              className="form-control mb-3"
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleCoverImageUpload}
+              className="form-control mb-3"
+            />
+            <input
+              type="text"
+              value={PropertyName}
+              onChange={(e) => setPropertyName(e.target.value)}
+              placeholder="Kohteen nimi"
+              className="form-control mb-3"
+            />
+            <input
+              type="text"
+              value={customText}
+              onChange={(e) => setCustomText(e.target.value)}
+              placeholder="Tarkastuspäivämäärä"
+              className="form-control"
+            />
+          </div>
+
+          
+          <div className="accordion my-4" id="templateAccordion">
+  {sections.map((section, index) => (
+    <div className="accordion-item" key={section.key}>
+      <h2 className="accordion-header" id={`template-heading-${index}`}>
+        <button
+          className={`accordion-button ${!section.include ? 'collapsed' : ''}`}
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target={`#template-collapse-${index}`}
+          aria-expanded={section.include ? 'true' : 'false'}
+          aria-controls={`template-collapse-${index}`}
+          onClick={() => {
             const updated = [...sections];
-            updated[index].content = e.target.value;
+            updated[index].include = !updated[index].include;
+
+            if (updated[index].include && section.key === 'johdanto' && !updated[index].content) {
+              updated[index].content = JohdantoText.Option1;
+            }
+            if (updated[index].include && section.key === 'jarjestelma' && !updated[index].content) {
+              updated[index].content = Jarjestelmakuvaus.option1;
+            }
+
             setSections(updated);
           }}
-        />
+        >
+          {section.label}
+        </button>
+      </h2>
 
-        {/* Image upload for 'kuvat' sections */}
-        {(section.key.toLowerCase().includes('kuvat') || section.label.toLowerCase().includes('kuvat')) && (
-          <>
-            <div className="mt-2">
-              <button
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => document.getElementById(`file-${section.key}`).click()}
-              >
-                ➕ Lisää kuva
-              </button>
-              <input
-                type="file"
-                id={`file-${section.key}`}
-                accept="image/*"
-                style={{ display: 'none' }}
-                multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files);
-                  const convertToBase64 = (file) =>
-                    new Promise((resolve, reject) => {
-                      const reader = new FileReader();
-                      reader.onload = () => resolve(reader.result);
-                      reader.onerror = reject;
-                      reader.readAsDataURL(file);
-                    });
+      <div
+        id={`template-collapse-${index}`}
+        className={`accordion-collapse collapse ${section.include ? 'show' : ''}`}
+        aria-labelledby={`template-heading-${index}`}
+        
+      >
+        <div className="accordion-body">
+          {![ 'rakennetekniikka', 'lvi', 'sahko'].includes(section.key) && (
+  <textarea
+    className="form-control mb-3"
+    rows="8"
+    value={section.content}
+    onChange={(e) => {
+      const updated = [...sections];
+      updated[index].content = e.target.value;
+      setSections(updated);
+    }}
+  />
+)}
 
-                  Promise.all(files.map(convertToBase64)).then((base64Images) => {
-                    const updated = [...sections];
-                    updated[index].images.push(...base64Images);
-                    setSections(updated);
-                  });
-                }}
-              />
-            </div>
+{section.key === 'kohteenkuvat' && (
+  <ImageUploadCategorizer sections={sections} setSections={setSections} />
+)}
 
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '8px',
-                marginTop: '8px',
-              }}
-            >
-              {section.images.map((img, i) => (
-                <div key={i} style={{ position: 'relative' }}>
-                  <img
-                    src={img}
-                    alt="Section"
-                    style={{
-                      width: '100px',
-                      height: '100px',
-                      objectFit: 'cover',
-                      borderRadius: '4px',
-                    }}
-                  />
-                  <button
-                    type="button"
-                    style={{
-                      position: 'absolute',
-                      top: '2px',
-                      right: '2px',
-                      background: '#ef4444',
-                      color: 'white',
-                      borderRadius: '9999px',
-                      padding: '2px 6px',
-                      fontSize: '10px',
-                      opacity: 0.75,
-                      border: 'none',
-                    }}
-                    onClick={() => {
-                      const updated = [...sections];
-                      updated[index].images = updated[index].images.filter((_, imgIndex) => imgIndex !== i);
-                      setSections(updated);
-                    }}
-                  >
-                    ❌
-                  </button>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
 
-        {/* Risk table for jarjestelma */}
-        {section.key === 'jarjestelma' && (
-          <div className="mt-4 space-y-2">
-            <h4 className="text-md font-semibold mb-2">Riskitaulu</h4>
-            {riskidata.map((item, riskIndex) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-4 border-b border-gray-300 pb-2"
-              >
-                <div className="w-1/4 font-semibold">{item.label}</div>
-                <div className="flex items-center gap-3 flex-1">
-                  <span
-                    style={{
-                      color:
-                        item.risk === 'low'
-                          ? 'green'
-                          : item.risk === 'medium'
-                          ? 'orange'
-                          : 'red',
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    √
-                  </span>
+{section.images && section.images.length > 0 && (
+  <div className="mt-3 d-flex flex-wrap gap-3">
+    {section.images.map((img, imgIndex) => (
+      <div
+  key={imgIndex}
+  className="position-relative border rounded p-2 text-center d-flex flex-column align-items-center"
+  style={{ width: 160 }}
+>
+  <button
+    type="button"
+    onClick={() => {
+      const updated = [...sections];
+      updated[index].images = updated[index].images.filter((_, i) => i !== imgIndex);
+      setSections(updated);
+    }}
+    style={{
+      position: 'absolute',
+      top: '4px',
+      right: '6px',
+      background: 'transparent',
+      border: 'none',
+      color: 'red',
+      fontWeight: 'bold',
+      fontSize: '1.25rem',
+      cursor: 'pointer',
+      lineHeight: '1',
+    }}
+  >
+    X
+  </button>
 
-                  <select
-                    className="form-input border px-2 py-1 rounded text-sm w-32 text-center"
-                    value={item.risk}
-                    onChange={(e) => {
-                      const updated = [...riskidata];
-                      updated[riskIndex].risk = e.target.value;
-                      setRiskidata(updated);
-                    }}
-                  >
-                    <option value="low">Matala riski</option>
-                    <option value="medium">Keskitason riski</option>
-                    <option value="high">Korkea riski</option>
-                  </select>
+ 
+  <img
+    src={img.url}
+    alt={`kuva-${imgIndex}`}
+    style={{
+      width: '100%',
+      height: 100,
+      objectFit: 'cover',
+      borderRadius: 6,
+      marginBottom: 4
+    }}
+  />
 
-                  <input
-                    type="text"
-                    className="form-input border px-2 py-1 rounded text-sm flex-1"
-                    placeholder="Kirjoita selite..."
-                    value={item.description || ''}
-                    onChange={(e) => {
-                      const updated = [...riskidata];
-                      updated[riskIndex].description = e.target.value;
-                      setRiskidata(updated);
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </>
-    )}
+  
+  <input
+    type="text"
+    className="form-control form-control-sm"
+    placeholder="Kuvateksti"
+    value={img.caption || ''}
+    onChange={(e) => {
+      const updated = [...sections];
+      updated[index].images[imgIndex].caption = e.target.value;
+      setSections(updated);
+    }}
+    style={{ fontSize: '0.75rem' }}
+  />
+</div>
+
+    ))}
+  </div>
+)}
+
+
+
+          
+          {section.key === 'jarjestelma' && (
+            <div className="mt-4 space-y-2">
+              <h4 className="text-md fw-semibold mb-3">Riskitaulu</h4>
+  {riskidata.map((item, riskIndex) => (
+  <div
+    key={item.id}
+    className="d-flex align-items-center mb-2"
+    style={{ gap: '1rem' }}
+  >
+    <div style={{ width: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <strong>{item.label}</strong>
+    </div>
+
+    <div
+      style={{
+        width: '30px',
+        textAlign: 'center',
+        fontSize: '1.2rem',
+        color:
+          item.risk === 'low'
+            ? 'green'
+            : item.risk === 'medium'
+            ? 'orange'
+            : 'red',
+      }}
+    >
+      ✓
+    </div>
+
+    <div style={{ width: '160px' }}>
+      <select
+        className="form-select form-select-sm"
+        value={item.risk}
+        onChange={(e) => {
+          const updated = [...riskidata];
+          updated[riskIndex].risk = e.target.value;
+          setRiskidata(updated);
+        }}
+      >
+        <option value="low">Matala riski</option>
+        <option value="medium">Keskitason riski</option>
+        <option value="high">Korkea riski</option>
+      </select>
+    </div>
+
+    <input
+      type="text"
+      className="form-control form-control-sm"
+      placeholder="Selite"
+      value={item.description || ''}
+      onChange={(e) => {
+        const updated = [...riskidata];
+        updated[riskIndex].description = e.target.value;
+        setRiskidata(updated);
+      }}
+      style={{ flex: 1, minWidth: '200px' }}
+    />
   </div>
 ))}
 
-    
-    <button onClick={handleAddCustomSection} className="btn btn-outline-primary">
-        ➕ Lisää uusi osio
-      </button>
-      {/* Excel */}
-<div className="flex justify-center mt-6 gap-4">
-  <button onClick={handlePreviewPdf} className="btn btn-secondary">
-    Esikatsele Raportti
-  </button>
-  <button onClick={handleExportPdf} className="btn btn-primary">
-    Lataa Raportti
-  </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ))}
 </div>
-{showPreviewModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-    <div className="bg-white p-2 rounded shadow-md w-[90vw] h-[90vh] relative">
-      <button
-        className="absolute top-2 right-2 text-black bg-gray-200 rounded px-2 py-1"
-        onClick={() => {
-          URL.revokeObjectURL(previewUrl);
-          setShowPreviewModal(false);
+
+
+          <button onClick={handleAddCustomSection} className="btn btn-outline-primary">
+            ➕ Lisää uusi osio
+          </button>
+
+          <div className="flex justify-center mt-6 gap-4">
+            <button onClick={handleExportPdf} className="btn btn-primary">
+              Lataa Raportti
+            </button>
+          </div>
+
+         
+        </div>
+      </div>
+    </Tab>
+
+    <Tab eventKey="pts" title="PTS (Pitkän tähtäimen suunnitelma)">
+      <div className="p-4">
+        <h3 className="text-xl font-semibold mb-4">📊 PTS (Pitkän tähtäimen suunnitelma)</h3>
+        <PTSLongTermTable />
+      
+        
+      </div>
+    </Tab>
+<Tab eventKey="preview" title=" Raportin esikatselu">
+   
+  {previewUrl ? (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '92vh',
+        backgroundColor: '#f8f9fa',
+      }}
+    >
+      
+      <div
+        style={{
+          width: '80vw',
+          height: '90vh',
+          backgroundColor: '#fff',
+          boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+          borderRadius: '8px',
+          overflow: 'hidden',
         }}
       >
-        ❌ Close
-      </button>
-      <embed
-        src={previewUrl}
-        type="application/pdf"
-        className="w-full h-full"
-      />
+        
+        <embed
+          src={previewUrl}
+          type="application/pdf"
+          style={{ width: '100%', height: '100%' }}
+        />
+        
+      </div>
+      
     </div>
-  </div>
-)}
-    </div>
-    </div>
-  );
+  ) : (
+    <div className="p-4 text-muted">Ei esikatselua vielä ladattu.</div>
+  )}
+  <div className="mb-3">
+        <button onClick={handleExportPdf} className="btn btn-outline-primary btn-sm">
+          📥 Lataa Raportti
+        </button>
+      </div>
+</Tab>
+
+
+  </Tabs>
+);
+
 };
 
 export default PropertyDetailsForm;
