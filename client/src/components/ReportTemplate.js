@@ -1,17 +1,16 @@
 import React, { useState, useRef } from 'react';
 import 'handsontable/dist/handsontable.full.min.css';
-import ExcelTabs from '../assets/exceltoReport';
 import { Riskidataa } from '../assets/Riskidata';
-import html2canvas from 'html2canvas';
 import { useEffect } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake'
 import '../fonts/josefin-fonts.js';
 import'../fonts/Lato-fonts.js';
-import Select from 'react-select';
+
 import JohdantoText from '../Static/johdando';
 import Jarjestelmakuvaus from '../Static/Jarjestelmariskikuvaus';
-import PTSReportTable from './PTS/PTSreportTable.js';
 import PTSLongTermTable from './PTS/PTSLongTermTable.js';
+import LVITable from './PTS/LVItaulu.js';
+import SähkötekniikkaTable from './PTS/Sähkötekniikkataulu.js';
 import { Tab, Tabs } from 'react-bootstrap';
 
 
@@ -646,6 +645,8 @@ return (
       <div className="p-4">
         <h3 className="text-xl font-semibold mb-4">📊 PTS (Pitkän tähtäimen suunnitelma)</h3>
         <PTSLongTermTable />
+        <LVITable/>
+        <SähkötekniikkaTable />
       </div>
     </Tab>
   </Tabs>

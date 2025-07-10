@@ -123,120 +123,6 @@ function Resultdisplay({ data, setMapCoords }) {
   return (
   <div className="mt-4">
 
-      {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
-        <div key={kiinteistoIndex} className="kiinteistocard card mb-4 p-2 border border-primary bg-dark text-white p-1">
-          <div className="card-header d-flex flex-column align-items-center">
-            <p className="h4 text-center">Kiinteistö <span className='text-decoration-underline'>{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}</span>
-              <button className="btn btn-outline-secondary btn-sm align-items-center ms-2" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>
-                <i className="bi bi-clipboard me-2"></i> Kopioi
-              </button>
-            </p>
-
-            <button type="button" className="btn btn-success mt-2" onClick={() => luoKortti(kiinteisto)}> 
-                Luo taloyhtiökortti
-            </button>
-
-            <div>{response.length > 0 && (<>{JSON.stringify(response)}</>)}</div>
-
-            {/* {korttiNappi && (<p>{prettifyJson(kiinteisto)}</p>)}
-            <div>SPACE</div>
-            {korttiNappi && (<p>{prettifyJson(jsonToModelFormat(kiinteisto))}</p>)} */}
-          </div>
-
-          {kiinteisto.rakennukset?.length > 0 ? (
-            <>
-              <div className="d-flex justify-content-between align-items-center p-2">
-
-              </div>
-
-              {kiinteisto.rakennukset.map((rakennus, rakennusIndex) => (
-                <div key={rakennusIndex} className="card mb-4 p-2">
-                  <div className="card-body">
-                    <div className="card-header d-flex justify-content-between align-items-center">
-                      <label className="d-flex align-items-center gap-2">
-
-                        Rakennus {rakennus.properties.yleistiedot.Rakennustunnus?.value || ''} - {Array.isArray(rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value) ? rakennus.properties.yleistiedot["Kohteen osoitteet"].value.join(", ") : rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value || ''}
-                        {" "}{rakennus.properties.yleistiedot["Toimipaikka"]?.value || ''}{` (${rakennus.properties?.rakennustiedot["Rakennusluokitus"].value})`}
-
-                      </label>
-
-                      <button
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => setMapCoords(rakennus.geometry?.coordinates)}
-                      >
-                        <i className="bi bi-geo-alt-fill me-1"></i> Näytä kartalla
-                      </button>
-                    </div>
-                    <div className="card-header d-flex justify-content-between align-items-center">
-  <label className="d-flex align-items-center gap-2">
-    Rakennus {rakennus.properties.yleistiedot.Rakennustunnus?.value || ''} ...
-  </label>
-
-  <div className="d-flex gap-2">
-    <button
-      className="btn btn-outline-primary btn-sm"
-      onClick={() => setMapCoords(rakennus.geometry?.coordinates)}
-    >
-      <i className="bi bi-geo-alt-fill me-1"></i> Näytä kartalla
-    </button>
-
-    <button
-      className="btn btn-sm btn-outline-success"
-      onClick={() => {
-        setReportRakennus(rakennus);
-        setShowReport(true);
-      }}
-    >
-      Luo raportti
-    </button>
-  </div>
-</div>
-
-
-                    <Accordion>
-                      <Accordion.Item eventKey="0">
-                        <Accordion.Header>Yleistiedot</Accordion.Header>
-                        <Accordion.Body>
-                          <Tabletemplate properties={rakennus.properties.yleistiedot} />
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="1">
-                        <Accordion.Header>Tekniset tiedot</Accordion.Header>
-                        <Accordion.Body>
-                          <Tabletemplate properties={rakennus.properties.teknisettiedot} />
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="2">
-                        <Accordion.Header>Rakennustiedot</Accordion.Header>
-                        <Accordion.Body>
-                          <Tabletemplate properties={rakennus.properties.rakennustiedot} />
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="3">
-                        <Accordion.Header>Aluetiedot</Accordion.Header>
-                        <Accordion.Body>
-                          <Tabletemplate properties={rakennus.properties.aluetiedot} />
-                        </Accordion.Body>
-                      </Accordion.Item>
-                    </Accordion>
-                  </div>
-                </div>
-              ))}
-            </>
-          ) : (
-            <div className="p-2">Ei rakennuksia</div>
-          )}
-        </div>
-      ))}
-
-      <Modal show={showReport} onHide={() => setShowReport(false)} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Muokkaa raporttia</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {reportRakennus && <EditableReport rakennus={reportRakennus} />}
-        </Modal.Body>
-      </Modal>
     <Modal show={showCreatedModal} onHide={() => setShowCreatedModal(false)} centered backdrop="static">
       <Modal.Body className="text-center">
       <i className="bi bi-check-circle-fill text-success" style={{ fontSize: '2rem' }}></i>
@@ -279,12 +165,7 @@ function Resultdisplay({ data, setMapCoords }) {
               <Card key={rakennusIndex} className="mb-3 shadow-sm">
                 <Card.Header className="d-flex justify-content-between align-items-center bg-white">
                   <label className="form-check-label fw-medium">
-                    <input
-                      type="checkbox"
-                      className="form-check-input me-2"
-                      checked={!!selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value]}
-                      onChange={() => handleCheckboxChange(rakennus.properties.yleistiedot.Rakennustunnus?.value)}
-                    />
+                  
                     {rakennus.properties.yleistiedot.Rakennustunnus?.value} -{" "}
                     {Array.isArray(rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value)
                       ? rakennus.properties.yleistiedot["Kohteen osoitteet"].value.join(", ")
