@@ -1,12 +1,12 @@
-import { Button, Card, Form, InputGroup } from 'react-bootstrap';
-import Badge from 'react-bootstrap/Badge';
+import { Button, Card, Form, InputGroup, Modal, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { getKiinteistotWithRakennukset } from '../api/api'; // your updated api function
+import { getKiinteistotWithRakennukset } from '../api/api';
 import { useEffect, useState } from 'react';
+import PropertyDetailsForm from '../components/ReportTemplate'; // varmista polku
 
 function Taloyhtiokortit() {
   const [kiinteistot, setKiinteistot] = useState([]);
-  const [resultOrder, setResultOrder] = useState('DESC'); // default ASC matches your API default
+  const [resultOrder, setResultOrder] = useState('DESC');
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalPages, setTotalPages] = useState(0);
@@ -14,7 +14,9 @@ function Taloyhtiokortit() {
   const [totalItems, setTotalItems] = useState(0);
   const [errMessage, setErrMessage] = useState('');
 
-  // Fetch data function
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [selectedRakennusForReport, setSelectedRakennusForReport] = useState(null);
+
   const fetchData = async () => {
     try {
       setErrMessage('');
@@ -23,7 +25,7 @@ function Taloyhtiokortit() {
         pageSize,
         'id_kiinteisto',
         resultOrder,
-        searchTerm // 🔹 New parameter passed to API
+        searchTerm
       );
       const { data, totalPages, totalItems } = response.data;
       setKiinteistot(data);
@@ -36,8 +38,7 @@ function Taloyhtiokortit() {
 
   useEffect(() => {
     fetchData();
-  }, [page, pageSize, resultOrder]); 
-
+  }, [page, pageSize, resultOrder]);
 
   const increasePage = () => {
     if (page < totalPages) setPage(page + 1);
@@ -49,7 +50,7 @@ function Taloyhtiokortit() {
 
   const handleSearch = () => {
     setPage(1);
-    fetchData(); // Trigger search
+    fetchData();
   };
 
   const handleKeyDown = (e) => {
@@ -127,7 +128,19 @@ function Taloyhtiokortit() {
                   <Card.Title className="fs-6 text-secondary">
                     Kiinteistötunnus: {kiinteisto.kiinteistotunnus}
                   </Card.Title>
-                  <Link to={`/taloyhtiokortti/${kiinteisto.id_kiinteisto}`} className="mt-3">
+
+                  <Button
+                   
+                   variant="outline-primary" className="w-100 fw-semibold"
+                    onClick={() => {
+                      setSelectedRakennusForReport(kiinteisto.rakennukset_fulls[0]);
+                      setShowReportModal(true);
+                    }}
+                  >
+                    Luo raportti
+                  </Button>
+
+                  <Link to={`/taloyhtiokortti/${kiinteisto.id_kiinteisto}`} className="mt-2">
                     <Button variant="outline-primary" className="w-100 fw-semibold">
                       Avaa kortti
                     </Button>
@@ -138,6 +151,23 @@ function Taloyhtiokortit() {
           ))}
         </div>
       </div>
+
+      {/* Modal outside of map */}
+      <Modal
+        show={showReportModal}
+        onHide={() => setShowReportModal(false)}
+        size="xl"
+        backdrop="static"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Luo raportti</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedRakennusForReport && (
+            <PropertyDetailsForm rakennus={selectedRakennusForReport} />
+          )}
+        </Modal.Body>
+      </Modal>
 
       <style jsx>{`
         .hover-shadow:hover {

@@ -165,12 +165,7 @@ function Resultdisplay({ data, setMapCoords }) {
               <Card key={rakennusIndex} className="mb-3 shadow-sm">
                 <Card.Header className="d-flex justify-content-between align-items-center bg-white">
                   <label className="form-check-label fw-medium">
-                    <input
-                      type="checkbox"
-                      className="form-check-input me-2"
-                      checked={!!selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value]}
-                      onChange={() => handleCheckboxChange(rakennus.properties.yleistiedot.Rakennustunnus?.value)}
-                    />
+                  
                     {rakennus.properties.yleistiedot.Rakennustunnus?.value} -{" "}
                     {Array.isArray(rakennus.properties.yleistiedot["Kohteen osoitteet"]?.value)
                       ? rakennus.properties.yleistiedot["Kohteen osoitteet"].value.join(", ")

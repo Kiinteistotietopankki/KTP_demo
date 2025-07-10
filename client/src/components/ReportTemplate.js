@@ -9,6 +9,8 @@ import'../fonts/Lato-fonts.js';
 import JohdantoText from '../Static/johdando';
 import Jarjestelmakuvaus from '../Static/Jarjestelmariskikuvaus';
 import PTSLongTermTable from './PTS/PTSLongTermTable.js';
+import LVITable from './PTS/LVItaulu.js';
+import SähkötekniikkaTable from './PTS/Sähkötekniikkataulu.js';
 import { Tab, Tabs } from 'react-bootstrap';
 import ImageUploadCategorizer from './ImageUpload.js';
 

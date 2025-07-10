@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function Tekniikkataulut() {
+export default function Tekniikkataulut({onYhteensaChange}) {
   const years = Array.from({ length: 11 }, (_, i) => 2025 + i);
 
   const initialData = [
@@ -153,7 +153,7 @@ export default function Tekniikkataulut() {
     setTableData(updated);
   };
 
-  // ✅ Calculate grand yhteensä row
+  // Calculate grand total
   const yhteensa = Array(11).fill(0);
   tableData.forEach(section => {
     section.items.forEach(item => {
@@ -164,105 +164,120 @@ export default function Tekniikkataulut() {
     });
   });
 
+  useEffect(() => {
+    if (onYhteensaChange) onYhteensaChange(yhteensa);
+  }, [yhteensa, onYhteensaChange]);
+
   return (
-    <div className="overflow-x-auto mt-4 text-black">
-      <table className="min-w-full text-sm border">
-        <thead>
-          <tr className="bg-green-700 font-bold text-black">
-            <th className="border px-2 py-1 font-bold">Osa-alue</th>
-            <th className="border px-2 py-1 font-bold">KL</th>
-            {years.map((year) => (
-              <th key={year} className="border px-2 py-1 text-center font-bold">{year}</th>
-            ))}
-            <th className="border px-2 py-1 font-bold"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((section, headerIndex) => (
-            <React.Fragment key={headerIndex}>
-              {/* STATIC HEADER ROW */}
-              <tr className="bg-gray-100">
-                <td className="border px-2 py-1 uppercase font-bold text-black">
-                  {section.header}
-                </td>
-                <td className="text-black font-bold">
-                  <select
-                    value={section.kl}
-                    onChange={(e) => handleKlChange(headerIndex, e.target.value)}
-                    className="border rounded px-1 py-0.5 text-xs"
-                  >
-                    <option value="KL1">KL1</option>
-                    <option value="KL2">KL2</option>
-                    <option value="KL3">KL3</option>
-                    <option value="KL4">KL4</option>
-                    <option value="KL5">KL5</option>
-                  </select>
-                </td>
-                {years.map((_, i) => (
-                  <td key={i} className="border px-2 py-1"></td>
-                ))}
-                <td className="border px-2 py-1 text-center">
-                  <button
-                    onClick={() => handleAddRow(headerIndex)}
-                    className="text-green-700 text-lg"
-                    title="Add row"
-                  >
-                    +
-                  </button>
-                </td>
-              </tr>
+    <div className="accordion my-4" id="rakennetekniikkaAccordion">
+      <div className="accordion-item">
+        <h2 className="accordion-header" id="headingRakennetekniikka">
+          <button
+            className="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseRakennetekniikka"
+            aria-expanded="false"
+            aria-controls="collapseRakennetekniikka"
+          >
+            Rakennetekniikka
+          </button>
+        </h2>
 
-              {/* ALIOTSIKOT INPUT ROWS */}
-              {section.items.map((item, itemIndex) => (
-                <tr key={itemIndex}>
-                  <td className="border px-2 py-1">
-                    <input
-                      type="text"
-                      value={item.label}
-                      onChange={(e) => handleLabelChange(headerIndex, itemIndex, e.target.value)}
-                      className="w-full px-1 py-0.5 text-xs border rounded"
-                    />
-                  </td>
-                  <td className="border px-2 py-1"></td>
-                  {item.values.map((val, yearIdx) => (
-                    <td key={yearIdx} className="border px-2 py-1">
-                      <input
-                        type="text"
-                        value={val}
-                        onChange={(e) =>
-                          handleYearValueChange(headerIndex, itemIndex, yearIdx, e.target.value)
-                        }
-                        className="w-full px-1 py-0.5 text-xs border rounded"
-                      />
-                    </td>
+        <div
+          id="collapseRakennetekniikka"
+          className="accordion-collapse collapse"
+          aria-labelledby="headingRakennetekniikka"
+          data-bs-parent="#rakennetekniikkaAccordion"
+        >
+          <div className="accordion-body p-0">
+            <table className="table table-sm mb-0">
+              <thead className="table-light">
+                <tr>
+                  <th>Osa-alue</th>
+                  <th>KL</th>
+                  {years.map(year => (
+                    <th key={year} className="text-center">{year}</th>
                   ))}
-                  <td className="border px-2 py-1 text-center">
-                    <button
-                      onClick={() => handleRemoveRow(headerIndex, itemIndex)}
-                      className="text-red-500 text-lg"
-                      title="Remove row"
-                    >
-                      ×
-                    </button>
-                  </td>
+                  <th></th>
                 </tr>
-              ))}
-            </React.Fragment>
-          ))}
+              </thead>
+              <tbody>
+                {tableData.map((section, headerIndex) => (
+                  <React.Fragment key={headerIndex}>
+                    <tr className="bg-secondary text-white">
+                      <td colSpan={years.length + 3} className="fw-semibold">{section.header}</td>
+                    </tr>
 
-          {/* ✅ GRAND YHTEENSÄ ROW */}
-          <tr className="bg-gray-200 font-semibold">
-            <td className="border px-2 py-1">YHTEENSÄ</td>
-            <td className="border px-2 py-1"></td>
-            {yhteensa.map((sum, idx) => (
-              <td key={idx} className="border px-2 py-1">
-                {sum}
-              </td>
-            ))}
-            <td className="border px-2 py-1"></td>
-          </tr>
-        </tbody>
-      </table>
+                    {section.items.map((item, itemIndex) => (
+                      <tr key={itemIndex}>
+                        <td>
+                          <input
+                            type="text"
+                            value={item.label}
+                            onChange={(e) => handleLabelChange(headerIndex, itemIndex, e.target.value)}
+                            className="form-control form-control-sm"
+                          />
+                        </td>
+                        <td>
+                          <select
+                            value={section.kl}
+                            onChange={(e) => handleKlChange(headerIndex, e.target.value)}
+                            className="form-select form-select-sm"
+                          >
+                            {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
+                              <option key={kl} value={kl}>{kl}</option>
+                            ))}
+                          </select>
+                        </td>
+                        {item.values.map((val, yearIdx) => (
+                          <td key={yearIdx}>
+                            <input
+                              type="text"
+                              value={val}
+                              onChange={(e) =>
+                                handleYearValueChange(headerIndex, itemIndex, yearIdx, e.target.value)
+                              }
+                              className="form-control form-control-sm text-end"
+                            />
+                          </td>
+                        ))}
+                        <td>
+                          <button
+                            onClick={() => handleRemoveRow(headerIndex, itemIndex)}
+                            className="btn btn-sm btn-danger"
+                            title="Remove row"
+                          >×</button>
+                        </td>
+                      </tr>
+                    ))}
+
+                    <tr>
+                      <td colSpan={years.length + 3} className="text-center">
+                        <button
+                          onClick={() => handleAddRow(headerIndex)}
+                          className="btn btn-sm btn-outline-success"
+                        >
+                          + Lisää rivi
+                        </button>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+
+                <tr className="table-success fw-bold">
+                  <td>YHTEENSÄ</td>
+                  <td></td>
+                  {yhteensa.map((sum, idx) => (
+                    <td key={idx} className="text-center">{sum}</td>
+                  ))}
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
