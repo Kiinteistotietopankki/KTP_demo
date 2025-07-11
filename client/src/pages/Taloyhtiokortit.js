@@ -13,26 +13,33 @@ function Taloyhtiokortit() {
   const [pageSize, setPageSize] = useState(6);
   const [totalItems, setTotalItems] = useState(0);
   const [errMessage, setErrMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Fetch data function
   const fetchData = async () => {
     try {
+      setLoading(true); // start loading
       setErrMessage('');
+
       const response = await getKiinteistotWithRakennukset(
         page,
         pageSize,
         'id_kiinteisto',
         resultOrder,
-        searchTerm // 🔹 New parameter passed to API
+        searchTerm
       );
+
       const { data, totalPages, totalItems } = response.data;
       setKiinteistot(data);
       setTotalPages(totalPages);
       setTotalItems(totalItems);
     } catch (error) {
       setErrMessage(error.message || 'Error fetching data');
+    } finally {
+      setLoading(false); // stop loading
     }
   };
+
 
   useEffect(() => {
     fetchData();
@@ -113,6 +120,14 @@ function Taloyhtiokortit() {
             <Badge bg="danger" pill>
               {errMessage}
             </Badge>
+          </div>
+        )}
+
+        {loading && (
+          <div className="text-center my-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Ladataan...</span>
+            </div>
           </div>
         )}
 
