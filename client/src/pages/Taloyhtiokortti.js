@@ -6,6 +6,7 @@ import { Tab, Tabs } from 'react-bootstrap';
 import StickyAfterScroll from '../components/Stickyafterscroll';
 import { getKiinteistoWhole } from '../api/api';
 import PerustiedotAccordion from '../components/PerustiedotAccordion';
+import TilastoTable from '../components/TilastoTable';
 
 function Taloyhtiokortti() {
   const { id } = useParams();
@@ -67,7 +68,7 @@ function Taloyhtiokortti() {
             <div className="p-3">Tähän tulee dokumentit ja raportit.</div>
           </Tab>
           <Tab eventKey="kiinteistotiedot" title="Kiinteistötiedot">
-            <div className="p-3">Tähän tulee kiinteistötiedot.</div>
+            <TilastoTable></TilastoTable>
           </Tab>
           <Tab eventKey="rhtiedot" title="RH-tiedot">
             <div className="p-3">Tähän tulee RH-tiedot.</div>
