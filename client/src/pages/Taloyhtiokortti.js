@@ -10,6 +10,7 @@ import { Button, Modal } from 'react-bootstrap';
 import PropertyDetailsForm from '../components/ReportTemplate'; 
 import TilastoTable from '../components/TilastoTable';
 
+
 function Taloyhtiokortti() {
   const { id } = useParams();
   const [card, setCard] = useState(null);
@@ -30,6 +31,8 @@ const [existingPTSData, setExistingPTSData] = useState(null);
         if (coords) setMapCoords([coords[1], coords[0]]);
       })
       .catch(err => console.error('API error:', err));
+
+      console.log(card)
   }, [id]);
 
   if (!card) return <div className="text-center mt-5">Ladataan tietoja...</div>;
@@ -97,7 +100,13 @@ const [existingPTSData, setExistingPTSData] = useState(null);
 
           </Tab>
           <Tab eventKey="kiinteistotiedot" title="Kiinteistötiedot">
-            <TilastoTable></TilastoTable>
+            
+          </Tab>
+          <Tab eventKey="tilastot" title="Tilastot">
+            <div className="container mt-4">
+              <TilastoTable indicator={2313} kunta={card?.rakennukset_fulls[0]?.toimipaikka} chartLabel={'asuinpientalokiinteistöt asemakaava-alueella - rakennetut kohteet (kauppahinta mediaani €)'}></TilastoTable>
+              <TilastoTable indicator={2503} kunta={card?.rakennukset_fulls[0]?.toimipaikka} chartLabel={'asuinpientalokiinteistöt haja-asutusalueella - rakennetut kohteet (kauppahinta mediaani €)'}></TilastoTable>
+            </div>
           </Tab>
           <Tab eventKey="rhtiedot" title="RH-tiedot">
             <div className="p-3">Tähän tulee RH-tiedot.</div>
