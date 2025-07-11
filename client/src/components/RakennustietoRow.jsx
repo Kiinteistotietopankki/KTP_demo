@@ -57,7 +57,8 @@ export default function RakennustietoRow({
 
     try {
       await updateRakennus(rakennus.id_rakennus, updates);
-      console.log(`Updated ${field} and/or its source successfully`);
+      // alert(`"${otsikko}" päivitetty onnistuneesti!`);
+      window.location.reload();  // refreshes the current page
     } catch (err) {
       alert(
         `Kentän "${otsikko}" tallennus epäonnistui: ${

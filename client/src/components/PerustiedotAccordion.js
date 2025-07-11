@@ -23,7 +23,7 @@ export default function PerustiedotAccordion({ kiinteisto, setMapCoodinates }) {
                 <dl className="col-6">
                   <RakennustietoRow otsikko="Osoite" field="osoite" rakennus={rakennus} editable={false} showSource={false} />
                   <RakennustietoRow otsikko="Postinumero" field="postinumero" rakennus={rakennus} editable={false} showSource={false} />
-                  <RakennustietoRow otsikko="Toimipaikka" field="toimipaikka" rakennus={rakennus} editable={false} showSource={false} />
+                  <RakennustietoRow otsikko="Toimipaikka" field="toimipaikka" rakennus={rakennus} editable={true} showSource={false} />
                 </dl>
 
                 <dl className="col-6">
