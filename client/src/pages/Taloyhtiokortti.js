@@ -11,6 +11,7 @@ import PropertyDetailsForm from '../components/ReportTemplate';
 import TilastoTable from '../components/TilastoTable';
 import TulosteetTab from '../components/TulosteetTab';
 import MMLTabFetcher from '../components/MMLTabFetcher';
+import MMLTabFetcher from '../components/MMLTabFetcher';
 
 
 function Taloyhtiokortti() {
@@ -104,6 +105,7 @@ const [existingPTSData, setExistingPTSData] = useState(null);
 
           <Tab eventKey="kiinteistotiedot" title="Kiinteistötiedot">
             <MMLTabFetcher kohdetunnus={card?.kiinteistotunnus}></MMLTabFetcher>
+            <MMLTabFetcher kiinteistotunnus={card?.kiinteistotunnus}></MMLTabFetcher>
           </Tab>
           <Tab eventKey="tulosteet" title="Hae tulosteita">
             <TulosteetTab kiinteistotunnus={card?.kiinteistotunnus}></TulosteetTab>
