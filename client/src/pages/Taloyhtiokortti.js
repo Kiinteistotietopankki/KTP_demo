@@ -8,6 +8,7 @@ import { getKiinteistoWhole } from '../api/api';
 import PerustiedotAccordion from '../components/PerustiedotAccordion';
 import TilastoTable from '../components/TilastoTable';
 import TulosteetTab from '../components/TulosteetTab';
+import MMLTabFetcher from '../components/MMLTabFetcher';
 
 
 function Taloyhtiokortti() {
@@ -73,7 +74,7 @@ function Taloyhtiokortti() {
           </Tab>
 
           <Tab eventKey="kiinteistotiedot" title="Kiinteistötiedot">
-            
+            <MMLTabFetcher kiinteistotunnus={card?.kiinteistotunnus}></MMLTabFetcher>
           </Tab>
           <Tab eventKey="tulosteet" title="Hae tulosteita">
             <TulosteetTab kiinteistotunnus={card?.kiinteistotunnus}></TulosteetTab>
