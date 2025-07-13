@@ -9,6 +9,7 @@ import PerustiedotAccordion from '../components/PerustiedotAccordion';
 import { Button, Modal } from 'react-bootstrap';
 import PropertyDetailsForm from '../components/ReportTemplate'; 
 import TilastoTable from '../components/TilastoTable';
+import TulosteetTab from '../components/TulosteetTab';
 
 
 function Taloyhtiokortti() {
@@ -99,8 +100,15 @@ const [existingPTSData, setExistingPTSData] = useState(null);
 </div>
 
           </Tab>
+
           <Tab eventKey="kiinteistotiedot" title="Kiinteistötiedot">
             
+          </Tab>
+          <Tab eventKey="tulosteet" title="Hae tulosteita">
+            <TulosteetTab kiinteistotunnus={card?.kiinteistotunnus}></TulosteetTab>
+          </Tab>
+          <Tab eventKey="pts" title="PTS">
+            <div className="p-3">Tähän tulee PTS-tiedot.</div>
           </Tab>
           <Tab eventKey="tilastot" title="Tilastot">
             <div className="container mt-4">
