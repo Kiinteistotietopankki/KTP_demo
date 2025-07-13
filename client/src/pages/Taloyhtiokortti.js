@@ -7,6 +7,7 @@ import StickyAfterScroll from '../components/Stickyafterscroll';
 import { getKiinteistoWhole } from '../api/api';
 import PerustiedotAccordion from '../components/PerustiedotAccordion';
 import TilastoTable from '../components/TilastoTable';
+import TulosteetTab from '../components/TulosteetTab';
 
 
 function Taloyhtiokortti() {
@@ -70,20 +71,21 @@ function Taloyhtiokortti() {
           <Tab eventKey="dokumentit" title="Dokumentit ja raportit">
             <div className="p-3">Tähän tulee dokumentit ja raportit.</div>
           </Tab>
+
           <Tab eventKey="kiinteistotiedot" title="Kiinteistötiedot">
             
+          </Tab>
+          <Tab eventKey="tulosteet" title="Hae tulosteita">
+            <TulosteetTab kiinteistotunnus={card?.kiinteistotunnus}></TulosteetTab>
+          </Tab>
+          <Tab eventKey="pts" title="PTS">
+            <div className="p-3">Tähän tulee PTS-tiedot.</div>
           </Tab>
           <Tab eventKey="tilastot" title="Tilastot">
             <div className="container mt-4">
               <TilastoTable indicator={2313} kunta={card?.rakennukset_fulls[0]?.toimipaikka} chartLabel={'asuinpientalokiinteistöt asemakaava-alueella - rakennetut kohteet (kauppahinta mediaani €)'}></TilastoTable>
               <TilastoTable indicator={2503} kunta={card?.rakennukset_fulls[0]?.toimipaikka} chartLabel={'asuinpientalokiinteistöt haja-asutusalueella - rakennetut kohteet (kauppahinta mediaani €)'}></TilastoTable>
             </div>
-          </Tab>
-          <Tab eventKey="rhtiedot" title="RH-tiedot">
-            <div className="p-3">Tähän tulee RH-tiedot.</div>
-          </Tab>
-          <Tab eventKey="pts" title="PTS">
-            <div className="p-3">Tähän tulee PTS-tiedot.</div>
           </Tab>
         </Tabs>
       </div>
