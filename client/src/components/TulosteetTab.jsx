@@ -72,7 +72,9 @@ const TulosteetTab = ({ kiinteistotunnus }) => {
 
   return (
     <div className="p-3">
-      <h5 className="mb-4">Lataa tulosteita kiinteistölle: <strong>{kiinteistotunnus}</strong></h5>
+      <h5 className="mb-4">
+        Tulosteiden haku kohteelle: <span className="text-primary fw-semibold">{kiinteistotunnus}</span>
+      </h5>
       {error && <Alert variant="danger">{error}</Alert>}
 
       <div className="d-grid gap-2">
