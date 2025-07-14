@@ -103,7 +103,7 @@ const [existingPTSData, setExistingPTSData] = useState(null);
           </Tab>
 
           <Tab eventKey="kiinteistotiedot" title="Kiinteistötiedot">
-            <MMLTabFetcher kiinteistotunnus={card?.kiinteistotunnus}></MMLTabFetcher>
+            <MMLTabFetcher kohdetunnus={card?.kiinteistotunnus}></MMLTabFetcher>
           </Tab>
           <Tab eventKey="tulosteet" title="Hae tulosteita">
             <TulosteetTab kiinteistotunnus={card?.kiinteistotunnus}></TulosteetTab>
