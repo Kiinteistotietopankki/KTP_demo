@@ -45,7 +45,7 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
         zoom: 17,
         minZoom: 15,
         maxZoom: 17,
-        dragging: false,
+        dragging: true,
         scrollWheelZoom: false
       });
 
@@ -55,9 +55,7 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
           shadowUrl: require('leaflet/dist/images/marker-shadow.png')
         });
 
-      // console.log(apiKey)
-      // console.log(encodeURIComponent(apiKey));
-      const template = `https://avoin-karttakuva.maanmittauslaitos.fi/avoin/wmts/1.0.0/{layerName}/default/{tileMatrixSet}/{z}/{y}/{x}.png?`;
+      const template = process.env.REACT_APP_API_URL+process.env.REACT_APP_API_MAP_TEMPLATE
 
       // Layers
 
