@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css';
 
 
 
-
 const apiKey = process.env.REACT_APP_API_KEY;
 
 const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
@@ -45,7 +44,7 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
         zoom: 17,
         minZoom: 15,
         maxZoom: 17,
-        dragging: true,
+        dragging: false,
         scrollWheelZoom: false
       });
 
@@ -64,56 +63,35 @@ const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       });
 
-      const layerBaseMap = basicTileHeader(
-        template,
-        {
-          tileMatrixSet: 'WGS84_Pseudo-Mercator',
-          layerName: 'taustakartta',
-          attribution: '&copy; Maanmittauslaitos',
-          detectRetina: true,
-        },
-        [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
-        null
-      );
+      const defaultTileMatrixSet = 'WGS84_Pseudo-Mercator';
 
-      const layerBaseMapIlmakuva = basicTileHeader(template, {
-          tileMatrixSet: 'WGS84_Pseudo-Mercator',
-          layerName: 'ortokuva',
-          attribution: '&copy; Maanmittauslaitos',
-          detectRetina: true
-        },
-        [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
-        null
-    );
+      const getTileUrl = (layerName, tileMatrixSet) => 
+        template
+          .replace('{layerName}', layerName)
+          .replace('{tileMatrixSet}', tileMatrixSet);
 
-      const layerBaseMapSelko = basicTileHeader(template, {
-          tileMatrixSet: 'WGS84_Pseudo-Mercator',
-          layerName: 'selkokartta',
-          attribution: '&copy; Maanmittauslaitos',
-          detectRetina: true
-          },
-          [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
-          null
-        );
+      const layerBaseMap = L.tileLayer(getTileUrl('taustakartta',defaultTileMatrixSet), {
+        attribution: '&copy; Maanmittauslaitos',
+        detectRetina: true,
+      });
 
-      const layerKiinteistotunnus = basicTileHeader(template, {
-        tileMatrixSet: 'WGS84_Pseudo-Mercator',
-        layerName: 'kiinteistotunnukset',
-        detectRetina: true
-        },
-        [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
-        null
-      );
+      const layerBaseMapIlmakuva = L.tileLayer(getTileUrl('ortokuva',defaultTileMatrixSet), {
+        attribution: '&copy; Maanmittauslaitos',
+        detectRetina: true,
+      });
 
-      const layerKiinteistorajat = basicTileHeader(template, {
-        tileMatrixSet: 'WGS84_Pseudo-Mercator',
-        layerName: 'kiinteistojaotus',
-        detectRetina: true
-        },
-        [{ header: 'Authorization', value: `Basic ${base64UserNameAndPassword}` }],
-        null
-      );
+      const layerBaseMapSelko = L.tileLayer(getTileUrl('selkokartta',defaultTileMatrixSet), {
+        attribution: '&copy; Maanmittauslaitos',
+        detectRetina: true,
+      });
 
+      const layerKiinteistotunnus = L.tileLayer(getTileUrl('kiinteistotunnukset',defaultTileMatrixSet), {
+        detectRetina: true,
+      });
+
+      const layerKiinteistorajat = L.tileLayer(getTileUrl('kiinteistojaotus',defaultTileMatrixSet), {
+        detectRetina: true,
+      });
 
       // Create layer control
       const baseMaps = {
