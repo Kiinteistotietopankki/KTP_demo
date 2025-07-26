@@ -24,9 +24,9 @@ function Home() {
 
   useEffect(() => {
     if (kiinteistoObjects.length > 0) {
-      const jsonData = kiinteistoObjects.map(obj => obj.toGeoJSON());
-      setKiinteistotJson(jsonData);
-      console.log('UEF HOME jsonData',jsonData)
+      // Assume kiinteistoObjects already contain the correct GeoJSON structure
+      setKiinteistotJson(kiinteistoObjects);
+      console.log('UEF HOME kiinteistoObjects as-is:', kiinteistoObjects);
     }
  
   }, [kiinteistoObjects]);
