@@ -3,6 +3,17 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_API_URL;
 const API_KEY = process.env.REACT_APP_PERSONAL_API_KEY; 
 
+export const searchKiinteistot = (kiinteistotunnus = '', osoite = '', kaupunki = '') => {
+  console.log(kiinteistotunnus, osoite, kaupunki);
+  return axios.get(`${API_URL}/api/haku/hae-kiinteistoja`, {
+    withCredentials: true,
+    params: {
+      kiinteistotunnus: kiinteistotunnus || undefined,
+      osoite: osoite || undefined,
+      kaupunki: kaupunki || undefined,
+    }
+  });
+};
 
 export const getKiinteistot = () =>
   axios.get(`${API_URL}/api/kiinteistot/default`, {

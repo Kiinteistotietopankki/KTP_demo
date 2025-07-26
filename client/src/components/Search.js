@@ -6,6 +6,7 @@ import { Tab } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 import KiinteistoHaku from '../classes/Kiinteistohaku';
 import { ktKokomuotoon } from '../assets/ktMuuntaja';
+import { searchKiinteistot } from '../api/api';
 
 // Hakulogiikka on tässä
 
@@ -29,24 +30,24 @@ function Search({afterSearch}) {
   
 
   const handleSearch = async () => {
-    let response = []
+    setLoading(true);
 
-    setLoading(true)
-  
     try {
-      let trimmedKt = kiinteistotunnus.trim()
-      let ktKokomuoto = ktKokomuotoon(trimmedKt)
-      let trimmedOsoite = osoite.trim() 
-      let trimmedKunta = paikkakunta.trim() 
+      let trimmedKt = kiinteistotunnus.trim();
+      let ktKokomuoto = ktKokomuotoon(trimmedKt);
+      let trimmedOsoite = osoite.trim();
+      let trimmedKunta = paikkakunta.trim();
 
-      response = await KH.haeKiinteistoja({kiinteistotunnus:ktKokomuoto, osoite:trimmedOsoite, kaupunki:trimmedKunta})
-      setResponseCount(response)
-      afterSearch(response)
+      const response = await searchKiinteistot(ktKokomuoto, trimmedOsoite, trimmedKunta);
 
+      const data = response.data; // 👈 Extract from Axios response
+
+      setResponseCount(data);
+      afterSearch(data);
     } catch (err) {
-
+      console.error("Virhe haussa:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
