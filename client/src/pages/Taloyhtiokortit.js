@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 function Taloyhtiokortit() {
   const [kiinteistot, setKiinteistot] = useState([]);
-  const [resultOrder, setResultOrder] = useState('DESC'); // default ASC matches your API default
+  const [resultOrder, setResultOrder] = useState('DESC'); // default DESC matches your API default
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalPages, setTotalPages] = useState(0);
@@ -34,17 +34,34 @@ function Taloyhtiokortit() {
       setTotalPages(totalPages);
       setTotalItems(totalItems);
     } catch (error) {
-      setErrMessage(error.message || 'Error fetching data');
+      // Check if error.response exists (Axios error)
+      if (error.response) {
+        switch (error.response.status) {
+          case 403:
+            setErrMessage('Käyttäjä ei ole kirjautunut sisään tai oikeudet puuttuvat (403)');
+            break;
+          case 401:
+            setErrMessage('Autentikointi epäonnistui (401)');
+            break;
+          case 500:
+            setErrMessage('Palvelinvirhe (500)');
+            break;
+          default:
+            setErrMessage(`Virhe haussa: ${error.response.status}`);
+        }
+      } else if (error.message) {
+        setErrMessage(error.message);
+      } else {
+        setErrMessage('Tuntematon virhe haussa');
+      }
     } finally {
       setLoading(false); // stop loading
     }
   };
 
-
   useEffect(() => {
     fetchData();
-  }, [page, pageSize, resultOrder]); 
-
+  }, [page, pageSize, resultOrder]);
 
   const increasePage = () => {
     if (page < totalPages) setPage(page + 1);
