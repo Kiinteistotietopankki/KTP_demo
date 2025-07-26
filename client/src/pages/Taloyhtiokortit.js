@@ -1,43 +1,69 @@
-import { Button, Card, Form, InputGroup } from 'react-bootstrap';
-import Badge from 'react-bootstrap/Badge';
+import { Button, Card, Form, InputGroup, Modal, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { getKiinteistotWithRakennukset } from '../api/api'; // your updated api function
+import { getKiinteistotWithRakennukset } from '../api/api';
 import { useEffect, useState } from 'react';
+import PropertyDetailsForm from '../components/ReportTemplate'; 
 
 function Taloyhtiokortit() {
   const [kiinteistot, setKiinteistot] = useState([]);
-  const [resultOrder, setResultOrder] = useState('DESC'); // default ASC matches your API default
+  const [resultOrder, setResultOrder] = useState('DESC'); // default DESC matches your API default
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalPages, setTotalPages] = useState(0);
   const [pageSize, setPageSize] = useState(6);
   const [totalItems, setTotalItems] = useState(0);
   const [errMessage, setErrMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Fetch data function
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [selectedRakennusForReport, setSelectedRakennusForReport] = useState(null);
+
   const fetchData = async () => {
     try {
+      setLoading(true); // start loading
       setErrMessage('');
+
       const response = await getKiinteistotWithRakennukset(
         page,
         pageSize,
         'id_kiinteisto',
         resultOrder,
-        searchTerm // 🔹 New parameter passed to API
+        searchTerm
       );
+
       const { data, totalPages, totalItems } = response.data;
       setKiinteistot(data);
       setTotalPages(totalPages);
       setTotalItems(totalItems);
     } catch (error) {
-      setErrMessage(error.message || 'Error fetching data');
+      // Check if error.response exists (Axios error)
+      if (error.response) {
+        switch (error.response.status) {
+          case 403:
+            setErrMessage('Käyttäjä ei ole kirjautunut sisään tai oikeudet puuttuvat (403)');
+            break;
+          case 401:
+            setErrMessage('Autentikointi epäonnistui (401)');
+            break;
+          case 500:
+            setErrMessage('Palvelinvirhe (500)');
+            break;
+          default:
+            setErrMessage(`Virhe haussa: ${error.response.status}`);
+        }
+      } else if (error.message) {
+        setErrMessage(error.message);
+      } else {
+        setErrMessage('Tuntematon virhe haussa');
+      }
+    } finally {
+      setLoading(false); // stop loading
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [page, pageSize, resultOrder]); 
-
+  }, [page, pageSize, resultOrder]);
 
   const increasePage = () => {
     if (page < totalPages) setPage(page + 1);
@@ -49,7 +75,7 @@ function Taloyhtiokortit() {
 
   const handleSearch = () => {
     setPage(1);
-    fetchData(); // Trigger search
+    fetchData();
   };
 
   const handleKeyDown = (e) => {
@@ -116,6 +142,14 @@ function Taloyhtiokortit() {
           </div>
         )}
 
+        {loading && (
+          <div className="text-center my-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Ladataan...</span>
+            </div>
+          </div>
+        )}
+
         <div className="row g-4">
           {kiinteistot?.map((kiinteisto) => (
             <div key={kiinteisto.id_kiinteisto} className="col-md-6 col-lg-4">
@@ -127,7 +161,10 @@ function Taloyhtiokortit() {
                   <Card.Title className="fs-6 text-secondary">
                     Kiinteistötunnus: {kiinteisto.kiinteistotunnus}
                   </Card.Title>
-                  <Link to={`/taloyhtiokortti/${kiinteisto.id_kiinteisto}`} className="mt-3">
+                  
+
+
+                  <Link to={`/taloyhtiokortti/${kiinteisto.id_kiinteisto}`} className="mt-2">
                     <Button variant="outline-primary" className="w-100 fw-semibold">
                       Avaa kortti
                     </Button>
@@ -138,6 +175,23 @@ function Taloyhtiokortit() {
           ))}
         </div>
       </div>
+
+      {/* Modal outside of map */}
+      <Modal
+        show={showReportModal}
+        onHide={() => setShowReportModal(false)}
+        size="xl"
+        backdrop="static"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Luo raportti</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedRakennusForReport && (
+            <PropertyDetailsForm rakennus={selectedRakennusForReport} />
+          )}
+        </Modal.Body>
+      </Modal>
 
       <style jsx>{`
         .hover-shadow:hover {

@@ -57,7 +57,8 @@ export default function RakennustietoRow({
 
     try {
       await updateRakennus(rakennus.id_rakennus, updates);
-      console.log(`Updated ${field} and/or its source successfully`);
+      // alert(`"${otsikko}" päivitetty onnistuneesti!`);
+      window.location.reload();  // refreshes the current page
     } catch (err) {
       alert(
         `Kentän "${otsikko}" tallennus epäonnistui: ${
@@ -80,41 +81,40 @@ export default function RakennustietoRow({
         style={{ whiteSpace: 'nowrap' }}
       >
         {isEditing ? (
-          <>
-            <input
-              type="text"
-              className="form-control form-control-sm d-inline-block w-auto mb-1"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              autoFocus
-              style={{ verticalAlign: 'middle' }}
-            />
-            {showSource && (
-              <input
-                type="text"
-                className="form-control form-control-sm d-inline-block w-auto ms-2 mb-1"
-                value={source}
-                onChange={(e) => setSource(e.target.value)}
-                placeholder="Lähde"
-                style={{ verticalAlign: 'middle' }}
-              />
-            )}
-            <br />
-            <button
-              className="btn btn-sm btn-primary me-2"
-              onClick={saveEdit}
-              type="button"
-            >
-              Save
-            </button>
-            <button
-              className="btn btn-sm btn-secondary"
-              onClick={cancelEdit}
-              type="button"
-            >
-              Cancel
-            </button>
-          </>
+  <div className="d-flex flex-column gap-2">
+    <input
+      type="text"
+      className="form-control form-control-sm"
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      autoFocus
+    />
+    {showSource && (
+      <input
+        type="text"
+        className="form-control form-control-sm"
+        value={source}
+        onChange={(e) => setSource(e.target.value)}
+        placeholder="Lähde"
+      />
+    )}
+    <div>
+      <button
+        className="btn btn-sm btn-primary me-2"
+        onClick={saveEdit}
+        type="button"
+      >
+        Save
+      </button>
+      <button
+        className="btn btn-sm btn-secondary"
+        onClick={cancelEdit}
+        type="button"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
         ) : (
           <>
             {valueFromData === '' ? 'Ei tiedossa' : valueFromData}
