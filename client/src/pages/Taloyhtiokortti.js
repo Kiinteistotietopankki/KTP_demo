@@ -8,6 +8,8 @@ import { getKiinteistoWhole } from '../api/api';
 import PerustiedotAccordion from '../components/PerustiedotAccordion';
 import { Button, Modal } from 'react-bootstrap';
 import PropertyDetailsForm from '../components/ReportTemplate'; 
+import TilastoTable from '../components/TilastoTable';
+
 function Taloyhtiokortti() {
   const { id } = useParams();
   const [card, setCard] = useState(null);
@@ -95,7 +97,7 @@ const [existingPTSData, setExistingPTSData] = useState(null);
 
           </Tab>
           <Tab eventKey="kiinteistotiedot" title="Kiinteistötiedot">
-            <div className="p-3">Tähän tulee kiinteistötiedot.</div>
+            <TilastoTable></TilastoTable>
           </Tab>
           <Tab eventKey="rhtiedot" title="RH-tiedot">
             <div className="p-3">Tähän tulee RH-tiedot.</div>
