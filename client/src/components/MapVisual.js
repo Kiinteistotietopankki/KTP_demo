@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 
 const apiKey = process.env.REACT_APP_API_KEY;
 
-const MapVisual = ({ pos = [65.00816937, 25.46030678], coords}) => {
+const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {
   
     const [position, setPosition] = useState([pos[0],pos[1]])
 
