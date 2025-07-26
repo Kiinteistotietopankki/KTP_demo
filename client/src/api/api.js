@@ -59,7 +59,7 @@ export const updateRakennus = (id, data) => {
   console.log('updateRakennus payload:', data);
 
   return axios.put(
-    `${API_URL}/api/rakennukset_full/${id}/with-metadata`,  // <-- use template literal correctly here
+    `${API_URL}/api/rakennukset_full/${id}/with-metadata`,  
     data,
     {
       headers: {

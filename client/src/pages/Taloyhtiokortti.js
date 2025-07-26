@@ -6,14 +6,17 @@ import { Tab, Tabs } from 'react-bootstrap';
 import StickyAfterScroll from '../components/Stickyafterscroll';
 import { getKiinteistoWhole } from '../api/api';
 import PerustiedotAccordion from '../components/PerustiedotAccordion';
-
+import { Button, Modal } from 'react-bootstrap';
+import PropertyDetailsForm from '../components/ReportTemplate'; 
 function Taloyhtiokortti() {
   const { id } = useParams();
   const [card, setCard] = useState(null);
   const hasFetched = useRef(false);
-
+  const [showPTSModal, setShowPTSModal] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
   const [mapCoords, setMapCoords] = useState([]);
-
+const [activeTab, setActiveTab] = useState('perustiedot');
+const [existingPTSData, setExistingPTSData] = useState(null);
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
@@ -64,7 +67,32 @@ function Taloyhtiokortti() {
             <PerustiedotAccordion kiinteisto={card} setMapCoodinates={setMapCoords} />
           </Tab>
           <Tab eventKey="dokumentit" title="Dokumentit ja raportit">
-            <div className="p-3">Tähän tulee dokumentit ja raportit.</div>
+           <div className="p-3">
+  <Button
+    variant="outline-primary"
+    onClick={() => setShowReportModal(true)}
+  >
+    ➕ Luo raportti
+  </Button>
+
+  <Modal
+    show={showReportModal}
+    onHide={() => setShowReportModal(false)}
+    size="xl"
+    backdrop="static"
+  >
+    <Modal.Header closeButton>
+      <Modal.Title>Luo raportti</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <PropertyDetailsForm
+        rakennus={rakennus}
+        kiinteistotunnus={card.kiinteistotunnus}
+      />
+    </Modal.Body>
+  </Modal>
+</div>
+
           </Tab>
           <Tab eventKey="kiinteistotiedot" title="Kiinteistötiedot">
             <div className="p-3">Tähän tulee kiinteistötiedot.</div>
@@ -73,8 +101,30 @@ function Taloyhtiokortti() {
             <div className="p-3">Tähän tulee RH-tiedot.</div>
           </Tab>
           <Tab eventKey="pts" title="PTS">
-            <div className="p-3">Tähän tulee PTS-tiedot.</div>
-          </Tab>
+          <div className="p-3">
+            <Button
+              variant="outline-primary"
+              onClick={() => setShowPTSModal(true)}
+            >
+              ➕ Luo uusi PTS
+            </Button>
+
+            <Modal
+              show={showPTSModal}
+              onHide={() => setShowPTSModal(false)}
+              size="xl"
+              backdrop="static"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Luo PTS-raportti</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <PropertyDetailsForm rakennus={rakennus} kiinteistotunnus={card.kiinteistotunnus} 
+                initialTab="pts"/>
+              </Modal.Body>
+            </Modal>
+          </div>
+        </Tab>
         </Tabs>
       </div>
     </div>

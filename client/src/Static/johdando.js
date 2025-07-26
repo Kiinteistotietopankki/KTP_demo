@@ -9,10 +9,10 @@ Toimeksiantaja:
 
 Tämä raportti on laadittu Insinööritoimisto Waativan toimesta. Tämän raportin ja siihen liittyvät tarkastukset on tehnyt seuraavat henkilöt:
 
-Koordinaattori:                                                Insinööritoimisto Waativa
-Rakennustekniikka:                                       Insinööritoimisto Waativa
-LVIA-järjestelmät:                                          Insinööritoimisto Waativa
-Sähköjärjestelmät:                                         Insinööritoimisto Waativa
+Koordinaattori:                                                             Insinööritoimisto Waativa
+Rakennustekniikka:                                                        Insinööritoimisto Waativa
+LVIA-järjestelmät:                                                        Insinööritoimisto Waativa
+Sähköjärjestelmät:                                                        Insinööritoimisto Waativa
 
 Asuinkiinteistöjen kuntoarvion tilaajaohjeen (RT 103002) mukaisesti kuntoarvion tavoitteena on muodostaa puolueeton kokonaiskuva kiinteistöstä, selvittää merkittävimmät korjaus- ja tutkimustarpeet. Tavoitteena ei ole korjaustoimenpiteiden yksityiskohtainen määrittely.
 

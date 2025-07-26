@@ -1,159 +1,46 @@
 import React, { useState, useEffect } from 'react';
 
-export default function Tekniikkataulut({onYhteensaChange}) {
-  const years = Array.from({ length: 11 }, (_, i) => 2025 + i);
+export default function Tekniikkataulut({ onYhteensaChange, setData }) {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth(); // 0 = January, 6 = July
+  const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
+  const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
   const initialData = [
     {
       header: 'Vierustat ja kuivatusosat',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
+      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
     },
     {
       header: 'Pihapäällysteet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Aluevarusteet ja -rakenteet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Perustukset ja sokkelit',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Alapohja',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Rakennusrunko',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Ulkoseinät',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Ulkoseinät',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Ulko-ovet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Parvekkeet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Kattorakenteet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Sisätilat',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
-    },
-    {
-      header: 'Märkätilat',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-        { label: '', values: Array(11).fill('') },
-      ]
+      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
     },
   ];
 
   const [tableData, setTableData] = useState(initialData);
 
-  const handleKlChange = (index, value) => {
+  const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
     const updated = [...tableData];
-    updated[index].kl = value;
+    updated[sectionIdx].items[itemIdx].values[yearIdx] = value;
     setTableData(updated);
   };
 
-  const handleLabelChange = (headerIndex, itemIndex, value) => {
+  const handleAddRow = (sectionIdx) => {
     const updated = [...tableData];
-    updated[headerIndex].items[itemIndex].label = value;
+    updated[sectionIdx].items.push({
+      label: '',
+      kl: '',
+      values: Array(11).fill(''),
+    });
     setTableData(updated);
   };
 
-  const handleYearValueChange = (headerIndex, itemIndex, yearIndex, value) => {
+  const handleRemoveRow = (sectionIdx, itemIdx) => {
     const updated = [...tableData];
-    updated[headerIndex].items[itemIndex].values[yearIndex] = value;
+    updated[sectionIdx].items.splice(itemIdx, 1);
     setTableData(updated);
   };
 
-  const handleAddRow = (headerIndex) => {
-    const updated = [...tableData];
-    updated[headerIndex].items.push({ label: '', values: Array(11).fill('') });
-    setTableData(updated);
-  };
-
-  const handleRemoveRow = (headerIndex, itemIndex) => {
-    const updated = [...tableData];
-    updated[headerIndex].items.splice(itemIndex, 1);
-    setTableData(updated);
-  };
-
-  // Calculate grand total
   const yhteensa = Array(11).fill(0);
   tableData.forEach(section => {
     section.items.forEach(item => {
@@ -164,9 +51,16 @@ export default function Tekniikkataulut({onYhteensaChange}) {
     });
   });
 
+useEffect(() => {
+  if (onYhteensaChange) {
+    onYhteensaChange([...yhteensa]); 
+  }
+  
+}, [JSON.stringify(yhteensa)]);
+
   useEffect(() => {
-    if (onYhteensaChange) onYhteensaChange(yhteensa);
-  }, [yhteensa, onYhteensaChange]);
+    if (typeof setData === 'function') setData(tableData);
+  }, [tableData]);
 
   return (
     <div className="accordion my-4" id="rakennetekniikkaAccordion">
@@ -194,35 +88,51 @@ export default function Tekniikkataulut({onYhteensaChange}) {
             <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
-                  <th>Osa-alue</th>
-                  <th>KL</th>
+                  <th style={{ minWidth: '180px' }}>Osa-alue</th>
+                  <th style={{ minWidth: '90px' }}>KL</th>
                   {years.map(year => (
                     <th key={year} className="text-center">{year}</th>
                   ))}
-                  <th></th>
+                  <th style={{ width: '40px' }}></th>
                 </tr>
               </thead>
               <tbody>
-                {tableData.map((section, headerIndex) => (
-                  <React.Fragment key={headerIndex}>
+                {tableData.map((section, sectionIdx) => (
+                  <React.Fragment key={sectionIdx}>
                     <tr className="bg-secondary text-white">
-                      <td colSpan={years.length + 3} className="fw-semibold">{section.header}</td>
+                      <td colSpan={years.length + 3} className="fw-semibold d-flex justify-content-between align-items-center">
+                        {section.header}
+                        <button
+                          onClick={() => handleAddRow(sectionIdx)}
+                          className="btn btn-sm btn-light text-dark border"
+                          title="Lisää rivi"
+                        >
+                          +
+                        </button>
+                      </td>
                     </tr>
-
-                    {section.items.map((item, itemIndex) => (
-                      <tr key={itemIndex}>
+                    {section.items.map((item, itemIdx) => (
+                      <tr key={itemIdx}>
                         <td>
                           <input
                             type="text"
                             value={item.label}
-                            onChange={(e) => handleLabelChange(headerIndex, itemIndex, e.target.value)}
+                            onChange={(e) => {
+                              const updated = [...tableData];
+                              updated[sectionIdx].items[itemIdx].label = e.target.value;
+                              setTableData(updated);
+                            }}
                             className="form-control form-control-sm"
                           />
                         </td>
                         <td>
                           <select
-                            value={section.kl}
-                            onChange={(e) => handleKlChange(headerIndex, e.target.value)}
+                            value={item.kl}
+                            onChange={(e) => {
+                              const updated = [...tableData];
+                              updated[sectionIdx].items[itemIdx].kl = e.target.value;
+                              setTableData(updated);
+                            }}
                             className="form-select form-select-sm"
                           >
                             {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
@@ -236,7 +146,7 @@ export default function Tekniikkataulut({onYhteensaChange}) {
                               type="text"
                               value={val}
                               onChange={(e) =>
-                                handleYearValueChange(headerIndex, itemIndex, yearIdx, e.target.value)
+                                handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)
                               }
                               className="form-control form-control-sm text-end"
                             />
@@ -244,27 +154,19 @@ export default function Tekniikkataulut({onYhteensaChange}) {
                         ))}
                         <td>
                           <button
-                            onClick={() => handleRemoveRow(headerIndex, itemIndex)}
-                            className="btn btn-sm btn-danger"
-                            title="Remove row"
-                          >×</button>
+                            onClick={() => handleRemoveRow(sectionIdx, itemIdx)}
+                            className="btn btn-sm btn-outline-danger"
+                            title="Poista rivi"
+                          >
+                            ×
+                          </button>
                         </td>
                       </tr>
                     ))}
-
-                    <tr>
-                      <td colSpan={years.length + 3} className="text-center">
-                        <button
-                          onClick={() => handleAddRow(headerIndex)}
-                          className="btn btn-sm btn-outline-success"
-                        >
-                          + Lisää rivi
-                        </button>
-                      </td>
-                    </tr>
                   </React.Fragment>
                 ))}
-
+              </tbody>
+              <tfoot>
                 <tr className="table-success fw-bold">
                   <td>YHTEENSÄ</td>
                   <td></td>
@@ -273,7 +175,7 @@ export default function Tekniikkataulut({onYhteensaChange}) {
                   ))}
                   <td></td>
                 </tr>
-              </tbody>
+              </tfoot>
             </table>
           </div>
         </div>
