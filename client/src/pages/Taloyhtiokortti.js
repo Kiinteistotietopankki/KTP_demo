@@ -11,7 +11,6 @@ import PropertyDetailsForm from '../components/ReportTemplate';
 import TilastoTable from '../components/TilastoTable';
 import TulosteetTab from '../components/TulosteetTab';
 import MMLTabFetcher from '../components/MMLTabFetcher';
-import MMLTabFetcher from '../components/MMLTabFetcher';
 
 
 function Taloyhtiokortti() {
