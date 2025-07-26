@@ -1,46 +1,33 @@
-import React, { useState } from 'react';
-import { Collapse } from 'react-collapse';
+import React, { useState, useEffect } from 'react';
 
-export default function LVITable() {
-  const years = Array.from({ length: 11 }, (_, i) => 2025 + i);
+export default function LVITable({ onYhteensaChange, setData }) {
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth(); // 0 = Tammikuu ja  6 = heinäkuu
+const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
+const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
-  const initialData = [
-    {
-      header: 'Lämmöntuotanto',
-      kl: 'KL3',
-      items: [
-        { label: 'Lämmönjakokeskuksen uusiminen', values: [0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-      ],
-    },
-    {
-      header: 'Lämmitysverkosto',
-      kl: 'KL3',
-      items: [
-        { label: 'Linjaventtiilien uusiminen ja verkoston tasapainotus', values: [0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0] },
-      ],
-    },
-    {
-      header: 'Vesijohtoverkosto',
-      kl: 'KL3',
-      items: [
-        { label: 'Linjaventtiilien uusiminen ja lämminkiertovesiverkoston virtaamien säätö', values: [0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0] },
-      ],
-    },
-    {
-      header: 'Ilmanvaihtojärjestelmä',
-      kl: 'KL3',
-      items: [
-        { label: 'Iv-nuohous ja ilmamäärien säätö', values: [0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0] },
-      ],
-    },
-  ];
- const [tableData, setTableData] = useState(initialData);
+const initialData = [
+  {
+    header: 'Lämmöntuotanto',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Lämmitysverkosto',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Vesijohtoverkosto',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Ilmanvaihtojärjestelmä',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+];
 
-  const handleKLChange = (sectionIdx, value) => {
-    const updated = [...tableData];
-    updated[sectionIdx].kl = value;
-    setTableData(updated);
-  };
+
+  const [tableData, setTableData] = useState(initialData);
+
 
   const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
     const updated = [...tableData];
@@ -48,7 +35,21 @@ export default function LVITable() {
     setTableData(updated);
   };
 
-  // Calculate grand total
+  const handleAddRow = (sectionIdx) => {
+  const updated = [...tableData];
+  updated[sectionIdx].items.push({
+    label: '',
+    kl: '',
+    values: Array(11).fill('')
+  });
+  setTableData(updated);
+};
+  const handleRemoveRow = (sectionIdx, itemIdx) => {
+    const updated = [...tableData];
+    updated[sectionIdx].items.splice(itemIdx, 1);
+    setTableData(updated);
+  };
+
   const yhteensa = Array(11).fill(0);
   tableData.forEach(section => {
     section.items.forEach(item => {
@@ -58,6 +59,17 @@ export default function LVITable() {
       });
     });
   });
+
+useEffect(() => {
+  if (onYhteensaChange) {
+    onYhteensaChange([...yhteensa]); // spread to avoid mutation issues
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [JSON.stringify(yhteensa)]);
+
+useEffect(() => {
+  if (typeof setData === 'function') setData(tableData);
+}, [tableData]);
 
   return (
     <div className="accordion my-4" id="lvijarjestelmatAccordion">
@@ -71,7 +83,7 @@ export default function LVITable() {
             aria-expanded="false"
             aria-controls="collapseLVI"
           >
-            LVI-järjestelmät
+            LVI-tekniikka
           </button>
         </h2>
 
@@ -85,26 +97,53 @@ export default function LVITable() {
             <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
-                  <th>Osa-alue</th>
-                  <th>KL</th>
+                  <th style={{ minWidth: '180px' }}>Osa-alue</th>
+                  <th style={{ minWidth: '90px' }}>KL</th>
                   {years.map(year => (
                     <th key={year} className="text-center">{year}</th>
                   ))}
+                  <th style={{ width: '40px' }}></th>
                 </tr>
               </thead>
               <tbody>
                 {tableData.map((section, sectionIdx) => (
                   <React.Fragment key={sectionIdx}>
                     <tr className="bg-secondary text-white">
-                      <td colSpan={years.length + 2} className="fw-semibold">{section.header}</td>
+                      <td colSpan={years.length + 3} className="fw-semibold d-flex justify-content-between align-items-center">
+                        {section.header}
+                                                <button
+                            onClick={() => handleAddRow(sectionIdx)}
+                          className="btn btn-sm btn-light text-dark border"
+
+                            title="Lisää rivi"
+                          >
+                            +
+                          </button>
+
+                      </td>
                     </tr>
                     {section.items.map((item, itemIdx) => (
                       <tr key={itemIdx}>
-                        <td>{item.label}</td>
+                        <td>
+                          <input
+                            type="text"
+                            value={item.label}
+                            onChange={(e) => {
+                              const updated = [...tableData];
+                              updated[sectionIdx].items[itemIdx].label = e.target.value;
+                              setTableData(updated);
+                            }}
+                            className="form-control form-control-sm"
+                          />
+                        </td>
                         <td>
                           <select
-                            value={section.kl}
-                            onChange={(e) => handleKLChange(sectionIdx, e.target.value)}
+                            value={item.kl}
+                            onChange={(e) => {
+                              const updated = [...tableData];
+                              updated[sectionIdx].items[itemIdx].kl = e.target.value;
+                              setTableData(updated);
+                            }}
                             className="form-select form-select-sm"
                           >
                             {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
@@ -124,12 +163,20 @@ export default function LVITable() {
                             />
                           </td>
                         ))}
+                        <td>
+                          <button
+                            onClick={() => handleRemoveRow(sectionIdx, itemIdx)}
+                            className="btn btn-sm btn-outline-danger"
+                            title="Poista rivi"
+                          >
+                            ×
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </React.Fragment>
                 ))}
               </tbody>
-
               <tfoot>
                 <tr className="table-success fw-bold">
                   <td>YHTEENSÄ</td>
@@ -137,6 +184,7 @@ export default function LVITable() {
                   {yhteensa.map((sum, idx) => (
                     <td key={idx} className="text-center">{sum}</td>
                   ))}
+                  <td></td>
                 </tr>
               </tfoot>
             </table>

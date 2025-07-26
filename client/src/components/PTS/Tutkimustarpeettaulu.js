@@ -1,65 +1,24 @@
 import React, { useState, useEffect } from 'react';
 
-export default function SahkotekniikkaTable({ onYhteensaChange, setData }) {
-const currentYear = new Date().getFullYear();
-const currentMonth = new Date().getMonth(); // 0 = Tammikuu ja  6 = heinäkuu
-const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
-const years = Array.from({ length: 11 }, (_, i) => startYear + i);
+export default function TutkimustarpeetTaulu({ onYhteensaChange }) {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth();
+  const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
+  const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
-  const [tableData, setTableData] = useState([
+  const initialData = [
     {
-      header: 'Aluesähköistys',
+      header: 'Tutkimustarpeet',
       kl: 'KL3',
       items: [
         { label: '', values: Array(11).fill('') },
        
-      ],
-    },
-    {
-      header: 'Kutkinlaitokset ja jakokeskukset',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Johdot ja niiden varusteet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Valaisimet, lämmittimet, kojeet ja laitteet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Tele- ja antennijärjestelmät',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Palo- ja turvajärjestelmät',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Siirtolaitteet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    
-    
-  ]);
+      ]
+    }
+  ];
+
+  const [tableData, setTableData] = useState(initialData);
+
 
   const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
     const updated = [...tableData];
@@ -67,23 +26,11 @@ const years = Array.from({ length: 11 }, (_, i) => startYear + i);
     setTableData(updated);
   };
 
-  const handleLabelChange = (sectionIdx, itemIdx, value) => {
-    const updated = [...tableData];
-    updated[sectionIdx].items[itemIdx].label = value;
-    setTableData(updated);
-  };
-
-  const handleKlChange = (sectionIdx, value) => {
-    const updated = [...tableData];
-    updated[sectionIdx].kl = value;
-    setTableData(updated);
-  };
-
   const handleAddRow = (sectionIdx) => {
   const updated = [...tableData];
   updated[sectionIdx].items.push({
     label: '',
-    kl: '', // 👈 add this line
+    kl: '', 
     values: Array(11).fill('')
   });
   setTableData(updated);
@@ -95,7 +42,6 @@ const years = Array.from({ length: 11 }, (_, i) => startYear + i);
     setTableData(updated);
   };
 
-  
   const yhteensa = Array(11).fill(0);
   tableData.forEach(section => {
     section.items.forEach(item => {
@@ -105,80 +51,79 @@ const years = Array.from({ length: 11 }, (_, i) => startYear + i);
       });
     });
   });
+
 useEffect(() => {
   if (onYhteensaChange) {
     onYhteensaChange([...yhteensa]); 
   }
   
 }, [JSON.stringify(yhteensa)]);
-  useEffect(() => {
-    if (typeof setData === 'function') setData(tableData);
-  }, [tableData]);
 
   return (
-    <div className="accordion my-4" id="sahkotekniikkaAccordion">
+    <div className="accordion my-4" id="tutkimusAccordion">
       <div className="accordion-item">
-        <h2 className="accordion-header" id="headingSahko">
+        <h2 className="accordion-header" id="headingTutkimus">
           <button
             className="accordion-button collapsed"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#collapseSahko"
+            data-bs-target="#collapseTutkimus"
             aria-expanded="false"
-            aria-controls="collapseSahko"
+            aria-controls="collapseTutkimus"
           >
-            Sähkötekniikka
+            Tutkimustarpeet
           </button>
         </h2>
 
         <div
-          id="collapseSahko"
+          id="collapseTutkimus"
           className="accordion-collapse collapse"
-          aria-labelledby="headingSahko"
-          data-bs-parent="#sahkotekniikkaAccordion"
+          aria-labelledby="headingTutkimus"
+          data-bs-parent="#tutkimusAccordion"
         >
           <div className="accordion-body p-0">
             <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
-                  <th>Osa-alue</th>
-                  <th>KL</th>
+                  <th style={{ minWidth: '180px' }}>Osa-alue</th>
+                  <th style={{ minWidth: '90px' }}>KL</th>
                   {years.map((year) => (
                     <th key={year} className="text-center">{year}</th>
                   ))}
-                  <th></th>
+                  <th style={{ width: '40px' }}></th>
                 </tr>
               </thead>
               <tbody>
                 {tableData.map((section, sectionIdx) => (
                   <React.Fragment key={sectionIdx}>
-                    
-                    <tr className="bg-secondary text-white">
+                    <tr className="bg-success text-white">
                       <td colSpan={years.length + 3} className="fw-semibold d-flex justify-content-between align-items-center">
                         {section.header}
                         <button
                           onClick={() => handleAddRow(sectionIdx)}
                           className="btn btn-sm btn-light text-dark border"
-
                           title="Lisää rivi"
                         >
                           +
                         </button>
                       </td>
                     </tr>
-
                     {section.items.map((item, itemIdx) => (
                       <tr key={itemIdx}>
                         <td>
                           <input
                             type="text"
-                            className="form-control form-control-sm"
                             value={item.label}
-                            onChange={(e) => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
+                            onChange={(e) => {
+                              const updated = [...tableData];
+                              updated[sectionIdx].items[itemIdx].label = e.target.value;
+                              setTableData(updated);
+                            }}
+                            className="form-control form-control-sm"
                           />
                         </td>
-                        <td style={{ minWidth: '90px' }}>
-                          <select
+                        <td>
+                           <select
                             value={item.kl}
                             onChange={(e) => {
                               const updated = [...tableData];
@@ -196,18 +141,19 @@ useEffect(() => {
                           <td key={yearIdx}>
                             <input
                               type="text"
-                              className="form-control form-control-sm text-end"
                               value={val}
                               onChange={(e) =>
                                 handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)
                               }
+                              className="form-control form-control-sm text-end"
                             />
                           </td>
                         ))}
                         <td>
                           <button
-                            className="btn btn-sm btn-danger"
                             onClick={() => handleRemoveRow(sectionIdx, itemIdx)}
+                            className="btn btn-sm btn-outline-danger"
+                            title="Poista rivi"
                           >
                             ×
                           </button>
@@ -216,8 +162,8 @@ useEffect(() => {
                     ))}
                   </React.Fragment>
                 ))}
-
-                
+              </tbody>
+              <tfoot>
                 <tr className="table-success fw-bold">
                   <td>YHTEENSÄ</td>
                   <td></td>
@@ -226,7 +172,7 @@ useEffect(() => {
                   ))}
                   <td></td>
                 </tr>
-              </tbody>
+              </tfoot>
             </table>
           </div>
         </div>

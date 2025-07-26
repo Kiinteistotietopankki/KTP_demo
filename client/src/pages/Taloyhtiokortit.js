@@ -2,7 +2,7 @@ import { Button, Card, Form, InputGroup, Modal, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { getKiinteistotWithRakennukset } from '../api/api';
 import { useEffect, useState } from 'react';
-import PropertyDetailsForm from '../components/ReportTemplate'; // varmista polku
+import PropertyDetailsForm from '../components/ReportTemplate'; 
 
 function Taloyhtiokortit() {
   const [kiinteistot, setKiinteistot] = useState([]);
@@ -128,17 +128,8 @@ function Taloyhtiokortit() {
                   <Card.Title className="fs-6 text-secondary">
                     Kiinteistötunnus: {kiinteisto.kiinteistotunnus}
                   </Card.Title>
+                  
 
-                  <Button
-                   
-                   variant="outline-primary" className="w-100 fw-semibold"
-                    onClick={() => {
-                      setSelectedRakennusForReport(kiinteisto.rakennukset_fulls[0]);
-                      setShowReportModal(true);
-                    }}
-                  >
-                    Luo raportti
-                  </Button>
 
                   <Link to={`/taloyhtiokortti/${kiinteisto.id_kiinteisto}`} className="mt-2">
                     <Button variant="outline-primary" className="w-100 fw-semibold">
