@@ -54,9 +54,17 @@ function Sidebar() {
             <li className="nav-item">
               <a className="nav-link border rounded px-2 mx-1 border border-success" href="/about">Ohjeet</a>
             </li>
-            <li className="nav-item">
-              <a className="nav-link border rounded px-2 mx-1 border border-success" href="/Profile">Omat tiedot</a>
-            </li>
+            {/* Only show "Omat tiedot" if authenticated */}
+            {isAuthenticated && (
+              <li className="nav-item">
+                <a
+                  className="nav-link border rounded px-2 mx-1 border border-success"
+                  href="/Profile"
+                >
+                  Omat tiedot
+                </a>
+              </li>
+            )}
             <li className="nav-item">
               {!isAuthenticated ? (
                   <a className="nav-link border rounded px-2 mx-1 border border-success" href="/login">Kirjaudu</a>
