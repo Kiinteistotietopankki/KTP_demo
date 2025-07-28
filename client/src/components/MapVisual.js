@@ -5,6 +5,8 @@ import 'leaflet/dist/leaflet.css';
 
 
 const apiKey = process.env.REACT_APP_API_KEY;
+const apiurl = process.env.REACT_APP_API_URL
+const maptemplate = process.env.REACT_APP_API_MAP_TEMPLATE
 
 const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {
   
@@ -54,7 +56,7 @@ const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {
           shadowUrl: require('leaflet/dist/images/marker-shadow.png')
         });
 
-      const template = process.env.REACT_APP_API_URL+process.env.REACT_APP_API_MAP_TEMPLATE
+      const template = apiurl+maptemplate
 
       // Layers
 
