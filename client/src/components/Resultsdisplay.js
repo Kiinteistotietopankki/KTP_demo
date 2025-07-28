@@ -147,7 +147,7 @@ function Resultdisplay({ data, setMapCoords }) {
       <Card key={kiinteistoIndex} className="mb-4 shadow border-primary">
         <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
           <h5 className="mb-0">
-            Kiinteistö: <span className="fw-bold">{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}</span>
+            Kiinteistö: <span className="fw-bold">{kiinteisto?.id_esitysmuoto_kiinteistotunnus || "N/A"}, {kiinteisto?.rakennukset[0].properties.yleistiedot.Toimipaikka.value}</span>
           </h5>
           <div>
             <Button variant="outline-light" size="sm" className="me-2" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>

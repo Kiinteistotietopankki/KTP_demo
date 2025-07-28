@@ -81,3 +81,17 @@ export const updateRakennus = (id, data) => {
     }
   );
 };
+
+export const getIndicatorValueByKuntaName = (indicatorId, kuntaName, years) => {
+  return axios.get(`${API_URL}/api/tilastot/get-indicator-value-by-kunta-name`, {
+    headers: {
+      'x-api-key': API_KEY,
+    },
+    withCredentials: true,
+    params: {
+      indicatorId,
+      kuntaName,
+      years: years.join(','),
+    }
+  });
+};

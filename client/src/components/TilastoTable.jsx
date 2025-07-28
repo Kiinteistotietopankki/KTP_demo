@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
+import { getIndicatorValueByKuntaName } from '../api/api';
 
 //https://khr.maanmittauslaitos.fi/tilastopalvelu/rest/1.1/groups/23/indicators
 
@@ -43,40 +44,35 @@ const TilastoTable = ({indicator, kunta, chartLabel}) => {
         years.push(y);
         }
 
-  useEffect(() => {
-    const yearsParam = years.join(',');
-    const BASEURL = process.env.REACT_APP_API_URL;
-    const url = `${BASEURL}/api/tilastot/get-indicator-value-by-kunta-name?indicatorId=${indicatorId}&kuntaName=${encodeURIComponent(kuntaName)}&years=${encodeURIComponent(yearsParam)}`;
+    useEffect(() => {
+      const yearsParam = years;
 
-    fetch(url)
-      .then(res => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-      })
-      .then(jsonData => {
-        const sorted = jsonData.sort((a, b) => b.year - a.year);
+      getIndicatorValueByKuntaName(indicatorId, kuntaName, yearsParam)
+        .then(response => {
+          const jsonData = response.data;
+          const sorted = jsonData.sort((a, b) => b.year - a.year);
 
-        const withChange = sorted.map((item, index) => {
-          if (index === sorted.length - 1) {
-            return { ...item, yearlyChange: null };
-          }
-          const nextValue = sorted[index + 1].value;
-          const change = ((item.value - nextValue) / nextValue) * 100;
-          return { ...item, yearlyChange: change.toFixed(2) };
+          const withChange = sorted.map((item, index) => {
+            if (index === sorted.length - 1) {
+              return { ...item, yearlyChange: null };
+            }
+            const nextValue = sorted[index + 1].value;
+            const change = ((item.value - nextValue) / nextValue) * 100;
+            return { ...item, yearlyChange: change.toFixed(2) };
+          });
+
+          const trendData = calculateTrendLine(withChange);
+          const merged = withChange.map((item, idx) => ({
+            ...item,
+            trend: trendData[idx].trend
+          }));
+
+          setData(merged);
+        })
+        .catch(err => {
+          console.error('Fetch error:', err);
         });
-
-        const trendData = calculateTrendLine(withChange);
-        const merged = withChange.map((item, idx) => ({
-          ...item,
-          trend: trendData[idx].trend
-        }));
-
-        setData(merged);
-      })
-      .catch(err => {
-        console.error('Fetch error:', err);
-      });
-  }, []);
+    }, []);
 
   return (
     <div className='mt-4'>
