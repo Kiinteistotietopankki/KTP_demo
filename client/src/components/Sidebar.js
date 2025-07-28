@@ -4,8 +4,10 @@ import logo from '../assets/images/waativalogo.png'
 function Sidebar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
   const checkAuth = () => {
-    fetch('http://localhost:3001/me', {
+    fetch(`${API_URL}/me`, {
       credentials: 'include',
     })
       .then(res => setIsAuthenticated(res.ok))
@@ -17,7 +19,7 @@ function Sidebar() {
   }, []);
 
   const handleLogout = async () => {
-    await fetch('http://localhost:3001/auth/logout', {
+    await fetch(`${API_URL}/auth/logout`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -44,7 +46,7 @@ function Sidebar() {
         <div className="collapse navbar-collapse flex-column text-center" id="navbarSupportedContent">
           <ul className="navbar-nav mr-auto flex-column gap-3">
             <li className="nav-item active mt-3">
-              <a className="nav-link border rounded px-2 mx-1 border border-success" href="/haku">Haku</a>
+              <a className="nav-link border rounded px-2 mx-1 border border-success" href="/">Haku</a>
             </li>
             <li className="nav-item">
               <a className="nav-link border rounded px-2 mx-1 border border-success" href="/taloyhtiokortit">Kortit</a>
