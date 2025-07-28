@@ -8,9 +8,9 @@ on:
     branches: [ "azure2" ]
 
 env:
-  APP_LOCATION: "client"          # client source code
-  API_LOCATION: ""                # no API in this repo
-  APP_ARTIFACT_LOCATION: "build" # relative build output folder inside client
+  APP_LOCATION: "client"            # client source code
+  API_LOCATION: ""                  # no API in this repo
+  APP_ARTIFACT_LOCATION: "build"    # relative build output folder inside client
   AZURE_STATIC_WEB_APPS_API_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
 
 permissions:
@@ -36,6 +36,10 @@ jobs:
 
       - name: Install dependencies and build
         working-directory: ${{ env.APP_LOCATION }}
+        env:
+          REACT_APP_API_KEY: ${{ secrets.REACT_APP_API_KEY }}
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          REACT_APP_API_MAP_TEMPLATE: ${{ secrets.REACT_APP_API_MAP_TEMPLATE }}
         run: |
           npm install
           CI=false npm run build
