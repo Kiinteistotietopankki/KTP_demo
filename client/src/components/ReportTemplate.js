@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import 'handsontable/dist/handsontable.full.min.css';
 import { Riskidataa } from '../assets/Riskidata';
 import { useEffect } from 'react';

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import Badge from 'react-bootstrap/Badge';
+import { useEffect, useState } from 'react';
 import '../App.css';
 import Resultdisplay from '../components/Resultsdisplay';
 import MapVisual from '../components/MapVisual';

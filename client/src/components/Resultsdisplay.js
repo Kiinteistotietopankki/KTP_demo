@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Tabletemplate from './Tabletemplate';
 import { Accordion, Button, Card, Col, Container, ListGroup, Row, Tab, Tabs } from 'react-bootstrap';
 import exportToExcel from './Excelexport';

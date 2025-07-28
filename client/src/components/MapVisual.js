@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { basicTileHeader, L } from '../assets/leafletHeader'; 
+import { useEffect, useRef, useState } from 'react';
+import { L } from '../assets/leafletHeader'; 
 import 'leaflet/dist/leaflet.css';
 
 
