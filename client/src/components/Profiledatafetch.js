@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 
 function Profiledata({ setUserData }) {
+  const API_URL = process.env.REACT_APP_API_URL;
   const fetchUserData = async () => {
     try {
-      const response = await fetch('http://localhost:3001/me', {
+      const response = await fetch(`${API_URL}/me`, {
         method: 'GET',
         credentials: 'include', // ✅ include the session cookie in the request
       });

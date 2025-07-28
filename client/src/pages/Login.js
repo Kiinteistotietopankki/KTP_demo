@@ -1,10 +1,12 @@
 
 import logo from '../assets/images/waativalogo.png';
 import { Container, Card, Button } from 'react-bootstrap';
+
 function Login() {
+  const API_URL = process.env.REACT_APP_API_URL;
+
   const handleLogin = () => {
-   
-    window.location.href = 'http://localhost:3001/auth/login';
+    window.location.href = `${API_URL}/auth/login`;
   };
 
   return (
