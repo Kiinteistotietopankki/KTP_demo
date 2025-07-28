@@ -4,18 +4,10 @@ import 'leaflet/dist/leaflet.css';
 
 
 
-const apiKey = process.env.REACT_APP_API_KEY;
+const apiKey = process.env.REACT_APP_PERSONAL_API_KEY;
 const apiurl = process.env.REACT_APP_API_URL;
 const maptemplate = process.env.REACT_APP_API_MAP_TEMPLATE;
 
-// Sanity check environment variables
-if (!apiKey || !apiurl || !maptemplate) {
-  console.error('Missing required environment variables:', {
-    REACT_APP_API_KEY: apiKey,
-    REACT_APP_API_URL: apiurl,
-    REACT_APP_API_MAP_TEMPLATE: maptemplate
-  });
-}
 
 const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {
   
