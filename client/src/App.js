@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import './App.css';
 import Home from './pages/Home';
@@ -27,6 +27,7 @@ function App() {
                   //<ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on kirjautunut sisään */}
                     
                       <Routes>
+                        <Route path="/" element={<Navigate to="/haku" replace />} />
                         <Route path="/haku" element={<Home />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/about" element={<About />} />
