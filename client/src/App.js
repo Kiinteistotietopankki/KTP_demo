@@ -27,7 +27,7 @@ function App() {
                   //<ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on kirjautunut sisään */}
                     
                       <Routes>
-                        <Route path="/" element={<Home />} />
+                        <Route path="/haku" element={<Home />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/taloyhtiokortit" element={<Taloyhtiokortit/>} />

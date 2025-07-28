@@ -46,7 +46,7 @@ function Sidebar() {
         <div className="collapse navbar-collapse flex-column text-center" id="navbarSupportedContent">
           <ul className="navbar-nav mr-auto flex-column gap-3">
             <li className="nav-item active mt-3">
-              <a className="nav-link border rounded px-2 mx-1 border border-success" href="/">Haku</a>
+              <a className="nav-link border rounded px-2 mx-1 border border-success" href="/haku">Haku</a>
             </li>
             <li className="nav-item">
               <a className="nav-link border rounded px-2 mx-1 border border-success" href="/taloyhtiokortit">Kortit</a>
