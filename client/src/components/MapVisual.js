@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css';
 
 
 
-const apiKey = process.env.REACT_APP_PERSONAL_API_KEY;
 const apiurl = process.env.REACT_APP_API_URL;
 const maptemplate = process.env.REACT_APP_API_MAP_TEMPLATE;
 
@@ -13,14 +12,6 @@ const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {
   
     const [position, setPosition] = useState([pos[0],pos[1]])
 
-    const username = apiKey;
-    const password = apiKey;
-
-    // Combine username and password in the format "username:password"
-    const combined = `${username}:${username}`;
-
-  // Encode the combined string in Base64
-    const base64UserNameAndPassword = btoa(combined);
 
     const mapRef = useRef(null);
     // const position = [pos[0], pos[1]]

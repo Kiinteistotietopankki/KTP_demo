@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL;
-const API_KEY = process.env.REACT_APP_PERSONAL_API_KEY; 
 
 export const searchKiinteistot = (kiinteistotunnus = '', osoite = '', kaupunki = '') => {
   console.log(kiinteistotunnus, osoite, kaupunki);
@@ -17,9 +16,6 @@ export const searchKiinteistot = (kiinteistotunnus = '', osoite = '', kaupunki =
 
 export const getKiinteistot = () =>
   axios.get(`${API_URL}/api/kiinteistot/default`, {
-    headers: {
-      'x-api-key': API_KEY 
-    },
     withCredentials: true
   });
 
@@ -31,9 +27,6 @@ export const getKiinteistotWithRakennukset = (
   searchTerm = '' // new param with default empty string
 ) =>
   axios.get(`${API_URL}/api/kiinteistot/with-rakennukset`, {
-    headers: {
-      'x-api-key': API_KEY,
-    },
     withCredentials: true,
     params: {
       page,
@@ -46,9 +39,6 @@ export const getKiinteistotWithRakennukset = (
 
 export const getKiinteistoWhole = (id) =>
   axios.get(`${API_URL}/api/kiinteistot/with-rakennukset/by/id/${id}`, {
-    headers: {
-      'x-api-key' : API_KEY
-    },
     withCredentials: true
   })
 
@@ -59,7 +49,6 @@ export const createKiinteisto = (data) =>
     data,
     {
       headers: {
-        'x-api-key': API_KEY,
         'Content-Type': 'application/json',
       },
       withCredentials: true,
@@ -74,7 +63,6 @@ export const updateRakennus = (id, data) => {
     data,
     {
       headers: {
-        'x-api-key': API_KEY,
         'Content-Type': 'application/json',
       },
       withCredentials: true,
@@ -84,9 +72,6 @@ export const updateRakennus = (id, data) => {
 
 export const getIndicatorValueByKuntaName = (indicatorId, kuntaName, years) => {
   return axios.get(`${API_URL}/api/tilastot/get-indicator-value-by-kunta-name`, {
-    headers: {
-      'x-api-key': API_KEY,
-    },
     withCredentials: true,
     params: {
       indicatorId,
