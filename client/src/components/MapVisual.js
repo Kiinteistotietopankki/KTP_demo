@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { L } from '../assets/leafletHeader'; 
 import 'leaflet/dist/leaflet.css';
+import config from '../devprodConfig';
 
 
 
-const apiurl = process.env.REACT_APP_API_URL;
-const maptemplate = process.env.REACT_APP_API_MAP_TEMPLATE;
+const apiurl = config.apiBaseUrl;
+const maptemplate = config.mapTileTemplate;
 
 
 const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {

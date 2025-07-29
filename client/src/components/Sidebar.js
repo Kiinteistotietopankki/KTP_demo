@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import logo from '../assets/images/waativalogo.png'
+import config from '../devprodConfig';
 
 function Sidebar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = config.apiBaseUrl;
 
   const checkAuth = () => {
     fetch(`${API_URL}/me`, {

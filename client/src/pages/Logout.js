@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import config from '../devprodConfig';
 
 function Logout() {
   const navigate = useNavigate();
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = config.apiBaseUrl;
 
   useEffect(() => {
     const doLogout = async () => {
