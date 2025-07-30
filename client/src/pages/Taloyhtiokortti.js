@@ -74,30 +74,30 @@ function Taloyhtiokortti() {
           </Tab>
           <Tab eventKey="dokumentit" title="Dokumentit ja raportit">
            <div className="p-3">
-  <Button
-    variant="outline-primary"
-    onClick={() => setShowReportModal(true)}
-  >
-    ➕ Luo raportti
-  </Button>
+            <Button
+              variant="outline-primary"
+              onClick={() => setShowReportModal(true)}
+            >
+              ➕ Luo raportti
+            </Button>
 
-  <Modal
-    show={showReportModal}
-    onHide={() => setShowReportModal(false)}
-    size="xl"
-    backdrop="static"
-  >
-    <Modal.Header closeButton>
-      <Modal.Title>Luo raportti</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <PropertyDetailsForm
-        rakennus={rakennus}
-        kiinteistotunnus={card.kiinteistotunnus}
-      />
-    </Modal.Body>
-  </Modal>
-</div>
+            <Modal
+              show={showReportModal}
+              onHide={() => setShowReportModal(false)}
+              size="xl"
+              backdrop="static"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Luo raportti</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <PropertyDetailsForm
+                  rakennus={rakennus}
+                  kiinteistotunnus={card.kiinteistotunnus}
+                />
+              </Modal.Body>
+            </Modal>
+          </div>
 
           </Tab>
 
@@ -106,9 +106,6 @@ function Taloyhtiokortti() {
           </Tab>
           <Tab eventKey="tulosteet" title="Hae tulosteita">
             <TulosteetTab kiinteistotunnus={card?.kiinteistotunnus}></TulosteetTab>
-          </Tab>
-          <Tab eventKey="pts" title="PTS">
-            <div className="p-3">Tähän tulee PTS-tiedot.</div>
           </Tab>
           <Tab eventKey="tilastot" title="Tilastot">
             <div className="container mt-4">
