@@ -50,15 +50,15 @@ export default function PTSLongTermTable() {
     updated[catIdx].subcategories[subIdx].items[itemIdx].values[yearIdx] = value;
     setData(updated);
   };
-useEffect(() => {
-  const kiinteistotunnus = window.localStorage.getItem('selectedKiinteistotunnus');
-  if (!kiinteistotunnus) return;
+    useEffect(() => {
+    const kiinteistotunnus = window.localStorage.getItem('selectedKiinteistotunnus');
+    if (!kiinteistotunnus) return;
 
-  const fetchPTS = async () => {
+    const fetchPTS = async () => {
     try {
-    const res = await fetch(`http://localhost:3001/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
-const data = await res.json();
-const entries = Array.isArray(data.entries) ? data.entries : [];
+      const res = await fetch(`http://localhost:3001/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
+      const data = await res.json();
+      const entries = Array.isArray(data.entries) ? data.entries : [];
 
 
       const getTotals = (entries) => {

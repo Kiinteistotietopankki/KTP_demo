@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Profiledata from '../components/Profiledatafetch';
 import '../App.css';
 import { Card, Spinner, Container, Row, Col } from 'react-bootstrap';

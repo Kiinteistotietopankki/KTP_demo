@@ -1,7 +1,8 @@
 // src/api/mmlApi.js
 import axios from "axios";
+import config from "../devprodConfig";
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = config.apiBaseUrl;
 const BASE_URL = "/api/mml";
 
 const api = axios.create({

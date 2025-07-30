@@ -1,5 +1,5 @@
 // Searchbox.js
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import '../App.css';
 import { Tabs, Tab } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';

@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import config from '../devprodConfig';
 
 function Logout() {
   const navigate = useNavigate();
 
+  const API_URL = config.apiBaseUrl;
+
   useEffect(() => {
     const doLogout = async () => {
       try {
-        await fetch('http://localhost:3001/auth/logout', {
+        await fetch(`${API_URL}/auth/logout`, {
           method: 'GET',
           credentials: 'include', // to send cookies
         });

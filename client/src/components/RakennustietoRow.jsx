@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { updateRakennus } from '../api/api'; // your updated api function
 
 export default function RakennustietoRow({
