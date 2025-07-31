@@ -1,4 +1,4 @@
-const isProd = true;
+const isProd = false;
 
 const config = {
   apiBaseUrl: isProd
