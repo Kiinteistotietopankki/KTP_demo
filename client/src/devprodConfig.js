@@ -8,4 +8,5 @@ const config = {
   mapTileTemplate: '/api/kartat/fetch-tile/{layerName}/{tileMatrixSet}/{z}/{y}/{x}'
 };
 
+export { isProd };
 export default config;

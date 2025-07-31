@@ -2,12 +2,18 @@
 import logo from '../assets/images/waativalogo.png';
 import { Container, Card, Button } from 'react-bootstrap';
 import config from '../devprodConfig';
+import isProd from './../devprodConfig.js'
 
 function Login() {
   const API_URL = config.apiBaseUrl;
 
+
   const handleLogin = () => {
-    window.location.href = `${API_URL}/auth/login`;
+    if (isProd===true){
+      window.location.href = `/api/auth/login`;
+    } else{
+      window.location.href = `${API_URL}/auth/login`;
+    }
   };
 
   return (
