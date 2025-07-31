@@ -9,5 +9,11 @@
       "/logo192.png",
       "/logo512.png"
     ]
-  }
+  },
+  "routes": [
+    {
+      "route": "/api/*",
+      "rewrite": "https://ktpapi-b9bpd4g9ewaqa4af.swedencentral-01.azurewebsites.net/api/:*"
+    }
+  ]
 }
