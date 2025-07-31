@@ -1,23 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-export default function Tekniikkataulut({ onYhteensaChange, setData }) {
+export default function Tekniikkataulut({ data, setData, onYhteensaChange }) {
   const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth(); // 0 = January, 6 = July
+  const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
   const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
-  const initialData = [
-    {
-      header: 'Vierustat ja kuivatusosat',
-      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-    },
-    {
-      header: 'Pihapäällysteet',
-      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-    },
-  ];
+  const [tableData, setTableData] = useState(data || []);
 
-  const [tableData, setTableData] = useState(initialData);
+  useEffect(() => {
+    setTableData(data || []);
+  }, [data]);
+
+  useEffect(() => {
+    if (typeof setData === 'function') {
+      setData(tableData);
+    }
+  }, [tableData]);
+ const initialData = [
+  {
+    header: 'Aluesähköistys',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Kutkinlaitokset ja jakokeskukset',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Johdot ja niiden varusteet',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Valaisimet, lämmittimet, kojeet ja laitteet',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Tele- ja antennijärjestelmät',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Palo- ja turvajärjestelmät',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Siirtolaitteet',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+];
+
+  useEffect(() => {
+    const yhteensa = Array(11).fill(0);
+    tableData.forEach(section => {
+      section.items.forEach(item => {
+        item.values.forEach((val, idx) => {
+          const num = parseFloat(val);
+          if (!isNaN(num)) yhteensa[idx] += num;
+        });
+      });
+    });
+    if (typeof onYhteensaChange === 'function') {
+      onYhteensaChange([...yhteensa]);
+    }
+  }, [tableData, onYhteensaChange]);
 
   const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
     const updated = [...tableData];
@@ -25,11 +76,23 @@ export default function Tekniikkataulut({ onYhteensaChange, setData }) {
     setTableData(updated);
   };
 
+  const handleLabelChange = (sectionIdx, itemIdx, value) => {
+    const updated = [...tableData];
+    updated[sectionIdx].items[itemIdx].label = value;
+    setTableData(updated);
+  };
+
+  const handleKLChange = (sectionIdx, itemIdx, value) => {
+    const updated = [...tableData];
+    updated[sectionIdx].items[itemIdx].kl = value;
+    setTableData(updated);
+  };
+
   const handleAddRow = (sectionIdx) => {
     const updated = [...tableData];
     updated[sectionIdx].items.push({
       label: '',
-      kl: '',
+      kl: 'KL3',
       values: Array(11).fill(''),
     });
     setTableData(updated);
@@ -40,27 +103,6 @@ export default function Tekniikkataulut({ onYhteensaChange, setData }) {
     updated[sectionIdx].items.splice(itemIdx, 1);
     setTableData(updated);
   };
-
-  const yhteensa = Array(11).fill(0);
-  tableData.forEach(section => {
-    section.items.forEach(item => {
-      item.values.forEach((val, idx) => {
-        const num = parseFloat(val);
-        if (!isNaN(num)) yhteensa[idx] += num;
-      });
-    });
-  });
-
-useEffect(() => {
-  if (onYhteensaChange) {
-    onYhteensaChange([...yhteensa]); 
-  }
-  
-}, [JSON.stringify(yhteensa)]);
-
-  useEffect(() => {
-    if (typeof setData === 'function') setData(tableData);
-  }, [tableData]);
 
   return (
     <div className="accordion my-4" id="rakennetekniikkaAccordion">
@@ -88,12 +130,12 @@ useEffect(() => {
             <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
-                  <th style={{ minWidth: '180px' }}>Osa-alue</th>
-                  <th style={{ minWidth: '90px' }}>KL</th>
-                  {years.map(year => (
+                  <th>Osa-alue</th>
+                  <th>KL</th>
+                  {years.map((year) => (
                     <th key={year} className="text-center">{year}</th>
                   ))}
-                  <th style={{ width: '40px' }}></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -117,22 +159,14 @@ useEffect(() => {
                           <input
                             type="text"
                             value={item.label}
-                            onChange={(e) => {
-                              const updated = [...tableData];
-                              updated[sectionIdx].items[itemIdx].label = e.target.value;
-                              setTableData(updated);
-                            }}
+                            onChange={(e) => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
                             className="form-control form-control-sm"
                           />
                         </td>
                         <td>
                           <select
                             value={item.kl}
-                            onChange={(e) => {
-                              const updated = [...tableData];
-                              updated[sectionIdx].items[itemIdx].kl = e.target.value;
-                              setTableData(updated);
-                            }}
+                            onChange={(e) => handleKLChange(sectionIdx, itemIdx, e.target.value)}
                             className="form-select form-select-sm"
                           >
                             {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
@@ -156,7 +190,6 @@ useEffect(() => {
                           <button
                             onClick={() => handleRemoveRow(sectionIdx, itemIdx)}
                             className="btn btn-sm btn-outline-danger"
-                            title="Poista rivi"
                           >
                             ×
                           </button>
@@ -170,9 +203,15 @@ useEffect(() => {
                 <tr className="table-success fw-bold">
                   <td>YHTEENSÄ</td>
                   <td></td>
-                  {yhteensa.map((sum, idx) => (
-                    <td key={idx} className="text-center">{sum}</td>
-                  ))}
+                  {Array.from({ length: 11 }, (_, idx) => {
+                    const colSum = tableData.reduce((sum, section) => {
+                      return sum + section.items.reduce((secSum, item) => {
+                        const num = parseFloat(item.values[idx]);
+                        return secSum + (isNaN(num) ? 0 : num);
+                      }, 0);
+                    }, 0);
+                    return <td key={idx} className="text-center">{colSum}</td>;
+                  })}
                   <td></td>
                 </tr>
               </tfoot>

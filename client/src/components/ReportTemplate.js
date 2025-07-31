@@ -752,7 +752,7 @@ return (
     <Tab eventKey="pts" title="PTS (Pitkän tähtäimen suunnitelma)">
       <div className="p-4">
         <h3 className="text-xl font-semibold mb-4">📊 PTS (Pitkän tähtäimen suunnitelma)</h3>
-        <PTSLongTermTable />
+        <PTSLongTermTable kiinteistotunnus={kiinteistotunnus} />
       
         
       </div>

@@ -1,66 +1,57 @@
 import React, { useState, useEffect } from 'react';
 
-export default function SahkotekniikkaTable({ onYhteensaChange, setData }) {
+export default function SahkotekniikkaTable({data, onYhteensaChange, setData }) {
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth(); // 0 = Tammikuu ja  6 = heinäkuu
 const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
 const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
-  const [tableData, setTableData] = useState([
-    {
-      header: 'Aluesähköistys',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-       
-      ],
-    },
-    {
-      header: 'Kutkinlaitokset ja jakokeskukset',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Johdot ja niiden varusteet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Valaisimet, lämmittimet, kojeet ja laitteet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Tele- ja antennijärjestelmät',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Palo- ja turvajärjestelmät',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    {
-      header: 'Siirtolaitteet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-      ],
-    },
-    
-    
-  ]);
+  const initialData = [
+  {
+    header: 'Aluesähköistys',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Kutkinlaitokset ja jakokeskukset',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Johdot ja niiden varusteet',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Valaisimet, lämmittimet, kojeet ja laitteet',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Tele- ja antennijärjestelmät',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Palo- ja turvajärjestelmät',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+  {
+    header: 'Siirtolaitteet',
+    kl: 'KL3',
+    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+  },
+];
 
+const [tableData, setTableData] = useState(() =>
+  Array.isArray(data) && data.length > 0 ? data : initialData
+);
+useEffect(() => {
+  if (Array.isArray(data) && data.length > 0) {
+    setTableData(data);
+  }
+}, [data]);
   const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
     const updated = [...tableData];
     updated[sectionIdx].items[itemIdx].values[yearIdx] = value;
@@ -111,9 +102,11 @@ useEffect(() => {
   }
   
 }, [JSON.stringify(yhteensa)]);
-  useEffect(() => {
-    if (typeof setData === 'function') setData(tableData);
-  }, [tableData]);
+useEffect(() => {
+  if (typeof setData === 'function') {
+    setData(tableData);
+  }
+}, [tableData, setData]);
 
   return (
     <div className="accordion my-4" id="sahkotekniikkaAccordion">

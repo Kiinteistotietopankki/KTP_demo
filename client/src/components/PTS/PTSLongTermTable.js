@@ -11,7 +11,7 @@ import LVITable from './LVItaulu';
 import SahkotekniikkaTable from './Sähkötekniikkataulu';
 import TutkimustarpeetTaulu from './Tutkimustarpeettaulu';
 
-export default function PTSLongTermTable() {
+export default function PTSLongTermTable({ kiinteistotunnus }) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -51,51 +51,111 @@ export default function PTSLongTermTable() {
     setData(updated);
   };
 useEffect(() => {
-  const kiinteistotunnus = window.localStorage.getItem('selectedKiinteistotunnus');
   if (!kiinteistotunnus) return;
 
   const fetchPTS = async () => {
     try {
-    const res = await fetch(`http://localhost:3001/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
-const data = await res.json();
-const entries = Array.isArray(data.entries) ? data.entries : [];
+      // Step 1: Fetch list of PTS reports for the kiinteistötunnus
+      const listRes = await fetch(`http://localhost:3001/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
+      const ptsList = await listRes.json();
 
+      if (!ptsList.length) {
+        console.log("ℹ️ Ei PTS-raportteja löytynyt");
+        return;
+      }
 
-      const getTotals = (entries) => {
-        const sums = Array(11).fill(0);
-        entries.forEach(e => {
-          const vals = Object.values(e.values_by_year || {});
-          vals.forEach((val, i) => {
-            const num = parseFloat(val);
-            if (!isNaN(num)) sums[i] += num;
-          });
-        });
-        return sums;
-      };
+      // Step 2: Get the latest one (or you could let the user choose)
+      const latestPTSId = ptsList[0].id;
 
+      // Step 3: Fetch full content of that report
+      const fullRes = await fetch(`http://localhost:3001/api/pts/${latestPTSId}`);
+      const fullPTS = await fullRes.json();
+
+      const entries = fullPTS.entries || [];
+      console.log("📦 Raw fetched entries:", entries);
+
+      // Step 4: Split entries by category
       const filterByCategory = (cat) => entries.filter(e => e.category === cat);
 
       const tekniikka = filterByCategory('Rakennetekniikka');
       const lvi = filterByCategory('LVI Järjestelmät');
       const sahko = filterByCategory('Sähköjärjestelmät');
       const tutkimus = filterByCategory('Lisätutkimukset');
+      console.log("🔧 Split entries:", {
+  tekniikka, lvi, sahko, tutkimus
+});
 
-      setTekniikkaData(tekniikka);
-      setLviData(lvi);
-      setSahkoData(sahko);
-      setTutkimusData(tutkimus);
+      // Step 5: Format them into state shape
+    const mapToSection = (items) => {
+  const grouped = {};
+
+  items.forEach(entry => {
+    const key = entry.section || 'Muu';
+    if (!grouped[key]) grouped[key] = [];
+let parsedValuesByYear = {};
+try {
+  parsedValuesByYear = typeof entry.values_by_year === 'string'
+    ? JSON.parse(entry.values_by_year)
+    : entry.values_by_year || {};
+} catch (err) {
+  console.warn("❌ Failed to parse values_by_year:", entry.values_by_year);
+}
+    // 🔧 Build `values[]` array from values_by_year.y1 to y11
+   const values = Array.from({ length: 11 }, (_, i) => {
+  const raw = parsedValuesByYear[`y${i + 1}`];
+  return raw !== undefined && raw !== null ? String(raw) : '0';
+});
+console.log("📌 values array for:", entry.label, values);
+    grouped[key].push({
+      label: entry.label || '',
+      kl: entry.kl_rating || '',
+      values
+    });
+  });
+
+  return Object.entries(grouped).map(([section, items]) => ({
+    name: section,
+    items
+  }));
+};
+
+
+      setTekniikkaData(mapToSection(tekniikka));
+      setLviData(mapToSection(lvi));
+      console.log("📋 Mapped LVI Data:", mapToSection(lvi));
+      setSahkoData(mapToSection(sahko));
+      setTutkimusData(mapToSection(tutkimus));
+
+      // Step 6: Compute totals
+  const getTotals = (entries) => {
+  const sums = Array(11).fill(0);
+  entries.forEach(e => {
+    const source = typeof e.values_by_year === 'string'
+      ? JSON.parse(e.values_by_year)
+      : e.values_by_year || {};
+
+    for (let i = 0; i < 11; i++) {
+      const val = source[`y${i + 1}`];
+      const num = parseFloat(val);
+      if (!isNaN(num)) sums[i] += num;
+    }
+  });
+  return sums;
+};
 
       setTekniikkaYhteensa(getTotals(tekniikka));
       setLviYhteensa(getTotals(lvi));
       setSahkoYhteensa(getTotals(sahko));
       setTutkimusYhteensa(getTotals(tutkimus));
+
     } catch (err) {
-      console.error('❌ Virhe ladattaessa PTS-tietoja:', err);
+      console.error("❌ Virhe ladattaessa PTS-tietoja:", err);
     }
   };
 
   fetchPTS();
-}, []);
+}, [kiinteistotunnus]);
+
 
   useEffect(() => {
     const updated = [...data];
@@ -127,21 +187,29 @@ const entries = Array.isArray(data.entries) ? data.entries : [];
 
   
 const handleSavePTS = async () => {
- const flattenForPTS = (sections, category) => {
-    return sections.flatMap(section =>
-      (section.items || []).map(item => ({
+  if (!kiinteistotunnus) return;
+ const flattenForPTS = (sections, category) =>
+  sections.flatMap(section =>
+    (section.items || [])
+      .filter(item => {
+        const hasLabel = item.label?.trim();
+        const hasKL = item.kl?.trim();
+        const hasValues = (item.values || []).some(v => parseFloat(v) > 0);
+        return hasLabel || hasKL || hasValues;
+      })
+      .map(item => ({
         category,
         section: section.name || section.header || '',
         label: item.label || '',
         kl_rating: item.kl || '',
         values_by_year: (item.values || []).reduce((acc, val, idx) => {
-  acc[`y${idx + 1}`] = parseFloat(val) || 0;
-  return acc;
-}, {}),
+          acc[`y${idx + 1}`] = parseFloat(val) || 0;
+          return acc;
+        }, {}),
         metadata: {}
       }))
-    );
-  };
+  );
+
 
 
   const allData = [
@@ -151,7 +219,6 @@ const handleSavePTS = async () => {
     ...flattenForPTS(tutkimusData, 'Lisätutkimukset')
   ];
 
-  const kiinteistotunnus = window.localStorage.getItem('selectedKiinteistotunnus');
 
   if (!kiinteistotunnus) {
     alert('❌ Kiinteistötunnus puuttuu!');
@@ -346,12 +413,31 @@ const handleSavePTS = async () => {
 </div>
 
 
-      <TutkimustarpeetTaulu onYhteensaChange={setTutkimusYhteensa} setData={setTutkimusData} />
-      <div className="accordion-body p-0">
-        <Tekniikkataulut onYhteensaChange={setTekniikkaYhteensa} setData={setTekniikkaData} />
-        <LVITable onYhteensaChange={setLviYhteensa} setData={setLviData} />
-        <SahkotekniikkaTable onYhteensaChange={setSahkoYhteensa} setData={setSahkoData} />
-      </div>
+     <TutkimustarpeetTaulu
+  data={tutkimusData}
+  setData={setTutkimusData}
+  onYhteensaChange={setTutkimusYhteensa}
+/>
+
+<Tekniikkataulut
+  data={tekniikkaData}
+  setData={setTekniikkaData}
+  onYhteensaChange={setTekniikkaYhteensa}
+/>
+
+<LVITable
+  data={lviData}
+  setData={setLviData}
+  onYhteensaChange={setLviYhteensa}
+/>
+
+<SahkotekniikkaTable
+  data={sahkoData}
+  setData={setSahkoData}
+  onYhteensaChange={setSahkoYhteensa}
+/>
+
+
 
       <div className="text-end p-4">
         <button className="btn btn-success" onClick={handleSavePTS}>
