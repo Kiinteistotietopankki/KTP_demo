@@ -4,8 +4,8 @@ const devurl = process.env.REACT_APP_DEV_API_URL
 
 const config = {
   apiBaseUrl: isProd
-    ? produrl
-    : devurl,
+    ? 'https://ktpapi-b9bpd4g9ewaqa4af.swedencentral-01.azurewebsites.net'
+    : 'http://localhost:3001',
 
   mapTileTemplate: '/api/kartat/fetch-tile/{layerName}/{tileMatrixSet}/{z}/{y}/{x}'
 };
