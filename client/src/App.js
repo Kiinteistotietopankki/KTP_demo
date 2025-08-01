@@ -54,9 +54,10 @@ function ScrollToTop() {
 }
 
 function About() {
-  const environment = process.env.REACT_APP_ENVIRONMENT || 'not found'
+  const environment = process.env.REACT_APP_ENVIRONMENT || 'environment boolean not found'
+  const apiurl = process.env.REACT_APP_PROD_API_URL || 'api url not found'
 
-  return <h2 className="text-primary">Ohjeet <Badge bg="secondary">Tulossa</Badge><div className='mt-4'>Production environment: {environment}</div></h2>;
+  return <h2 className="text-primary">Ohjeet <Badge bg="secondary">Tulossa</Badge><div className='mt-4'>Production environment: {environment} - {apiurl}</div></h2>;
 }
 
 function Contact() {
