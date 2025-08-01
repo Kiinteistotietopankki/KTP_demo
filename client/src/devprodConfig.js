@@ -1,9 +1,9 @@
-const isProd = true;
+const isProd = process.env.REACT_APP_ENVIRONMENT;
 
 const config = {
   apiBaseUrl: isProd
-    ? 'https://ktpapi-b9bpd4g9ewaqa4af.swedencentral-01.azurewebsites.net'
-    : 'http://localhost:3001',
+    ? process.env.REACT_APP_PROD_API_URL
+    : process.env.REACT_APP_DEV_API_URL,
 
   mapTileTemplate: '/api/kartat/fetch-tile/{layerName}/{tileMatrixSet}/{z}/{y}/{x}'
 };

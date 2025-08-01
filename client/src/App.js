@@ -56,7 +56,7 @@ function ScrollToTop() {
 function About() {
   const environment = process.env.REACT_APP_ENVIRONMENT || 'not found'
 
-  return <h2 className="text-primary">Ohjeet <Badge bg="secondary">Tulossa {environment}</Badge></h2>;
+  return <h2 className="text-primary">Ohjeet <Badge bg="secondary">Tulossa</Badge><div className='mt-4'>Production environment: {environment}</div></h2>;
 }
 
 function Contact() {
