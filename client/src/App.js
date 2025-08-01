@@ -24,7 +24,6 @@ function App() {
               <Route
                 path="/*"
                 element={
-                  //<ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on kirjautunut sisään */}
                     
                       <Routes>
                         <Route path="/" element={<Home />} />
@@ -55,7 +54,9 @@ function ScrollToTop() {
 }
 
 function About() {
-  return <h2 className="text-primary">Ohjeet <Badge bg="secondary">Tulossa</Badge></h2>;
+  const environment = process.env.REACT_APP_ENVIRONMENT || 'not found'
+
+  return <h2 className="text-primary">Ohjeet <Badge bg="secondary">Tulossa {environment}</Badge></h2>;
 }
 
 function Contact() {
