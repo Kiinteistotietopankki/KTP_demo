@@ -1,63 +1,58 @@
-name: Deploy web app to Azure Static Web Apps
+name: Azure Static Web Apps CI/CD
 
 on:
   push:
-    branches: [ "azure2" ]
+    branches:
+      - azure2
   pull_request:
     types: [opened, synchronize, reopened, closed]
-    branches: [ "azure2" ]
-
-env:
-  APP_LOCATION: "client"
-  API_LOCATION: ""
-  APP_ARTIFACT_LOCATION: "build"
-
-permissions:
-  contents: read
+    branches:
+      - azure2
 
 jobs:
   build_and_deploy_job:
-    permissions:
-      contents: read
-      pull-requests: write
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Install OIDC Client from Core Package
+        run: npm install @actions/core@1.6.0 @actions/http-client
+
+      - name: Get ID Token
+        uses: actions/github-script@v6
+        id: idtoken
         with:
-          node-version: '18'
+          script: |
+            const core = require('@actions/core');
+            return await core.getIDToken();
+          result-encoding: string
 
-      - name: Install dependencies and build
-        working-directory: ${{ env.APP_LOCATION }}
-        env:
-          REACT_APP_PERSONAL_API_KEY: ${{ secrets.REACT_APP_PERSONAL_API_KEY }}
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
-          REACT_APP_API_MAP_TEMPLATE: ${{ secrets.REACT_APP_API_MAP_TEMPLATE }}
-          REACT_APP_ENVIRONMENT: ${{secrets.REACT_APP_ENVIRONMENT}}
-        run: |
-          npm install
-          CI=false npm run build
-
-      - name: Build And Deploy
+      - name: Build & Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "upload"
-          app_location: ${{ env.APP_LOCATION }}
-          api_location: ${{ env.API_LOCATION }}
-          app_artifact_location: ${{ env.APP_ARTIFACT_LOCATION }}
-
+          app_location: "client"
+          api_location: ""
+          output_location: "build"
+          github_id_token: ${{ steps.idtoken.outputs.result }}
+        env:
+          CI: false
+          REACT_APP_ENVIRONMENT: ${{ secrets.REACT_APP_ENVIRONMENT }}
+          REACT_APP_PERSONAL_API_KEY: ${{ secrets.REACT_APP_PERSONAL_API_KEY }}
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          REACT_APP_API_MAP_TEMPLATE: ${{ secrets.REACT_APP_API_MAP_TEMPLATE }}
 
   close_pull_request_job:
-    permissions:
-      contents: none
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     name: Close Pull Request Job
@@ -65,5 +60,4 @@ jobs:
       - name: Close Pull Request
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "close"
