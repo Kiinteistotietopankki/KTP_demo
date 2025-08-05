@@ -10,6 +10,7 @@ import Badge from 'react-bootstrap/Badge';
 import Taloyhtiokortti from './pages/Taloyhtiokortti';
 import Taloyhtiokortit from './pages/Taloyhtiokortit';
 
+
 function App() {
   return (
     <Router>
