@@ -35,8 +35,8 @@ const MapVisualMultiple = ({ rakennukset_fulls = [], height = '300px' }) => {
         zoom: 17,
         minZoom: 15,
         maxZoom: 17,
-        dragging: false,
-        scrollWheelZoom: false,
+        dragging: true,
+        scrollWheelZoom: true,
         zoomControl: false,
         });
 
@@ -80,6 +80,13 @@ const MapVisualMultiple = ({ rakennukset_fulls = [], height = '300px' }) => {
         detectRetina: true,
         });
 
+        const markerLayer = L.layerGroup();
+        markers.forEach(({ lat, lng, label }) => {
+            const marker = L.marker([lat, lng]);
+            if (label) marker.bindPopup(label);
+            marker.addTo(markerLayer);
+        });
+
         const baseMaps = {
         'OpenStreetMap': layerBasePublic,
         'Taustakartta': layerBaseMap,
@@ -90,23 +97,20 @@ const MapVisualMultiple = ({ rakennukset_fulls = [], height = '300px' }) => {
         const overlayMaps = {
         'Kiinteistötunnukset': layerKiinteistotunnus,
         'Kiinteistörajat': layerKiinteistorajat,
+        'Rakennusmerkit': markerLayer, // ✅ Add markerLayer to overlays
         };
 
         
 
         layerBaseMap.addTo(map);
 
-        // Add markers
-        markers.forEach(({ lat, lng, label }) => {
-        const marker = L.marker([lat, lng]).addTo(map);
-        if (label) {
-            marker.bindPopup(label);
-        }
-        });
+
+        markerLayer.addTo(map); // Add markerLayer by default (optional)
 
         // Add controls
         L.control.layers(baseMaps, overlayMaps, { collapsed: true }).addTo(map);
         L.control.zoom({ position: 'topright' }).addTo(map);
+        
         
 
         // Clean up
