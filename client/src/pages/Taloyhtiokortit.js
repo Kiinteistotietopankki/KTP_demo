@@ -165,7 +165,7 @@ function Taloyhtiokortit() {
 
 
                   <Link to={`/taloyhtiokortti/${kiinteisto.id_kiinteisto}`} className="mt-2">
-                    <Button variant="outline-primary" className="w-100 fw-semibold">
+                    <Button variant="outline-success" className="w-100 fw-semibold">
                       Avaa kortti
                     </Button>
                   </Link>
