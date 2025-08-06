@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import { Accordion } from 'react-bootstrap'
+import { Accordion, Tab, Tabs } from 'react-bootstrap'
 
 export default function PerustiedotTab({card}) {
 
   return (
 
     <div className=" px-5 mb-4" style={{ maxWidth: '600px', margin: 'auto' }}>
+        <div className="flex-d justify-content-center mt-1 mb-1">
+            <Tabs
+                id="taloyhtiokortti-tabs"
+                className="mb-0"
+                variant="pills"
+                defaultActiveKey={card.rakennukset_fulls[0]?.rakennustunnus} // optional default
+            >
+                <Tab title='Kiinteistö'></Tab>
+                <Tab title='Rakennukset'></Tab>
+               
+            </Tabs>
+        </div>
+       
+
         {card && (
             <table className="table" style={{ borderCollapse: 'separate', borderSpacing: '0 0.5rem' }}>
                 <tbody>
@@ -111,7 +125,39 @@ export default function PerustiedotTab({card}) {
             </table>
         )}
 
-        {/* <div className="flex justify-content-center mt-1 mb-1">
+        <div className="border-top border-success my-3" style={{ height: '3px' }} />
+
+        {card && (
+            <table className="table" style={{ borderCollapse: 'separate', borderSpacing: '0 0.5rem' }}>
+                <tbody>
+                    {[
+                    ['Kokonaisala', `${card?.rakennukset_fulls[0]?.kokonaisala} m²`],
+                    ['Kerrosala', `${card?.rakennukset_fulls[0]?.kerrosala} m²`],
+                    ['Huoneistoala', `${card?.rakennukset_fulls[0]?.huoneistoala} m²`],
+                    ['Tilavuus', `${card?.rakennukset_fulls[0]?.tilavuus} m²`],
+                    ['Kerroksia', `${card?.rakennukset_fulls[0]?.kerroksia}`],
+                    ['Kellarikerroksia', `-`],
+                    
+                    ].map(([label, value]) => (
+                    <tr key={label} style={{ borderBottom: '1px solid #e9ecef' }}>
+                        <td
+                        className="text-start fw-semibold pe-3"
+                        style={{ width: '40%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}
+                        >
+                        {label}
+                        </td>
+                        <td className="text-start" style={{ verticalAlign: 'middle' }}>
+                        {value || '—'}
+                        </td>
+                    </tr>
+                    ))}
+                </tbody>
+            </table>
+        )}
+
+
+    {/* <div className=" px-5 mb-4" style={{ maxWidth: '600px', margin: 'auto' }}>
+        <div className="flex justify-content-center mt-1 mb-1">
             <p className="fs-5 fw-light">Rakennukset</p>
             <Tabs
                 id="taloyhtiokortti-tabs"
@@ -129,8 +175,8 @@ export default function PerustiedotTab({card}) {
                 </Tab>
                 ))}
             </Tabs>
-        </div>
-        */}
+        </div> */}
+
     </div>
   )
 }
