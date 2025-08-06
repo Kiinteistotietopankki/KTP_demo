@@ -8,37 +8,37 @@ const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
   const initialData = [
   {
-    header: 'Aluesähköistys',
+    name: 'Aluesähköistys',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Kutkinlaitokset ja jakokeskukset',
+    name: 'Kutkinlaitokset ja jakokeskukset',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Johdot ja niiden varusteet',
+    name: 'Johdot ja niiden varusteet',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Valaisimet, lämmittimet, kojeet ja laitteet',
+    name: 'Valaisimet, lämmittimet, kojeet ja laitteet',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Tele- ja antennijärjestelmät',
+    name: 'Tele- ja antennijärjestelmät',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Palo- ja turvajärjestelmät',
+    name: 'Palo- ja turvajärjestelmät',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Siirtolaitteet',
+    name: 'Siirtolaitteet',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
@@ -148,7 +148,7 @@ useEffect(() => {
                     
                     <tr className="bg-secondary text-white">
                       <td colSpan={years.length + 3} className="fw-semibold d-flex justify-content-between align-items-center">
-                        {section.header}
+                        {section.name}
                         <button
                           onClick={() => handleAddRow(sectionIdx)}
                           className="btn btn-sm btn-light text-dark border"

@@ -13,15 +13,19 @@ import { Tab, Tabs } from 'react-bootstrap';
 import ImageUploadCategorizer from './ImageUpload.js';
 
 
-const PropertyDetailsForm = ({ rakennus, kiinteistotunnus, initialTab }) => {
+const PropertyDetailsForm = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: initialRakennusData }) => {
   const savedData = JSON.parse(localStorage.getItem('reportFormData')) || {};
   useEffect(() => {
     console.log('🔍 Kiinteistötunnus received:', kiinteistotunnus);
   }, [kiinteistotunnus]);
+  const [rakennusData, setRakennusData] = useState(initialRakennusData || null);
+  useEffect(() => {
+  console.log('📦 rakennusData in editor:', rakennusData);
+}, [rakennusData]);
   const [activeTab, setActiveTab] = useState(initialTab || 'report');
   const [title, setTitle] = useState(savedData.title || '');
   const [customText, setCustomText] = useState(savedData.customText || '');
-  const [rakennusData, setRakennusData] = useState(rakennus);
+  
   const [PropertyName, setPropertyName] = useState(savedData.PropertyName || '');
   const [propertyId, setPropertyId] = useState(kiinteistotunnus);
   const [coverImage, setCoverImage] = useState(savedData.coverImage || null);
@@ -109,7 +113,11 @@ const [sections, setSections] = useState(savedData.sections || templates[default
     localStorage.removeItem('reportFormData');
   };
 
-
+useEffect(() => {
+  if (initialRakennusData) {
+    setRakennusData(initialRakennusData);
+  }
+}, [initialRakennusData]);
 useEffect(() => {
   const parsed = savedData;
   setTitle(parsed.title || '');
@@ -210,48 +218,73 @@ useEffect(() => {
           margin: [0, 0, 0, 20],
         }
       : null,
-    { text: `Tarkastuspäivämäärä: ${customText}`, fontSize: 12, margin: [0, 0, 0, 40] }
+    { text: `Tarkastuspäivämäärä: ${customText}`, fontSize: 12, margin: [0, 550, 0, 40] }
   );
-
-  // ➡️ Kohteen perustiedot
-  const yleistiedot = rakennusData?.properties?.yleistiedot || {};
-  const teknisettiedot = rakennusData?.properties?.teknisettiedot || {};
-  const allDetails = { ...yleistiedot, ...teknisettiedot };
-
-  content.push({ text: 'Kohteen Perustiedot', style: 'heading', pageBreak: 'before', margin: [0, 20, 0, 10] });
-
-  const detailsTable = Object.entries(allDetails).map(([key, value]) => {
-    const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-    let formattedValue = '';
-    let source = '-';
-    if (typeof value === 'object' && value !== null) {
-      formattedValue = value.value || '';
-      source = value.source || '-';
-    } else {
-      formattedValue = value || '';
-    }
-    return [formattedKey, formattedValue, source];
-  });
-
-  if (detailsTable.length) {
-    content.push({
-      table: {
-        widths: ['*', '*', '*'],
-        body: [['Kenttä', 'Arvo', 'Lähde'], ...detailsTable],
-      },
-      layout: 'lightHorizontalLines',
-      margin: [0, 0, 0, 20],
-    });
-  }
 
 
   const johdantoSection = sections.find((s) => s.key === 'johdanto' && s.include);
-  if (johdantoSection) {
-    content.push(
-      { text: johdantoSection.label.toUpperCase(), style: 'sectionTitle', pageBreak: 'before', margin: [0, 10, 0, 5] },
-      { text: johdantoSection.content, style: 'paragraph', margin: [0, 0, 0, 10] }
-    );
-  }
+if (johdantoSection) {
+  content.push(
+    {
+      text: johdantoSection.label.toUpperCase(),
+      style: 'sectionTitle',
+      pageBreak: 'before',
+      margin: [0, 10, 0, 5]
+    },
+    {
+      text: johdantoSection.content || '',
+      style: 'paragraph',
+      margin: [0, 0, 0, 10]
+    }
+  );
+}
+const rakennukset = rakennusData?.rakennukset_fulls || [];
+if (rakennukset.length > 0) {
+  content.push({
+    text: '🏠 Kohteen tiedot',
+    style: 'heading',
+    pageBreak: 'before',
+    margin: [0, 10, 0, 10],
+  });
+
+  rakennukset.forEach((rak) => {
+    const dataRows = [
+      ['Osoite', `${rak.osoite}, ${rak.postinumero} ${rak.toimipaikka}`],
+      ['Rakennustunnus', rak.rakennustunnus],
+      ['Rakennusvuosi', rak.rakennusvuosi],
+      ['Koordinaatti sijainti', rak.sijainti ? `${rak.sijainti.coordinates[1]}, ${rak.sijainti.coordinates[0]}` : '-'],
+      ['Rakennusluokitus', rak.rakennusluokitus],
+      ['Runkotapa', rak.runkotapa],
+      ['Käyttötilanne', rak.kayttotilanne],
+      ['Julkisivumateriaali', rak.julkisivumateriaali],
+      ['Lämmitystapa', rak.lammitystapa],
+      ['Energialähde', rak.lammitysenergialahde],
+      ['Rakennusaine', rak.rakennusaine],
+      ['Tilavuus', rak.tilavuus],
+      ['Kokonaisala', rak.kokonaisala],
+      ['Kerrosala', rak.kerrosala],
+      ['Huoneistoala', rak.huoneistoala],
+      ['Kerroksia', rak.kerroksia],
+    ];
+
+    const tableBody = dataRows.map(([label, value]) => [
+      { text: label, bold: true, fontSize: 11 },
+      { text: value || '-', fontSize: 11 }
+    ]);
+
+    content.push({
+      table: {
+        widths: ['30%', '70%'],
+        body: tableBody
+      },
+      layout: 'lightHorizontalLines',
+      margin: [0, 0, 0, 10]
+    });
+  });
+}
+ 
+
+
 
 
   content.push({
@@ -264,18 +297,10 @@ useEffect(() => {
   let pageCounter = 3;
   let tocIndex = 1;
 
-  if (johdantoSection) {
-    const label = johdantoSection.label.replace(/^(\W*\s*)/, '');
-    content.push({
-      columns: [
-        { text: `${tocIndex++}. ${label}`, style: 'paragraph', margin: [0, 2] },
-        { text: `${pageCounter++}`, alignment: 'right', style: 'paragraph', margin: [0, 2] },
-      ],
-    });
-  }
+
 
   sections.forEach((section) => {
-    if (section.include && section.key !== 'johdanto') {
+  if (section.include) {
       const label = section.label.replace(/^(\W*\s*)/, '');
       content.push({
         columns: [
@@ -288,8 +313,8 @@ useEffect(() => {
 
 
   let first = true;
-  for (const section of sections) {
-    if (!section.include) continue;
+for (const section of sections) {
+  if (!section.include || section.key === 'johdanto') continue; 
 
     content.push({
       text: section.label.toUpperCase(),
@@ -543,6 +568,52 @@ return (
               className="form-control"
             />
           </div>
+
+<div className="border p-4 rounded shadow-sm">
+  <h3 className="text-xl font-semibold mb-4">🏠 Kohteen tiedot</h3>
+
+  {rakennusData?.rakennukset_fulls?.map((rak, idx) => (
+    <div key={idx} className="mb-5">
+      <h5 className="fw-bold text-primary mb-3">
+        {rak.osoite}, {rak.postinumero} {rak.toimipaikka}
+      </h5>
+
+      <div className="row">
+        {[
+          ['Toimipaikka', 'toimipaikka'],
+          ['Rakennustunnus', 'rakennustunnus'],
+          ['Rakennusvuosi', 'rakennusvuosi'],
+          ['Sijainti', null, `${rak.sijainti?.coordinates[1]}, ${rak.sijainti?.coordinates[0]}`],
+          ['Rakennusluokitus', 'rakennusluokitus'],
+          ['Runkotapa', 'runkotapa'],
+          ['Käyttötilanne', 'kayttotilanne'],
+          ['Julkisivumateriaali', 'julkisivumateriaali'],
+          ['Lämmitystapa', 'lammitystapa'],
+          ['Energialähde', 'lammitysenergialahde'],
+          ['Rakennusaine', 'rakennusaine'],
+          ['Kokonaisala', 'kokonaisala'],
+          ['Kerrosala', 'kerrosala'],
+          ['Huoneistoala', 'huoneistoala'],
+          ['Tilavuus', 'tilavuus'],
+          ['Kerroksia', 'kerroksia'],
+        ].map(([label, key, customValue], i) => {
+          const value = customValue ?? rak[key] ?? '-';
+          const source = key ? rak.metadata?.[key]?.source ?? 'Ympäristö.fi-RYHTI' : 'Ympäristö.fi-RYHTI';
+
+          return (
+            <div key={i} className="col-md-6 mb-3">
+              <p className="mb-1"><strong>{label}</strong></p>
+              <p className="mb-0">{value}</p>
+              <small className="text-muted">Lähde: {source}</small>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  ))}
+</div>
+
+
 
           
           <div className="accordion my-4" id="templateAccordion">

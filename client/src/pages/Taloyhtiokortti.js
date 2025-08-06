@@ -95,6 +95,7 @@ const [existingPTSData, setExistingPTSData] = useState(null);
       <PropertyDetailsForm
         rakennus={rakennus}
         kiinteistotunnus={card.kiinteistotunnus}
+        rakennusData={card}
       />
     </Modal.Body>
   </Modal>

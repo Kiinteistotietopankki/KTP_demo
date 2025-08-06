@@ -98,14 +98,14 @@ try {
     ? JSON.parse(entry.values_by_year)
     : entry.values_by_year || {};
 } catch (err) {
-  console.warn("❌ Failed to parse values_by_year:", entry.values_by_year);
+
 }
     // 🔧 Build `values[]` array from values_by_year.y1 to y11
    const values = Array.from({ length: 11 }, (_, i) => {
   const raw = parsedValuesByYear[`y${i + 1}`];
   return raw !== undefined && raw !== null ? String(raw) : '0';
 });
-console.log("📌 values array for:", entry.label, values);
+console.log("values array for:", entry.label, values);
     grouped[key].push({
       label: entry.label || '',
       kl: entry.kl_rating || '',
@@ -284,14 +284,14 @@ const handleSavePTS = async () => {
                 <div className="accordion-body p-0">
                   <table className="table table-sm mb-0">
                     <thead className="table-light">
-                      <tr>
-                        <th>Osa-alue</th>
-                        <th>Yhteensä</th>
-                        {years.map((year) => (
-                          <th key={year} className="text-center">{year}</th>
-                        ))}
-                      </tr>
-                    </thead>
+  <tr>
+    <th className="text-start">Osa-alue</th>
+    <th className="text-end">Yhteensä</th>
+    {years.map((year) => (
+      <th key={year} className="text-end font-monospace">{year}</th>
+    ))}
+  </tr>
+</thead>
                     <tbody>
                       {sub.items
                         .filter((item) => item.label !== 'Yhteensä')
@@ -305,24 +305,33 @@ const handleSavePTS = async () => {
                             <tr key={itemIdx}>
                               <td>{item.label}</td>
                               <td>{rowTotal}</td>
-                              {item.values.map((val, yearIdx) => (
-                                <td key={yearIdx}>
-                                  <input
-                                    type="text"
-                                    value={val}
-                                    onChange={(e) =>
-                                      handleValueChange(catIdx, subIdx, itemIdx, yearIdx, e.target.value)
-                                    }
-                                    className="form-control form-control-sm text-end"
-                                  />
-                                </td>
-                              ))}
+                              {sub.name === 'Toimenpide-ehdotukset yhteensä' ? (
+  item.label === 'Rakennetekniikka' ? tekniikkaYhteensa :
+  item.label === 'LVI Järjestelmät' ? lviYhteensa :
+  item.label === 'Sähköjärjestelmät' ? sahkoYhteensa :
+  item.label === 'Lisätutkimukset' ? tutkimusYhteensa :
+  item.values // fallback
+).map((val, yearIdx) => (
+ <td key={yearIdx} className="text-end font-monospace">{val}</td>
+))
+: item.values.map((val, yearIdx) => (
+  <td key={yearIdx}>
+    <input
+      type="text"
+      value={val}
+      onChange={(e) =>
+        handleValueChange(catIdx, subIdx, itemIdx, yearIdx, e.target.value)
+      }
+      className="form-control form-control-sm text-end"
+    />
+  </td>
+))}
                             </tr>
                           );
                         })}
                     </tbody>
                     <tfoot>
-                      <tr className="table-success fw-bold">
+                      <tr className="table-success fw-bold text-dark">
                         <td>YHTEENSÄ</td>
                         <td>
                           {sub.items
@@ -344,7 +353,7 @@ const handleSavePTS = async () => {
                             }, 0);
 
                           return (
-                            <td key={idx} className="text-center">{colSum}</td>
+                            <td key={idx} className="text-end font-monospace">{colSum}</td>
                           );
                         })}
                       </tr>

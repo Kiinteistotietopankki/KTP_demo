@@ -17,39 +17,69 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange }) {
       setData(tableData);
     }
   }, [tableData]);
+
+  useEffect(() => {
+  if (!Array.isArray(data) || data.length === 0) {
+    // Use initial fallback only once
+    if (tableData.length === 0) {
+   const fallback = initialData;
+      setTableData(fallback);
+    }
+    return;
+  }
+
+  // Normalize and compare with existing tableData
+  const normalized = data.map(section => ({
+    header: section.header || section.name || 'Osa-alue',
+    items: (section.items || []).map(item => ({
+      label: item.label || item.name || '',
+      kl: item.kl || 'KL3',
+      values: item.values || Array(11).fill('')
+    }))
+  }));
+
+  // Only set if it's truly different to avoid flicker
+  const jsonNew = JSON.stringify(normalized);
+  const jsonOld = JSON.stringify(tableData);
+  if (jsonNew !== jsonOld) {
+    setTableData(normalized);
+  }
+
+}, [data]);
+
  const initialData = [
   {
-    header: 'Aluesähköistys',
+    name: 'Aluesähköistys',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Kutkinlaitokset ja jakokeskukset',
+    name: 'Kutkinlaitokset ja jakokeskukset',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Johdot ja niiden varusteet',
+    name: 'Johdot ja niiden varusteet',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Valaisimet, lämmittimet, kojeet ja laitteet',
+   name:'Valaisimet, lämmittimet, kojeet ja laitteet',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Tele- ja antennijärjestelmät',
+    name: 'Tele- ja antennijärjestelmät',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Palo- ja turvajärjestelmät',
+    name:'Palo- ja turvajärjestelmät',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
   {
-    header: 'Siirtolaitteet',
+    name: 'Siirtolaitteet',
     kl: 'KL3',
     items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
   },
@@ -163,17 +193,18 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange }) {
                             className="form-control form-control-sm"
                           />
                         </td>
-                        <td>
-                          <select
-                            value={item.kl}
-                            onChange={(e) => handleKLChange(sectionIdx, itemIdx, e.target.value)}
-                            className="form-select form-select-sm"
-                          >
-                            {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
-                              <option key={kl} value={kl}>{kl}</option>
-                            ))}
-                          </select>
-                        </td>
+                                                <td style={{ minWidth: '90px' }}>
+                            <select
+                              value={item.kl}
+                              onChange={(e) => handleKLChange(sectionIdx, itemIdx, e.target.value)}
+                              className="form-select form-select-sm"
+                            >
+                              {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
+                                <option key={kl} value={kl}>{kl}</option>
+                              ))}
+                            </select>
+                          </td>
+
                         {item.values.map((val, yearIdx) => (
                           <td key={yearIdx}>
                             <input
