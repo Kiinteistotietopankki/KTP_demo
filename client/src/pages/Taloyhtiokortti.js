@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import { useParams } from 'react-router-dom';
 import MapVisual from '../components/MapVisual';
-import { CardHeader, Col, Row, Tab, Table, Tabs } from 'react-bootstrap';
+import { Card, CardHeader, Col, Row, Tab, Table, Tabs } from 'react-bootstrap';
 import { getKiinteistoWhole } from '../api/api';
 import PerustiedotAccordion from '../components/PerustiedotAccordion';
 import { Button, Modal } from 'react-bootstrap';
@@ -10,6 +10,7 @@ import PropertyDetailsForm from '../components/ReportTemplate';
 import TilastoTable from '../components/TilastoTable';
 import TulosteetTab from '../components/TulosteetTab';
 import MMLTabFetcher from '../components/MMLTabFetcher';
+import PerustiedotTab from '../components/PerustiedotTab';
 
 
 function Taloyhtiokortti() {
@@ -21,7 +22,7 @@ function Taloyhtiokortti() {
   const [mapCoords, setMapCoords] = useState([]);
   const [activeTab, setActiveTab] = useState('perustiedot');
   const [existingPTSData, setExistingPTSData] = useState(null);
-   const [activeKey, setActiveKey] = useState('perustiedot');
+  const [activeKey, setActiveKey] = useState('perustiedot');
 
 
   useEffect(() => {
@@ -80,23 +81,10 @@ function Taloyhtiokortti() {
 
 
       {/* Tab content */}
-      <div className="">
-        {activeKey === 'perustiedot' && <div>
-              <table className="table table-success table-striped border" style={{ borderCollapse: 'separate', borderSpacing: '0', border: 'none' }}>
-                  <tbody>
-                    <tr>
-                      <td className="px-4 py-3">Data 1</td>
-                      <td className="px-4 py-3">Data 2</td>
-                      <td className="px-4 py-3">Data 3</td>
-                    </tr>
-                    <tr>
-                      <td className="px-4 py-3">Data 4</td>
-                      <td className="px-4 py-3">Data 5</td>
-                      <td className="px-4 py-3">Data 6</td>
-                    </tr>
-                  </tbody>
-                </table>
-          </div>}
+      <div className="mt-1">
+          {activeKey === 'perustiedot' && (
+              <PerustiedotTab card={card}></PerustiedotTab>
+          )}
 
         {activeKey === 'dokumentit' && <div>Dokumentit ja raportit sisältö tässä.</div>}
         {activeKey === 'pts' && <div>PTS sisältö tässä.</div>}
