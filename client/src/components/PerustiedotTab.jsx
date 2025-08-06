@@ -213,28 +213,52 @@ export default function PerustiedotTab({card}) {
 
                 {/* Modaali joka avataan ku avataan jonkun rakennuksen tiedot */}
                 
-                <Modal show={showModal} onHide={handleCloseModal} centered>
+                    <Modal
+                    show={showModal}
+                    onHide={handleCloseModal}
+                    centered
+                    fullscreen="md-down" // Fullscreen on mobile (md and below)
+                    size="xl"             // Large size on larger screens
+                    >
                     <Modal.Header closeButton>
-                    <Modal.Title> Rakennuksen tiedot </Modal.Title>
+                        <Modal.Title>Rakennuksen tiedot</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                    {selectedRakennus ? (
+                        {selectedRakennus ? (
                         <>
-                        <RakennustietoRow otsikko="Rakennustunnus" field="rakennustunnus" rakennus={selectedRakennus} editable={true} showSource={true} />
-                        <RakennustietoRow otsikko="Rakennusluokitus" field="rakennusluokitus" rakennus={selectedRakennus} editable={true} showSource={true} />
-                        <RakennustietoRow otsikko="Osoite" field="osoite" rakennus={selectedRakennus} editable={true} showSource={true} />
-                        {/* Add more fields here as needed */}
+                            <RakennustietoRow
+                            otsikko="Rakennustunnus"
+                            field="rakennustunnus"
+                            rakennus={selectedRakennus}
+                            editable={true}
+                            showSource={true}
+                            />
+                            <RakennustietoRow
+                            otsikko="Rakennusluokitus"
+                            field="rakennusluokitus"
+                            rakennus={selectedRakennus}
+                            editable={true}
+                            showSource={true}
+                            />
+                            <RakennustietoRow
+                            otsikko="Osoite"
+                            field="osoite"
+                            rakennus={selectedRakennus}
+                            editable={true}
+                            showSource={true}
+                            />
+                            {/* Add more fields as needed */}
                         </>
-                    ) : (
+                        ) : (
                         <p>Ei tietoja</p>
-                    )}
+                        )}
                     </Modal.Body>
                     <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal}>
+                        <Button variant="secondary" onClick={handleCloseModal}>
                         Sulje
-                    </Button>
+                        </Button>
                     </Modal.Footer>
-                </Modal>
+                    </Modal>
                 </div>
                 )}
             </div>

@@ -11,6 +11,7 @@ import TilastoTable from '../components/TilastoTable';
 import TulosteetTab from '../components/TulosteetTab';
 import MMLTabFetcher from '../components/MMLTabFetcher';
 import PerustiedotTab from '../components/PerustiedotTab';
+import MapVisualMultiple from '../components/MapVisualMultiple';
 
 
 function Taloyhtiokortti() {
@@ -97,7 +98,7 @@ function Taloyhtiokortti() {
                 boxShadow: '0 4px 8px rgba(25, 135, 84, 0.2)', // subtle greenish shadow
               }}
             >
-              <MapVisual pos={[65.00816937, 25.46030678]} coords={mapCoords} height="75vh" />
+              <MapVisualMultiple rakennukset_fulls={card.rakennukset_fulls} coords={mapCoords} height="75vh" />
             </div>
         )}
       </div>
