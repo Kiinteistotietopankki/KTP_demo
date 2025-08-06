@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Accordion, Button, Modal, Tab, Tabs } from 'react-bootstrap'
 import RakennustietoRow from './RakennustietoRow';
+import rakennusKoodit from '../assets/rakennusKoodit';
 
 export default function PerustiedotTab({card}) {
   const [showModal, setShowModal] = useState(false);
@@ -213,168 +214,122 @@ export default function PerustiedotTab({card}) {
 
                 {/* Modaali joka avataan ku avataan jonkun rakennuksen tiedot */}
                 
-                    <Modal
-                    show={showModal}
-                    onHide={handleCloseModal}
-                    centered
-                    fullscreen="md-down" // Fullscreen on mobile (md and below)
-                    size="xl"             // Large size on larger screens
-                    >
-                    <Modal.Header closeButton>
-                        <Modal.Title>Rakennuksen tiedot</Modal.Title>
-                    </Modal.Header>
-                        <Modal.Body>
-                        {selectedRakennus ? (
-                            <>
-                            {/* Identification */}
-                            <RakennustietoRow
-                                otsikko="Rakennustunnus"
-                                field="rakennustunnus"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Kiinteistö ID"
-                                field="id_kiinteisto"
-                                rakennus={selectedRakennus}
-                                editable={false}
-                                showSource={true}
-                            />
+                <Modal
+                show={showModal}
+                onHide={handleCloseModal}
+                centered
+                fullscreen="md-down"
+                size="xl"
+                contentClassName="border-success rounded-3"
+                >
+                <Modal.Header closeButton className="bg-success bg-opacity-10 border-success">
+                    <Modal.Title className="text-success">Rakennuksen tiedot</Modal.Title>
+                </Modal.Header>
 
-                            {/* Address */}
-                            <RakennustietoRow
-                                otsikko="Osoite"
-                                field="osoite"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Toimipaikka"
-                                field="toimipaikka"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Postinumero"
-                                field="postinumero"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
+                <Modal.Body className="px-4 py-3">
+                    {selectedRakennus ? (
+                    <dl className="row gy-3">
+                        {/* Identification */}
+                        <RakennustietoRow
+                        otsikko="Rakennustunnus"
+                        field="rakennustunnus"
+                        rakennus={selectedRakennus}
+                        editable={true}
+                        showSource={true}
+                        />
 
-                            {/* Basic building info */}
-                            <RakennustietoRow
-                                otsikko="Rakennusluokitus"
-                                field="rakennusluokitus"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Rakennusvuosi"
-                                field="rakennusvuosi"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Runkotapa"
-                                field="runkotapa"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Käyttötilanne"
-                                field="kayttotilanne"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
+                        {/* Address */}
+                        <RakennustietoRow otsikko="Osoite" field="osoite" rakennus={selectedRakennus} editable showSource />
+                        <RakennustietoRow otsikko="Toimipaikka" field="toimipaikka" rakennus={selectedRakennus} editable showSource />
+                        <RakennustietoRow otsikko="Postinumero" field="postinumero" rakennus={selectedRakennus} editable showSource />
 
-                            {/* Size & volume */}
-                            <RakennustietoRow
-                                otsikko="Kokonaisala (m²)"
-                                field="kokonaisala"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Kerrosala (m²)"
-                                field="kerrosala"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Huoneistoala (m²)"
-                                field="huoneistoala"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Tilavuus (m³)"
-                                field="tilavuus"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Kerroksia"
-                                field="kerroksia"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
+                        <div className="border-top border-success my-3" />
 
-                            {/* Materials & heating */}
-                            <RakennustietoRow
-                                otsikko="Julkisivumateriaali"
-                                field="julkisivumateriaali"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Lämmitystapa"
-                                field="lammitystapa"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Lämmitysenergialähde"
-                                field="lammitysenergialahde"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            <RakennustietoRow
-                                otsikko="Rakennusaine"
-                                field="rakennusaine"
-                                rakennus={selectedRakennus}
-                                editable={true}
-                                showSource={true}
-                            />
-                            
-                            {/* Add more fields here if needed */}
+                        {/* Basic Info */}
+                        <RakennustietoRow
+                        otsikko="Rakennusluokitus"
+                        field="rakennusluokitus"
+                        rakennus={selectedRakennus}
+                        editable
+                        showSource
+                        options={rakennusKoodit.rakennusluokitus}
+                        />
+                        <RakennustietoRow otsikko="Rakennusvuosi" field="rakennusvuosi" rakennus={selectedRakennus} editable showSource />
 
-                            </>
-                        ) : (
-                            <p>Ei tietoja</p>
-                        )}
-                        </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                        Sulje
-                        </Button>
-                    </Modal.Footer>
-                    </Modal>
+                        <div className="border-top border-success my-3" />
+
+                        {/* Size & Volume */}
+                        <RakennustietoRow otsikko="Kokonaisala (m²)" field="kokonaisala" rakennus={selectedRakennus} editable showSource />
+                        <RakennustietoRow otsikko="Kerrosala (m²)" field="kerrosala" rakennus={selectedRakennus} editable showSource />
+                        <RakennustietoRow otsikko="Huoneistoala (m²)" field="huoneistoala" rakennus={selectedRakennus} editable showSource />
+                        <RakennustietoRow otsikko="Tilavuus (m³)" field="tilavuus" rakennus={selectedRakennus} editable showSource />
+                        <RakennustietoRow otsikko="Kerroksia" field="kerroksia" rakennus={selectedRakennus} editable showSource />
+
+                        <div className="border-top border-success my-3" />
+
+                        {/* Structure */}
+                        <RakennustietoRow
+                        otsikko="Runkotapa"
+                        field="runkotapa"
+                        rakennus={selectedRakennus}
+                        editable
+                        showSource
+                        options={rakennusKoodit.rakentamistapa}
+                        />
+                        <RakennustietoRow
+                        otsikko="Käyttötilanne"
+                        field="kayttotilanne"
+                        rakennus={selectedRakennus}
+                        editable
+                        showSource
+                        options={rakennusKoodit.kayttotilanne}
+                        />
+
+                        {/* Materials & Heating */}
+                        <RakennustietoRow
+                        otsikko="Julkisivumateriaali"
+                        field="julkisivumateriaali"
+                        rakennus={selectedRakennus}
+                        editable
+                        showSource
+                        options={rakennusKoodit.julkisivumateriaali}
+                        />
+                        <RakennustietoRow
+                        otsikko="Lämmitystapa"
+                        field="lammitystapa"
+                        rakennus={selectedRakennus}
+                        editable
+                        showSource
+                        options={rakennusKoodit.lammitystapa}
+                        />
+                        <RakennustietoRow
+                        otsikko="Lämmitysenergialähde"
+                        field="lammitysenergialahde"
+                        rakennus={selectedRakennus}
+                        editable
+                        showSource
+                        options={rakennusKoodit.lammitysenergialahde}
+                        />
+                        <RakennustietoRow
+                        otsikko="Rakennusaine"
+                        field="rakennusaine"
+                        rakennus={selectedRakennus}
+                        editable
+                        showSource
+                        options={rakennusKoodit.rakennusaine}
+                        />
+                    </dl>
+                    ) : (
+                    <p>Ei tietoja</p>
+                    )}
+                </Modal.Body>
+
+                <Modal.Footer className="bg-light">
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                    Sulje
+                    </Button>
+                </Modal.Footer>
+                </Modal>
                 </div>
                 )}
             </div>
