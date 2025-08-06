@@ -223,36 +223,152 @@ export default function PerustiedotTab({card}) {
                     <Modal.Header closeButton>
                         <Modal.Title>Rakennuksen tiedot</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>
+                        <Modal.Body>
                         {selectedRakennus ? (
-                        <>
+                            <>
+                            {/* Identification */}
                             <RakennustietoRow
-                            otsikko="Rakennustunnus"
-                            field="rakennustunnus"
-                            rakennus={selectedRakennus}
-                            editable={true}
-                            showSource={true}
+                                otsikko="Rakennustunnus"
+                                field="rakennustunnus"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
                             />
                             <RakennustietoRow
-                            otsikko="Rakennusluokitus"
-                            field="rakennusluokitus"
-                            rakennus={selectedRakennus}
-                            editable={true}
-                            showSource={true}
+                                otsikko="Kiinteistö ID"
+                                field="id_kiinteisto"
+                                rakennus={selectedRakennus}
+                                editable={false}
+                                showSource={true}
+                            />
+
+                            {/* Address */}
+                            <RakennustietoRow
+                                otsikko="Osoite"
+                                field="osoite"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
                             />
                             <RakennustietoRow
-                            otsikko="Osoite"
-                            field="osoite"
-                            rakennus={selectedRakennus}
-                            editable={true}
-                            showSource={true}
+                                otsikko="Toimipaikka"
+                                field="toimipaikka"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
                             />
-                            {/* Add more fields as needed */}
-                        </>
+                            <RakennustietoRow
+                                otsikko="Postinumero"
+                                field="postinumero"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+
+                            {/* Basic building info */}
+                            <RakennustietoRow
+                                otsikko="Rakennusluokitus"
+                                field="rakennusluokitus"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Rakennusvuosi"
+                                field="rakennusvuosi"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Runkotapa"
+                                field="runkotapa"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Käyttötilanne"
+                                field="kayttotilanne"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+
+                            {/* Size & volume */}
+                            <RakennustietoRow
+                                otsikko="Kokonaisala (m²)"
+                                field="kokonaisala"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Kerrosala (m²)"
+                                field="kerrosala"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Huoneistoala (m²)"
+                                field="huoneistoala"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Tilavuus (m³)"
+                                field="tilavuus"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Kerroksia"
+                                field="kerroksia"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+
+                            {/* Materials & heating */}
+                            <RakennustietoRow
+                                otsikko="Julkisivumateriaali"
+                                field="julkisivumateriaali"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Lämmitystapa"
+                                field="lammitystapa"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Lämmitysenergialähde"
+                                field="lammitysenergialahde"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            <RakennustietoRow
+                                otsikko="Rakennusaine"
+                                field="rakennusaine"
+                                rakennus={selectedRakennus}
+                                editable={true}
+                                showSource={true}
+                            />
+                            
+                            {/* Add more fields here if needed */}
+
+                            </>
                         ) : (
-                        <p>Ei tietoja</p>
+                            <p>Ei tietoja</p>
                         )}
-                    </Modal.Body>
+                        </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleCloseModal}>
                         Sulje
