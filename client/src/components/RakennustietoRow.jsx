@@ -30,13 +30,15 @@ export default function RakennustietoRow({
 
     const updates = [];
 
-    if (value !== valueFromData) {
+    const hasValueChanged = value !== valueFromData;
+    const hasSourceChanged = source !== sourceFromData;
+
+    if (hasValueChanged) {
       const obj = {
         [field]: value
       };
 
-      if (source !== sourceFromData) {
-        // Wrap source inside metadata under the field key
+      if (hasSourceChanged) {
         obj.metadata = {
           [field]: { source }
         };
@@ -45,8 +47,7 @@ export default function RakennustietoRow({
       updates.push(obj);
     }
 
-    // If only source changed but value stayed the same
-    if (value === valueFromData && source !== sourceFromData) {
+    if (!hasValueChanged && hasSourceChanged) {
       updates.push({
         [field]: valueFromData,
         metadata: {
@@ -59,20 +60,28 @@ export default function RakennustietoRow({
 
     try {
       await updateRakennus(rakennus.id_rakennus, updates);
+
+      // ✅ Update local state to reflect saved values
+      setValue(value);
+      setSource(source);
+
       setTempAlert({ type: 'success', message: `"${otsikko}" päivitetty onnistuneesti!` });
-      setTimeout(() => setTempAlert(null), 4000); // dismiss after 3s
+      setTimeout(() => setTempAlert(null), 4000);
     } catch (err) {
-      setTempAlert({ type: 'danger', message: `Kentän "${otsikko}" tallennus epäonnistui: ${err.response?.data?.message || err.message}` });
-      setTimeout(() => setTempAlert(null), 4000); // dismiss after 3s
+      setTempAlert({
+        type: 'danger',
+        message: `Kentän "${otsikko}" tallennus epäonnistui: ${err.response?.data?.message || err.message}`
+      });
+      setTimeout(() => setTempAlert(null), 4000);
     }
   };
 
   const displayValue = (() => {
-    if (!options) return valueFromData;
+    if (!options) return value;
     const code = Object.entries(options).find(
-      ([_, label]) => label === valueFromData
+      ([_, label]) => label === value
     )?.[0];
-    return options[code] || valueFromData || 'Ei tiedossa';
+    return options[code] || value || 'Ei tiedossa';
   })();
 
   return (
