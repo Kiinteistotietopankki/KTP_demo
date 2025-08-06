@@ -2,22 +2,24 @@ import React, { useEffect, useState } from 'react'
 import { Accordion, Tab, Tabs } from 'react-bootstrap'
 
 export default function PerustiedotTab({card}) {
+    const [perustiedotActiveKey, setPerustiedotActiveKey] = useState('Kiinteistö')
+
 
   return (
 
     <div className=" px-5 mb-4" style={{ maxWidth: '600px', margin: 'auto' }}>
-        <div className="flex-d justify-content-center mt-1 mb-1">
-            <Tabs
+            <div className="d-flex justify-content-center mt-1 mb-1">
+              <Tabs
+                activeKey={perustiedotActiveKey}
+                onSelect={(k) => setPerustiedotActiveKey(k)}
                 id="taloyhtiokortti-tabs"
-                className="mb-0"
+                className="mb-0 custom-tabs2"
                 variant="pills"
-                defaultActiveKey={card.rakennukset_fulls[0]?.rakennustunnus} // optional default
-            >
-                <Tab title='Kiinteistö'></Tab>
-                <Tab title='Rakennukset'></Tab>
-               
-            </Tabs>
-        </div>
+              >
+                <Tab eventKey="Kiinteistö" title={<span className="text-white">Kiinteistö</span>} />
+                <Tab eventKey="Rakennukset" title={<span className="text-white">Rakennukset</span>} />
+              </Tabs>
+            </div>
        
 
         {card && (

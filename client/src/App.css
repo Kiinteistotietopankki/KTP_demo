@@ -23,6 +23,19 @@
   /* font-weight: bold; */
 }
 
+.custom-tabs2 .nav-link.active {
+  background-color: #027000 !important; /* or any color */
+  color: #ba3b46b9 !important; /* green text to match success theme */
+  /* font-weight: bold; */
+}
+
+.custom-tabs2 .nav-link {
+  background-color: #04aa00;  /* green background for all tabs */
+  color: black;               /* text color */              /* slightly faded for unselected */
+  transition: background-color 0.3s, opacity 0.3s;
+  margin-left: 3px;
+}
+
 .layout{
   display: flex;
   flex-direction: row;
