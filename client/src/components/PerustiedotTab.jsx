@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Accordion, Button, Modal, Tab, Tabs } from 'react-bootstrap'
 import RakennustietoRow from './RakennustietoRow';
 import rakennusKoodit from '../assets/rakennusKoodit';
+import MapModalWrapper from './MapModalWrapper';
 
 export default function PerustiedotTab({card}) {
   const [showModal, setShowModal] = useState(false);
@@ -225,6 +226,11 @@ export default function PerustiedotTab({card}) {
                 <Modal.Header closeButton className="bg-success bg-opacity-10 border-success">
                     <Modal.Title className="text-success">Rakennuksen tiedot</Modal.Title>
                 </Modal.Header>
+                
+                {selectedRakennus?.sijainti?.coordinates?.[1] && (
+                <MapModalWrapper coords={[selectedRakennus.sijainti.coordinates[1], selectedRakennus.sijainti.coordinates[0]]} />
+                )}
+                                
 
                 <Modal.Body className="px-4 py-3">
                     {selectedRakennus ? (
