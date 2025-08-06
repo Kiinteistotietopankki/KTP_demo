@@ -36,6 +36,17 @@
   margin-left: 3px;
 }
 
+@media (max-width: 576px) {
+  .table-responsive-text table {
+    font-size: 0.8rem; /* smaller font on mobile */
+  }
+
+  .table-responsive-text td,
+  .table-responsive-text th {
+    padding: 0.25rem 0.4rem; /* less padding for tighter rows */
+  }
+}
+
 .layout{
   display: flex;
   flex-direction: row;
