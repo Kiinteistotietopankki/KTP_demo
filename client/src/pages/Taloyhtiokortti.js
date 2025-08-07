@@ -12,6 +12,7 @@ import TulosteetTab from '../components/TulosteetTab';
 import MMLTabFetcher from '../components/MMLTabFetcher';
 import PerustiedotTab from '../components/PerustiedotTab';
 import MapVisualMultiple from '../components/MapVisualMultiple';
+import DokumentitTab from '../components/DokumentitTab';
 
 
 function Taloyhtiokortti() {
@@ -87,7 +88,9 @@ function Taloyhtiokortti() {
               <PerustiedotTab card={card}></PerustiedotTab>
           )}
 
-        {activeKey === 'dokumentit' && <div>Dokumentit ja raportit sisältö tässä.</div>}
+        {activeKey === 'dokumentit'  && (
+              <DokumentitTab kiinteisto={card}></DokumentitTab>
+          )}
         {activeKey === 'pts' && <div>PTS sisältö tässä.</div>}
         {activeKey === 'kartta' && (
             <div

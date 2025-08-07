@@ -185,7 +185,7 @@ export default function PerustiedotTab({card}) {
                 {/* Rakennukset ala-tabi perustiedoissa */}
 
                 {perustiedotActiveKey === 'Rakennukset' && card?.rakennukset_fulls?.length > 0 && (
-                <div className="flex table-responsive-text">
+                <div className="flex mt-3 table-responsive-text">
                     <table className="table table-sm" style={{ borderCollapse: 'separate', borderSpacing: '0 0.5rem' }}>
                     <thead>
                         <tr>
@@ -215,7 +215,7 @@ export default function PerustiedotTab({card}) {
 
                 {/* Tilastoja */}
 
-                <div className="border-top border-success my-1" style={{ height: '3px' }} />
+                <div className="border-top border-success my-3" style={{ height: '3px' }} />
                
                 <TilastoTable
                     kunta={card?.rakennukset_fulls[0]?.toimipaikka}

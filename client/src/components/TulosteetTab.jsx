@@ -72,23 +72,27 @@ const TulosteetTab = ({ kiinteistotunnus }) => {
 
   return (
     <div className="p-3">
-      <h5 className="mb-4">
-        Tulosteiden haku kohteelle: <span className="text-primary fw-semibold">{kiinteistotunnus}</span>
+      <h5 className="text-center mb-4">
+        <span className="fs-5 text-primary fw-semibold">{kiinteistotunnus}</span>
       </h5>
       {error && <Alert variant="danger">{error}</Alert>}
-
+      
       <div className="d-grid gap-2">
         {tulosteetList.map((doc, index) => (
+          <>
           <Button
             key={index}
             variant="outline-primary"
-            className="text-start"
+            className="text-center"
             onClick={() => setSelectedTuloste(doc)}
             disabled={loading}
           >
             {doc.label} — {doc.price.toFixed(2)} €
           </Button>
+          <div className="border-top border-success my-1" style={{ height: '3px' }} />
+          </>
         ))}
+        
       </div>
 
       {/* Confirmation Modal */}
