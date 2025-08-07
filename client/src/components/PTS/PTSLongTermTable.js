@@ -56,7 +56,10 @@ useEffect(() => {
 
     const fetchPTS = async () => {
     try {
-      const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
+      const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`
+      , {
+          credentials: 'include', 
+        });
       const ptsList = await listRes.json();
 
       if (!ptsList.length) {
@@ -70,7 +73,8 @@ useEffect(() => {
       }
 
       const latestPTSId = ptsList[0].id;
-      const fullRes = await fetch(`${config.apiBaseUrl}/api/pts/${latestPTSId}`);
+      const fullRes = await fetch(`${config.apiBaseUrl}/api/pts/${latestPTSId}`,{ credentials: 'include'
+});
       const fullPTS = await fullRes.json();
 
     
@@ -238,7 +242,8 @@ const handleSavePTS = async () => {
 
   try {
     // Step 1: Check if a PTS already exists
-    const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
+    const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`,{ credentials: 'include'
+});
     const ptsList = await listRes.json();
 
     const existingPTS = ptsList?.[0]; // may be undefined
@@ -251,6 +256,7 @@ const handleSavePTS = async () => {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      credentials: 'include'
     });
 
     const result = await res.json();
