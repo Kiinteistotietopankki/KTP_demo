@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Accordion, Button, Modal, Tab, Tabs } from 'react-bootstrap'
+import {Button, Modal, Tab, Tabs } from 'react-bootstrap'
 import RakennustietoRow from './RakennustietoRow';
 import rakennusKoodit from '../assets/rakennusKoodit';
 import MapModalWrapper from './MapModalWrapper';
+import TilastoTable from './TilastoTable';
 
 export default function PerustiedotTab({card}) {
   const [showModal, setShowModal] = useState(false);
   const [selectedRakennus, setSelectedRakennus] = useState(null);
+
 
   const handleOpenModal = (rakennus) => {
     setSelectedRakennus(rakennus);
@@ -19,28 +21,24 @@ export default function PerustiedotTab({card}) {
   };
 
     const [perustiedotActiveKey, setPerustiedotActiveKey] = useState('Kiinteistö')
-    const [buildingChoise, setBuildingChoise] = useState(card?.rakennukset_fulls[0]?.rakennustunnus)
 
-    // useEffect(() => {
-    //   setBuildingChoise(card?.rakennukset_fulls[0]?.rakennustunnus)
-    // }, [card])
-    
 
     return (
 
-        <div className=" px-5 mb-4" style={{ maxWidth: '600px', margin: 'auto' }}>
-                <div className="d-flex justify-content-center mt-1 mb-1">
-                <Tabs
-                    activeKey={perustiedotActiveKey}
-                    onSelect={(k) => setPerustiedotActiveKey(k)}
-                    id="taloyhtiokortti-tabs"
-                    className="mb-0 custom-tabs2"
-                    variant="pills"
-                >
-                    <Tab eventKey="Kiinteistö" title={<span className="text-white">Kiinteistö</span>} />
-                    <Tab eventKey="Rakennukset" title={<span className="text-white">Rakennukset</span>} />
-                </Tabs>
-                </div>
+        <div className="container-fluid px-3 px-md-4 mb-4">
+        <div className="mx-auto" style={{ maxWidth: '960px' }}>
+            <div className="d-flex justify-content-center mt-1 mb-1">
+            <Tabs
+                activeKey={perustiedotActiveKey}
+                onSelect={(k) => setPerustiedotActiveKey(k)}
+                id="taloyhtiokortti-tabs"
+                className="mb-0 custom-tabs2"
+                variant="pills"
+            >
+                <Tab eventKey="Kiinteistö" title={<span className="text-white">Kiinteistö</span>} />
+                <Tab eventKey="Rakennukset" title={<span className="text-white">Rakennukset</span>} />
+            </Tabs>
+            </div>
 
             <div className="mt-1">
             {perustiedotActiveKey === 'Kiinteistö' && (
@@ -160,7 +158,7 @@ export default function PerustiedotTab({card}) {
                                 ['Kokonaisala', `${card?.rakennukset_fulls[0]?.kokonaisala} m²`],
                                 ['Kerrosala', `${card?.rakennukset_fulls[0]?.kerrosala} m²`],
                                 ['Huoneistoala', `${card?.rakennukset_fulls[0]?.huoneistoala} m²`],
-                                ['Tilavuus', `${card?.rakennukset_fulls[0]?.tilavuus} m²`],
+                                ['Tilavuus', `${card?.rakennukset_fulls[0]?.tilavuus} m³`],
                                 ['Kerroksia', `${card?.rakennukset_fulls[0]?.kerroksia}`],
                                 ['Kellarikerroksia', `-`],
                                 
@@ -184,8 +182,10 @@ export default function PerustiedotTab({card}) {
                 </div>
             )}
 
+                {/* Rakennukset ala-tabi perustiedoissa */}
+
                 {perustiedotActiveKey === 'Rakennukset' && card?.rakennukset_fulls?.length > 0 && (
-                <div className="table-responsive-text">
+                <div className="flex table-responsive-text">
                     <table className="table table-sm" style={{ borderCollapse: 'separate', borderSpacing: '0 0.5rem' }}>
                     <thead>
                         <tr>
@@ -211,17 +211,26 @@ export default function PerustiedotTab({card}) {
                         </tr>
                         ))}
                     </tbody>
-                    </table>
+                </table>
+
+                {/* Tilastoja */}
+
+                <div className="border-top border-success my-1" style={{ height: '3px' }} />
+               
+                <TilastoTable
+                    kunta={card?.rakennukset_fulls[0]?.toimipaikka}
+                    chartLabel={'pientalojen kauppahinnat'}
+                />
 
                 {/* Modaali joka avataan ku avataan jonkun rakennuksen tiedot */}
                 
                 <Modal
-                show={showModal}
-                onHide={handleCloseModal}
-                centered
-                fullscreen="md-down"
-                size="xl"
-                contentClassName="border-success rounded-3"
+                    show={showModal}
+                    onHide={handleCloseModal}
+                    centered
+                    fullscreen="md-down"
+                    size="xl"
+                    contentClassName="border-success rounded-3"
                 >
                 <Modal.Header closeButton className="bg-success bg-opacity-10 border-success">
                     <Modal.Title className="text-success">Rakennuksen tiedot</Modal.Title>
@@ -340,7 +349,7 @@ export default function PerustiedotTab({card}) {
                 )}
             </div>
         
-
+            </div>
         </div>
     )
 }
