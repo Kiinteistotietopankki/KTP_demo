@@ -8,9 +8,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange }) {
 
   const [tableData, setTableData] = useState(data || []);
 
-  useEffect(() => {
-    setTableData(data || []);
-  }, [data]);
+
 
   useEffect(() => {
     if (typeof setData === 'function') {
@@ -28,7 +26,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange }) {
     return;
   }
 
-  // Normalize and compare with existing tableData
+  
   const normalized = data.map(section => ({
     header: section.header || section.name || 'Osa-alue',
     items: (section.items || []).map(item => ({
@@ -156,8 +154,8 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange }) {
           aria-labelledby="headingRakennetekniikka"
           data-bs-parent="#rakennetekniikkaAccordion"
         >
-          <div className="accordion-body p-0">
-            <table className="table table-sm mb-0">
+              <div className="responsive-table-container">
+  <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
                   <th>Osa-alue</th>

@@ -130,8 +130,8 @@ useEffect(() => {
           aria-labelledby="headingSahko"
           data-bs-parent="#sahkotekniikkaAccordion"
         >
-          <div className="accordion-body p-0">
-            <table className="table table-sm mb-0">
+          <div className="responsive-table-container">
+                  <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
                   <th>Osa-alue</th>
