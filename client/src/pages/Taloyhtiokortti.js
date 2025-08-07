@@ -15,6 +15,7 @@ import MapVisualMultiple from '../components/MapVisualMultiple';
 import DokumentitTab from '../components/DokumentitTab';
 
 import PTSLongTermTable from '../components/PTS/PTSLongTermTable';
+import config from '../devprodConfig';
 
 function Taloyhtiokortti() {
   const { id } = useParams();
@@ -78,7 +79,7 @@ function Taloyhtiokortti() {
                     title={<span className="text-white">PTS</span>}
                     onEnter={async () => {
                     try {
-                      const res = await fetch(`http://localhost:3001/api/pts/by/kiinteistotunnus/${card?.kiinteistotunnus}`);
+                      const res = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${card?.kiinteistotunnus}`);
                       const data = await res.json();
                       setHasPTSData(data.length > 0);
                     } catch (err) {
@@ -148,7 +149,7 @@ function Taloyhtiokortti() {
                 </Modal>
               </div>  
           )}
-          
+
         {activeKey === 'kartta' && (
             <div
               className="bg-white shadow-sm p-1"
