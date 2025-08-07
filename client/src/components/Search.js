@@ -1,7 +1,7 @@
 // Searchbox.js
 import { useEffect, useRef, useState } from 'react';
 import '../App.css';
-import { Tabs, Tab } from 'react-bootstrap';
+import { Tabs, Tab, Button } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 import KiinteistoHaku from '../classes/Kiinteistohaku';
 import { ktKokomuotoon } from '../assets/ktMuuntaja';
@@ -103,16 +103,8 @@ function Search({ afterSearch }) {
 
   return (
     <div className='search-container'>
-      <Tabs
-        id="controlled-tab-example"
-        activeKey={searchType}
-        onSelect={(k) => handleTabChange(k)}
-        className="mb-3 d-flex justify-content-center"
-      >
-        <Tab eventKey="kiinteistötunnuksella" title="Kiinteistöhaku"></Tab>
-      </Tabs>
 
-      <div className="mt-4 d-flex flex-column mb-3">
+      <div className="d-flex flex-column">
         <div className="input-group mb-3">
           <input
             type="text"
@@ -152,13 +144,9 @@ function Search({ afterSearch }) {
           />
         </div>
 
-        <button
-          className="btn btn-outline-secondary"
-          onClick={handleSearch}
-          id="button-addon2"
-        >
+        <Button variant='success' onClick={handleSearch}>
           Hae
-        </button>
+        </Button>
       </div>
 
       {/* Show error message */}
@@ -174,7 +162,7 @@ function Search({ afterSearch }) {
             Kiinteistöjä: {kiinteistoCount}
           </span>
         ) : (
-          !error && <span className="badge bg-secondary">Ei tuloksia</span>
+          !error && <span className="badge bg-secondary my-2">Ei tuloksia</span>
         )}
         {loading && <div className="spinner-border ms-3" role="status"></div>}
       </div>

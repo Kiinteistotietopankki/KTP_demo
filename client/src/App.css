@@ -1,3 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap');
+
+/* Override Bootstrap's default font */
+:root {
+  --bs-primary: #04aa00;        /* vihreä becomes primary */
+  --bs-primary-rgb: 4, 170, 0;
+
+  --bs-success: #04aa00;        /* keep success = vihreä too */
+  --bs-success-rgb: 4, 170, 0;
+
+  --bs-warning: #d0c407;        /* keltainen */
+  --bs-warning-rgb: 208, 196, 7;
+
+  --bs-danger: #ba3b46;         /* punainen */
+  --bs-danger-rgb: 186, 59, 70;
+
+   --bs-body-font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+}
+
+.custom-tabs .nav-link.active {
+  background-color: #027000 !important; /* or any color */
+  color: #ba3b46b9 !important; /* green text to match success theme */
+  /* font-weight: bold; */
+}
+
+.custom-tabs2 .nav-link.active {
+  background-color: #027000 !important; /* or any color */
+  color: #ba3b46b9 !important; /* green text to match success theme */
+  /* font-weight: bold; */
+  font-size: 0.85rem;
+}
+
+.custom-btn1 .btn{
+  background-color: #027000 !important; /* or any color */
+  
+}
+
+.custom-tabs2 .nav-link {
+  background-color: #04aa00;  /* green background for all tabs */
+  color: black;               /* text color */              /* slightly faded for unselected */
+  transition: background-color 0.3s, opacity 0.3s;
+  margin-left: 3px;
+  font-size: 0.85rem;   /* smaller text */
+  padding: 0.25rem 0.75rem; /* smaller padding */
+}
+
+@media (max-width: 576px) {
+  .table-responsive-text table {
+    font-size: 0.8rem; /* smaller font on mobile */
+  }
+
+  .table-responsive-text td,
+  .table-responsive-text th {
+    padding: 0.25rem 0.4rem; /* less padding for tighter rows */
+  }
+}
 
 .layout{
   display: flex;
@@ -30,17 +86,10 @@
 /* ====== */
 
 .app-container {
+  flex-grow: 1;
   display: flex;
-  /* outline: 2px dashed red; */
-  margin: 0 auto;   
-  padding: 15px;          /*  Nice breathing room */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Soft shadow */
-  min-height: 100vh;
-  border-radius: 0.5rem;  /* Rounded corners */
-  flex: 0.75;
-  width: 100%;
-
   flex-direction: column;
+  min-height: 100vh;
 }
 
 .otsikko{

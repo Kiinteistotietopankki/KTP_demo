@@ -9,7 +9,7 @@ const apiurl = config.apiBaseUrl;
 const maptemplate = config.mapTileTemplate;
 
 
-const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {
+const MapVisual = ({ pos = [64.22165784, 27.72696699], coords , height = '300px'}) => {
   
     const [position, setPosition] = useState([pos[0],pos[1]])
 
@@ -40,7 +40,8 @@ const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {
         minZoom: 15,
         maxZoom: 17,
         dragging: false,
-        scrollWheelZoom: false
+        scrollWheelZoom: false,
+        zoomControl: false,  // disable default zoom control here!
       });
 
       L.Icon.Default.mergeOptions({
@@ -105,7 +106,9 @@ const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {
       layerBaseMap.addTo(map);
 
       L.control.layers(baseMaps, overlayMaps, { collapsed: true }).addTo(map);
-
+      L.control.zoom({
+        position: 'topright'
+      }).addTo(map);
 
       const marker = L.marker(position).addTo(map);
       // marker.bindPopup('Default Icon Popup');
@@ -118,9 +121,12 @@ const MapVisual = ({ pos = [64.22165784, 27.72696699], coords}) => {
 
     return (
       // <div className='mapcont mt-5 mb-5'>
-        <div id='map' ref={mapRef} style={{ height: '300px', maxWidth: '100%',  borderRadius: '12px',}}>
-        </div>
-      // </div>
+        <div
+          id='map'
+          ref={mapRef}
+          style={{ height, maxWidth: '100%', borderRadius: '12px' }}
+        ></div>
+
     );
 };
 
