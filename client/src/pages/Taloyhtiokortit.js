@@ -1,4 +1,4 @@
-import { Button, Card, Form, InputGroup, Modal, Badge } from 'react-bootstrap';
+import { Button, Card, Form, InputGroup, Modal, Badge, Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { getKiinteistotWithRakennukset } from '../api/api';
 import { useEffect, useState } from 'react';
@@ -85,66 +85,56 @@ function Taloyhtiokortit() {
   return (
       <div className="main-content">
           <div className="bg-success text-white d-flex align-items-center justify-content-center shadow-sm" style={{ minHeight: '20vh' }}>
-            <header className="text-center">
-              <h1 className="fw-bold fs-4 display-5 mb-1 p-2">
-              Hae taloyhtiökortteja {/* <small className="fw-light">Taloyhtiökortit</small> */}
+            <header className="w-100 px-3 mt-3 text-center">
+              <h1 className="fw-bold fs-4 display-5 mb-3">
+                Hae taloyhtiökortteja
               </h1>
-              {/* <p className="fs-5 fw-light">Hae taloyhtiökortteja</p> */}
 
+              <div className="mx-auto" style={{ maxWidth: '600px' }}>
+                <InputGroup className="mb-3 shadow-sm rounded w-100">
+                  <Form.Control
+                    type="text"
+                    placeholder="Kiinteistötunnus, osoite tai paikkakunta"
+                    aria-label="Search"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="border-primary flex-grow-1 text-center"
+                  />
+                  <Button variant="success" onClick={handleSearch}>
+                    Hae
+                  </Button>
+                </InputGroup>
 
-<InputGroup className="mb-3 shadow-sm rounded w-100">
-  <Form.Control
-    type="text"
-    placeholder="Kiinteistötunnus, osoite tai paikkakunta"
-    aria-label="Search"
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    onKeyDown={handleKeyDown}
-    className="border-primary flex-grow-1"
-  />
-  <Button variant="success" onClick={handleSearch}>
-    Hae
-  </Button>
-</InputGroup>
-              
-              <Form.Select
-                  className="w-70 mx-auto mb-3 shadow-sm"
-                  aria-label="Filter"
-                  value={resultOrder === 'DESC' ? 'latest' : 'oldest'}
-                  onChange={(e) => {
-                  setResultOrder(e.target.value === 'latest' ? 'DESC' : 'ASC');
-                  }}
-                >
-                <option value="latest">Uusimmat</option>
-                <option value="oldest">Vanhimmat</option>
-              </Form.Select>
+                <Dropdown drop="down" className='mb-3'>
+                  <Dropdown.Toggle variant="light" size="sm">
+                    {resultOrder === 'DESC' ? 'Uusimmat' : 'Vanhimmat'}
+                  </Dropdown.Toggle>
 
+                  <Dropdown.Menu
+                    className="mx-auto text-center border"
+                    // style={{ padding: '0'}}
+                  >
+                    <Dropdown.Item
+                      className="py-1 px-2 border-bottom"
+                      onClick={() => setResultOrder('DESC')}
+                    >
+                      Uusimmat
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      className="py-1 px-2"
+                      onClick={() => setResultOrder('ASC')}
+                    >
+                      Vanhimmat
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
             </header>
           </div>
 
 
         <div className='container'>
-
-
-
-
-          {/* <nav aria-label="Page navigation" className="d-flex justify-content-center mb-2">
-            <ul className="pagination shadow-sm rounded">
-              <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                <button className="page-link text-success" onClick={decreasePage}>
-                  Edellinen
-                </button>
-              </li>
-              <li className="page-item disabled">
-                <span className="page-link">{page}</span>
-              </li>
-              <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                <button className="page-link text-success" onClick={increasePage}>
-                  Seuraava
-                </button>
-              </li>
-            </ul>
-          </nav> */}
 
           <div className="text-center my-3 fw-semibold">
             Kortteja: {totalItems} | Sivuja: {totalPages}
