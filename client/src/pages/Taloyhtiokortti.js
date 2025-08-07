@@ -79,7 +79,9 @@ function Taloyhtiokortti() {
                     title={<span className="text-white">PTS</span>}
                     onEnter={async () => {
                     try {
-                      const res = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${card?.kiinteistotunnus}`);
+                      const res = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${card?.kiinteistotunnus}`,{
+                        credentials: 'include', 
+                      });
                       const data = await res.json();
                       setHasPTSData(data.length > 0);
                     } catch (err) {
