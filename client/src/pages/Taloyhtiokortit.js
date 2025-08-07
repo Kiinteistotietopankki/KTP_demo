@@ -158,20 +158,26 @@ function Taloyhtiokortit() {
 
           <div className="row g-4">
             {kiinteistot?.map((kiinteisto) => (
-              <div key={kiinteisto.id_kiinteisto} className="col-md-6 col-lg-4">
-                <Card className="h-100 shadow-sm border-primary hover-shadow transition">
-                  <Card.Header className="bg-primary text-white fw-bold fs-5">
-                    {kiinteisto.rakennukset_fulls[0]?.osoite} | {kiinteisto.rakennukset_fulls[0]?.toimipaikka} {kiinteisto.rakennukset_fulls[0]?.postinumero}
+              <div key={kiinteisto.id_kiinteisto} className="col-md-6 col-lg-4 mb-1">
+                <Card className="h-100 border-0 rounded-4 card-hover" style={{ boxShadow: '0 12px 24px rgba(0, 0, 0, 0.2)', opacity:'0.8+'}}>
+                  <Card.Header className="bg-primary text-white px-3 py-2">
+                    <div className="d-flex flex-column">
+                      <div className="fw-semibold fs-6 text-truncate">
+                        {kiinteisto.rakennukset_fulls[0]?.osoite}
+                      </div>
+                      <div className="small text-truncate opacity-75">
+                        {kiinteisto.rakennukset_fulls[0]?.postinumero} {kiinteisto.rakennukset_fulls[0]?.toimipaikka}
+                      </div>
+                    </div>
                   </Card.Header>
-                  <Card.Body className="d-flex flex-column justify-content-between">
-                    <Card.Title className="fs-6 text-secondary">
-                      Kiinteistötunnus: {kiinteisto.kiinteistotunnus}
-                    </Card.Title>
-                    
 
+                  <Card.Body className="d-flex flex-column justify-content-between p-3">
+                    <div className="mb-2 text-muted small">
+                      Kiinteistötunnus: <span className="text-dark">{kiinteisto.kiinteistotunnus}</span>
+                    </div>
 
-                    <Link to={`/taloyhtiokortti/${kiinteisto.id_kiinteisto}`} className="mt-2">
-                      <Button variant="outline-success" className="w-100 fw-semibold">
+                    <Link to={`/taloyhtiokortti/${kiinteisto.id_kiinteisto}`} className="mt-auto">
+                      <Button variant="success" className="w-100 fw-semibold rounded-pill">
                         Avaa kortti
                       </Button>
                     </Link>
