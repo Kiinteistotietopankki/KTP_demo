@@ -81,8 +81,8 @@ useEffect(() => {
           aria-labelledby="headingTutkimus"
           data-bs-parent="#tutkimusAccordion"
         >
-          <div className="accordion-body p-0">
-            <table className="table table-sm mb-0">
+               <div className="responsive-table-container">
+                  <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
                   <th style={{ minWidth: '180px' }}>Osa-alue</th>
