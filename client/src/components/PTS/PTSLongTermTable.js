@@ -10,6 +10,7 @@ import Tekniikkataulut from './Tekniikkataulut';
 import LVITable from './LVItaulu';
 import SahkotekniikkaTable from './Sähkötekniikkataulu';
 import TutkimustarpeetTaulu from './Tutkimustarpeettaulu';
+import config from '../../devprodConfig';
 
 export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
   const currentYear = new Date().getFullYear();
@@ -55,7 +56,7 @@ useEffect(() => {
 
     const fetchPTS = async () => {
     try {
-      const listRes = await fetch(`http://localhost:3001/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
+      const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
       const ptsList = await listRes.json();
 
       if (!ptsList.length) {
@@ -69,7 +70,7 @@ useEffect(() => {
       }
 
       const latestPTSId = ptsList[0].id;
-      const fullRes = await fetch(`http://localhost:3001/api/pts/${latestPTSId}`);
+      const fullRes = await fetch(`${config.apiBaseUrl}/api/pts/${latestPTSId}`);
       const fullPTS = await fullRes.json();
 
     
@@ -237,14 +238,14 @@ const handleSavePTS = async () => {
 
   try {
     // Step 1: Check if a PTS already exists
-    const listRes = await fetch(`http://localhost:3001/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
+    const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
     const ptsList = await listRes.json();
 
     const existingPTS = ptsList?.[0]; // may be undefined
     const method = existingPTS ? 'PUT' : 'POST';
     const url = existingPTS
-      ? `http://localhost:3001/api/pts/${existingPTS.id}`
-      : 'http://localhost:3001/api/pts';
+      ? `${config.apiBaseUrl}/api/pts/${existingPTS.id}`
+      : `${config.apiBaseUrl}/api/pts`;
 
     const res = await fetch(url, {
       method,
