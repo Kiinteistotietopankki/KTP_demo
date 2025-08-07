@@ -39,13 +39,8 @@ function Home() {
   }
 
   return (
-    <>
-    {/* <h1 className="otsikko text-primary mb-1 mx-auto">
-      Kiinteistötietopankki <Badge bg="secondary">DEMO</Badge>
-    </h1> */}
     <div className="container-fluid mt-3 p-3">
       <div className="row">
-        {/* LEFT side: text + search + results */}
         <div className="col-md-6 mt-3">
 
           {/* <Searchbox/> */}
@@ -56,7 +51,7 @@ function Home() {
 
         {/* RIGHT side: map */}
         <div className="col-md-6 mt-2">
-          <MapVisual pos={[64.22165784, 27.72696699]} coords={coordinates}/>
+          {/* <MapVisual pos={[64.22165784, 27.72696699]} coords={coordinates}/> */}
         </div>
       </div>
       
@@ -68,7 +63,6 @@ function Home() {
       )}
 
     </div>
-    </>
   );
 }
 
