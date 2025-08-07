@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Tabletemplate from './Tabletemplate';
-import { Accordion, Button, Card, Modal } from 'react-bootstrap';
+import { Accordion, Button, Card, Collapse, Modal } from 'react-bootstrap';
 import exportToExcel from './Excelexport';
 import exportToPdf from './Pdfexport';
 import EditableReport from './ReportTemplate';
@@ -16,6 +16,9 @@ function Resultdisplay({ data, setMapCoords }) {
   const [response, setResponse] = useState({});
   const [showCreatedModal, setShowCreatedModal] = useState(false);
 
+  // Track which rakennus card is open, store by kiinteistoIndex + rakennusIndex key
+  const [openRakennusKey, setOpenRakennusKey] = useState(null);
+
   useEffect(() => {
     if (data[0]?.rakennukset.length) {
       setKiinteistot(data);
@@ -23,7 +26,10 @@ function Resultdisplay({ data, setMapCoords }) {
   }, [data]);
 
   useEffect(() => {
-    if (Array.isArray(kiinteistot) && kiinteistot[0]?.rakennukset?.[0]?.geometry?.coordinates) {
+    if (
+      Array.isArray(kiinteistot) &&
+      kiinteistot[0]?.rakennukset?.[0]?.geometry?.coordinates
+    ) {
       setMapCoords(kiinteistot[0].rakennukset[0].geometry.coordinates);
     }
   }, [kiinteistot]);
@@ -69,6 +75,11 @@ function Resultdisplay({ data, setMapCoords }) {
       .catch((err) => console.error('Api error', err));
   };
 
+  // Toggle collapse open/close for rakennus card
+  const toggleRakennus = (key) => {
+    setOpenRakennusKey(openRakennusKey === key ? null : key);
+  };
+
   return (
     <div className="mt-4">
       <Modal show={showCreatedModal} onHide={() => setShowCreatedModal(false)} centered backdrop="static">
@@ -79,15 +90,25 @@ function Resultdisplay({ data, setMapCoords }) {
       </Modal>
 
       {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
-        <Card key={kiinteistoIndex} className="mb-4 border rounded-4 shadow-sm">
+        <Card key={kiinteistoIndex} className="mb-4 border rounded-3">
           <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center p-3 rounded-top-4">
             <h5 className="mb-0">
-              Kiinteistö: <span className="fw-bold">{kiinteisto?.id_esitysmuoto_kiinteistotunnus || 'N/A'}, {kiinteisto?.rakennukset[0].properties.yleistiedot.Toimipaikka.value}</span>
+              Kiinteistö:{' '}
+              <span className="fw-bold">
+                {kiinteisto?.id_esitysmuoto_kiinteistotunnus  || 'N/A'},{' '}
+                {kiinteisto?.rakennukset[0].properties.yleistiedot.Toimipaikka.value}
+                  <Button
+                    variant="outline-light"
+                    size="sm"
+                    className="ms-2"
+                    onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}
+                  >
+                    <i className="bi bi-clipboard"></i>
+                  </Button>
+              </span>
             </h5>
             <div>
-              <Button variant="outline-light" size="sm" className="me-2" onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}>
-                <i className="bi bi-clipboard"></i> Kopioi tunnus
-              </Button>
+
               <Button variant="light" size="sm" onClick={() => luoKortti(kiinteisto)}>
                 <i className="bi bi-plus-circle me-1"></i> Luo taloyhtiökortti
               </Button>
@@ -96,49 +117,46 @@ function Resultdisplay({ data, setMapCoords }) {
 
           <Card.Body className="bg-light-subtle p-3">
             {kiinteisto.rakennukset?.length > 0 ? (
-              kiinteisto.rakennukset.map((rakennus, rakennusIndex) => (
-                <Card key={rakennusIndex} className="mb-3 border-0 shadow-sm rounded-3">
-                  <Card.Header className="d-flex justify-content-between align-items-center bg-white p-2">
-                    <label className="form-check-label fw-semibold text-secondary">
-                      {rakennus.properties.yleistiedot.Rakennustunnus?.value} -{' '}
-                      {Array.isArray(rakennus.properties.yleistiedot['Kohteen osoitteet']?.value)
-                        ? rakennus.properties.yleistiedot['Kohteen osoitteet'].value.join(', ')
-                        : rakennus.properties.yleistiedot['Kohteen osoitteet']?.value || ''}{' '}
-                      ({rakennus.properties.rakennustiedot['Rakennusluokitus'].value})
-                    </label>
-                    <MapModalWrapper coords={[rakennus.geometry.coordinates[1], rakennus.geometry.coordinates[0]]} />
-                  </Card.Header>
+              kiinteisto.rakennukset.map((rakennus, rakennusIndex) => {
+                const key = `${kiinteistoIndex}-${rakennusIndex}`;
+                const isOpen = openRakennusKey === key;
+                return (
+<Card key={rakennusIndex} className="mb-3 border-0 shadow-sm rounded-3">
+  <Card.Header className="d-flex justify-content-between align-items-center bg-white p-2">
+    <div className="d-flex align-items-center">
+      <Button
+        variant="outline-secondary"
+        size="sm"
+        className="me-2"
+        onClick={() => toggleRakennus(key)}
+        aria-expanded={isOpen}
+      >
+        <i className={`bi ${isOpen ? 'bi-caret-up-fill' : 'bi-caret-down-fill'}`}></i>
+      </Button>
 
-                  <Card.Body className="bg-white p-1">
-                    <Accordion>
-                      <Accordion.Item eventKey="0">
-                        <Accordion.Header>Yleistiedot</Accordion.Header>
-                        <Accordion.Body style={{ overflowX: 'auto', maxWidth: '100%' }}>
-                          <Tabletemplate properties={rakennus.properties.yleistiedot} />
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="1">
-                        <Accordion.Header>Tekniset tiedot</Accordion.Header>
-                        <Accordion.Body style={{ overflowX: 'auto', maxWidth: '100%' }}>
-                          <Tabletemplate properties={rakennus.properties.teknisettiedot} />
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="2">
-                        <Accordion.Header>Rakennustiedot</Accordion.Header>
-                        <Accordion.Body style={{ overflowX: 'auto', maxWidth: '100%' }}>
-                          <Tabletemplate properties={rakennus.properties.rakennustiedot} />
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="3">
-                        <Accordion.Header>Aluetiedot</Accordion.Header>
-                        <Accordion.Body style={{ overflowX: 'auto', maxWidth: '100%' }}>
-                          <Tabletemplate properties={rakennus.properties.aluetiedot} />
-                        </Accordion.Body>
-                      </Accordion.Item>
-                    </Accordion>
-                  </Card.Body>
-                </Card>
-              ))
+      <label className="form-check-label fw-semibold text-secondary m-0">
+        {rakennus.properties.yleistiedot.Rakennustunnus?.value} -{' '}
+        {Array.isArray(rakennus.properties.yleistiedot['Kohteen osoitteet']?.value)
+          ? rakennus.properties.yleistiedot['Kohteen osoitteet'].value.join(', ')
+          : rakennus.properties.yleistiedot['Kohteen osoitteet']?.value || ''}{' '}
+        ({rakennus.properties.rakennustiedot['Rakennusluokitus'].value})
+      </label>
+    </div>
+
+    <MapModalWrapper coords={[rakennus.geometry.coordinates[1], rakennus.geometry.coordinates[0]]} />
+  </Card.Header>
+
+  <Collapse in={isOpen}>
+    <Card.Body className="bg-white p-1">
+      <Tabletemplate properties={rakennus.properties.yleistiedot} />
+      <Tabletemplate properties={rakennus.properties.teknisettiedot} />
+      <Tabletemplate properties={rakennus.properties.rakennustiedot} />
+      <Tabletemplate properties={rakennus.properties.aluetiedot} />
+    </Card.Body>
+  </Collapse>
+</Card>
+                );
+              })
             ) : (
               <div className="text-muted">Ei rakennuksia</div>
             )}
