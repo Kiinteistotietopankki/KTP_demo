@@ -10,6 +10,7 @@ import Badge from 'react-bootstrap/Badge';
 import Taloyhtiokortti from './pages/Taloyhtiokortti';
 import Taloyhtiokortit from './pages/Taloyhtiokortit';
 
+
 function App() {
   return (
     <Router>
@@ -24,7 +25,6 @@ function App() {
               <Route
                 path="/*"
                 element={
-                  //<ProtectedRoute> {/* Suojaus reitelle. pääsee käsiksi kun käyttäjä on kirjautunut sisään */}
                     
                       <Routes>
                         <Route path="/" element={<Home />} />
@@ -55,7 +55,10 @@ function ScrollToTop() {
 }
 
 function About() {
-  return <h2 className="text-primary">Ohjeet <Badge bg="secondary">Tulossa</Badge></h2>;
+  const environment = process.env.REACT_APP_ENVIRONMENT || 'environment boolean not found'
+  const apiurl = process.env.REACT_APP_PROD_API_URL || 'api url not found'
+
+  return <h2 className="text-primary">Ohjeet <Badge bg="secondary">Tulossa</Badge><div className='mt-4'>Production environment: {environment} - {apiurl}</div></h2>;
 }
 
 function Contact() {
