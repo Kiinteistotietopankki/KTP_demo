@@ -162,7 +162,7 @@ function Search({ afterSearch }) {
             Kiinteistöjä: {kiinteistoCount}
           </span>
         ) : (
-          !error && <span className="badge bg-secondary">Ei tuloksia</span>
+          !error && <span className="badge bg-secondary my-2">Ei tuloksia</span>
         )}
         {loading && <div className="spinner-border ms-3" role="status"></div>}
       </div>

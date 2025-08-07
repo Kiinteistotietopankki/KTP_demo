@@ -121,40 +121,40 @@ function Resultdisplay({ data, setMapCoords }) {
                 const key = `${kiinteistoIndex}-${rakennusIndex}`;
                 const isOpen = openRakennusKey === key;
                 return (
-<Card key={rakennusIndex} className="mb-3 border-0 shadow-sm rounded-3">
-  <Card.Header className="d-flex justify-content-between align-items-center bg-white p-2">
-    <div className="d-flex align-items-center">
-      <Button
-        variant="outline-secondary"
-        size="sm"
-        className="me-2"
-        onClick={() => toggleRakennus(key)}
-        aria-expanded={isOpen}
-      >
-        <i className={`bi ${isOpen ? 'bi-caret-up-fill' : 'bi-caret-down-fill'}`}></i>
-      </Button>
+                  <Card key={rakennusIndex} className="mb-3 border-0 shadow-sm rounded-3">
+                    <Card.Header className="d-flex justify-content-between align-items-center bg-white p-2">
+                      <div className="d-flex align-items-center">
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => toggleRakennus(key)}
+                          aria-expanded={isOpen}
+                        >
+                          <i className={`bi ${isOpen ? 'bi-caret-up-fill' : 'bi-caret-down-fill'}`}></i>
+                        </Button>
 
-      <label className="form-check-label fw-semibold text-secondary m-0">
-        {rakennus.properties.yleistiedot.Rakennustunnus?.value} -{' '}
-        {Array.isArray(rakennus.properties.yleistiedot['Kohteen osoitteet']?.value)
-          ? rakennus.properties.yleistiedot['Kohteen osoitteet'].value.join(', ')
-          : rakennus.properties.yleistiedot['Kohteen osoitteet']?.value || ''}{' '}
-        ({rakennus.properties.rakennustiedot['Rakennusluokitus'].value})
-      </label>
-    </div>
+                        <label className="form-check-label fw-semibold text-secondary m-0">
+                          {rakennus.properties.yleistiedot.Rakennustunnus?.value} -{' '}
+                          {Array.isArray(rakennus.properties.yleistiedot['Kohteen osoitteet']?.value)
+                            ? rakennus.properties.yleistiedot['Kohteen osoitteet'].value.join(', ')
+                            : rakennus.properties.yleistiedot['Kohteen osoitteet']?.value || ''}{' '}
+                          ({rakennus.properties.rakennustiedot['Rakennusluokitus'].value})
+                        </label>
+                      </div>
 
-    <MapModalWrapper coords={[rakennus.geometry.coordinates[1], rakennus.geometry.coordinates[0]]} />
-  </Card.Header>
+                      <MapModalWrapper coords={[rakennus.geometry.coordinates[1], rakennus.geometry.coordinates[0]]} />
+                    </Card.Header>
 
-  <Collapse in={isOpen}>
-    <Card.Body className="bg-white p-1">
-      <Tabletemplate properties={rakennus.properties.yleistiedot} />
-      <Tabletemplate properties={rakennus.properties.teknisettiedot} />
-      <Tabletemplate properties={rakennus.properties.rakennustiedot} />
-      <Tabletemplate properties={rakennus.properties.aluetiedot} />
-    </Card.Body>
-  </Collapse>
-</Card>
+                    <Collapse in={isOpen}>
+                      <Card.Body className="bg-white p-1">
+                        <Tabletemplate properties={rakennus.properties.yleistiedot} />
+                        <Tabletemplate properties={rakennus.properties.teknisettiedot} />
+                        <Tabletemplate properties={rakennus.properties.rakennustiedot} />
+                        <Tabletemplate properties={rakennus.properties.aluetiedot} />
+                      </Card.Body>
+                    </Collapse>
+                  </Card>
                 );
               })
             ) : (
