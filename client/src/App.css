@@ -167,3 +167,14 @@ textarea.form-control {
   min-height: 100px;
   max-height: 500px; /* Optional, to prevent textarea from growing too large */
 }
+.responsive-table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table-container table {
+  min-width: 900px; 
+}
+
+

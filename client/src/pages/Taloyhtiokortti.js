@@ -10,12 +10,13 @@ import PropertyDetailsForm from '../components/ReportTemplate';
 import TilastoTable from '../components/TilastoTable';
 import TulosteetTab from '../components/TulosteetTab';
 import MMLTabFetcher from '../components/MMLTabFetcher';
-
+import PTSLongTermTable from '../components/PTS/PTSLongTermTable';
 
 function Taloyhtiokortti() {
   const { id } = useParams();
   const [card, setCard] = useState(null);
   const hasFetched = useRef(false);
+  const [hasPTSData, setHasPTSData] = useState(null);
   const [showPTSModal, setShowPTSModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [mapCoords, setMapCoords] = useState([]);
@@ -74,30 +75,29 @@ function Taloyhtiokortti() {
           </Tab>
           <Tab eventKey="dokumentit" title="Dokumentit ja raportit">
            <div className="p-3">
-            <Button
-              variant="outline-primary"
-              onClick={() => setShowReportModal(true)}
-            >
-              ➕ Luo raportti
-            </Button>
+  <button className="btn btn-success" onClick={() => setShowReportModal(true)}
+  >
+    ➕ Luo raportti
+  </button>
 
-            <Modal
-              show={showReportModal}
-              onHide={() => setShowReportModal(false)}
-              size="xl"
-              backdrop="static"
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>Luo raportti</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <PropertyDetailsForm
-                  rakennus={rakennus}
-                  kiinteistotunnus={card.kiinteistotunnus}
-                />
-              </Modal.Body>
-            </Modal>
-          </div>
+  <Modal
+    show={showReportModal}
+    onHide={() => setShowReportModal(false)}
+    size="xl"
+    backdrop="static"
+  >
+    <Modal.Header closeButton>
+      <Modal.Title>Luo raportti</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <PropertyDetailsForm
+        rakennus={rakennus}
+        kiinteistotunnus={card.kiinteistotunnus}
+        rakennusData={card}
+      />
+    </Modal.Body>
+  </Modal>
+</div>
 
           </Tab>
 
@@ -116,31 +116,63 @@ function Taloyhtiokortti() {
           <Tab eventKey="rhtiedot" title="RH-tiedot">
             <div className="p-3">Tähän tulee RH-tiedot.</div>
           </Tab>
-          <Tab eventKey="pts" title="PTS">
-          <div className="p-3">
-            <Button
-              variant="outline-primary"
-              onClick={() => setShowPTSModal(true)}
-            >
-              ➕ Luo uusi PTS
-            </Button>
+<Tab
+  eventKey="pts"
+  title="PTS"
+  onEnter={async () => {
+    try {
+      const res = await fetch(`http://localhost:3001/api/pts/by/kiinteistotunnus/${card?.kiinteistotunnus}`);
+      const data = await res.json();
+      setHasPTSData(data.length > 0);
+    } catch (err) {
+      console.error("Virhe haettaessa PTS-dataa:", err);
+      setHasPTSData(false);
+    }
+  }}
+>
+  <div className="p-3">
+    {hasPTSData === null ? (
+      <p className="text-muted">Tarkistetaan PTS-tietoja...</p>
+    ) : hasPTSData === true ? (
+      <>
+        <h5 className="mb-3 fw-bold text-success">📋 PTS-suunnitelma </h5>
+        <PTSLongTermTable kiinteistotunnus={card?.kiinteistotunnus} />
+        <div className="mt-3 text-end">
+        
+        </div>
+      </>
+    ) : (
+      <>
+        <p>Ei vielä PTS-suunnitelmaa tälle kiinteistölle.</p>
+        <button className="btn btn-success" onClick={() => setShowPTSModal(true)}
+        >
+          ➕ Luo PTS
+        </button>
+      </>
+    )}
 
-            <Modal
-              show={showPTSModal}
-              onHide={() => setShowPTSModal(false)}
-              size="xl"
-              backdrop="static"
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>Luo PTS-raportti</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <PropertyDetailsForm rakennus={rakennus} kiinteistotunnus={card.kiinteistotunnus} 
-                initialTab="pts"/>
-              </Modal.Body>
-            </Modal>
-          </div>
-        </Tab>
+    <Modal
+      show={showPTSModal}
+      onHide={() => setShowPTSModal(false)}
+      size="xl"
+      backdrop="static"
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>{hasPTSData ? 'Muokkaa PTS-raporttia' : 'Luo uusi PTS'}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <PropertyDetailsForm
+          rakennus={rakennus}
+          kiinteistotunnus={card.kiinteistotunnus}
+          rakennusData={card}
+          initialTab="pts"
+        />
+      </Modal.Body>
+    </Modal>
+  </div>
+</Tab>
+
+
         </Tabs>
       </div>
     </div>

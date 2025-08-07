@@ -11,17 +11,21 @@ import Jarjestelmakuvaus from '../Static/Jarjestelmariskikuvaus';
 import PTSLongTermTable from './PTS/PTSLongTermTable.js';
 import { Tab, Tabs } from 'react-bootstrap';
 import ImageUploadCategorizer from './ImageUpload.js';
+import logo from '../assets/images/waativalogo.png'; 
 
-
-const PropertyDetailsForm = ({ rakennus, kiinteistotunnus, initialTab }) => {
+const PropertyDetailsForm = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: initialRakennusData }) => {
   const savedData = JSON.parse(localStorage.getItem('reportFormData')) || {};
   useEffect(() => {
     console.log('🔍 Kiinteistötunnus received:', kiinteistotunnus);
   }, [kiinteistotunnus]);
+  const [rakennusData, setRakennusData] = useState(initialRakennusData || null);
+  useEffect(() => {
+  console.log('📦 rakennusData in editor:', rakennusData);
+}, [rakennusData]);
   const [activeTab, setActiveTab] = useState(initialTab || 'report');
   const [title, setTitle] = useState(savedData.title || '');
   const [customText, setCustomText] = useState(savedData.customText || '');
-  const [rakennusData, setRakennusData] = useState(rakennus);
+  
   const [PropertyName, setPropertyName] = useState(savedData.PropertyName || '');
   const [propertyId, setPropertyId] = useState(kiinteistotunnus);
   const [coverImage, setCoverImage] = useState(savedData.coverImage || null);
@@ -29,28 +33,46 @@ const PropertyDetailsForm = ({ rakennus, kiinteistotunnus, initialTab }) => {
 const [previewUrl, setPreviewUrl] = useState(null);
 const [showPreviewModal, setShowPreviewModal] = useState(false);
 const [zoomLevel, setZoomLevel] = useState(1); // 1 = 100%
+const formatFinnishDate = (isoDate) => {
+  if (!isoDate) return '';
+  const [year, month, day] = isoDate.split('-');
+  return `${day}.${month}.${year}`;
+};
+
+
+const [logoBase64, setLogoBase64] = useState(null);
+
+useEffect(() => {
+  fetch(logo)
+    .then(res => res.blob())
+    .then(blob => {
+      const reader = new FileReader();
+      reader.onloadend = () => setLogoBase64(reader.result);
+      reader.readAsDataURL(blob);
+    });
+}, []);
 
 // raporttipohjat
 const templates = {
   wpts: {
-    name: 'W-PTS Katselmus',
+    name: 'W-PTS KATSELMUS',
     defaultSections: [
-      { key: 'kohteenkuvat', label: '📷 Ota kuvia kohteesta'},
+      
       { key: 'johdanto', label: '📝 Johdanto', content: JohdantoText.Option1, include: true, images: [] },
       { key: 'jarjestelma', label: '⚙️ Järjestelmäkuvaukset ja Riskiluokitus', content: Jarjestelmakuvaus.option1, include: true, images: [] },
-      { key: 'rakennetekniikka', label: '🏗️ Rakennetekniikkan Kuvat', content: '', include: false, images: [] },
-      { key: 'lvi', label: '💧 LVI-Tekniikan Kuvat', content: '', include: false, images: [] },
-      { key: 'sahko', label: '⚡ Sähköjärjestelmien Kuvat', content: '', include: false, images: [] },
-      { key: 'lähtötiedot', label: 'Lähtötiedot', content: '', include: false, images: [] },
-      { key: 'havainnot', label: 'Merkittävimmät havainnot', content: '', include: false, images: [] },
+      { key: 'rakennetekniikka', label: '🏗️ Rakennetekniikkan Kuvat', content: '', include: true, images: [] },
+      { key: 'lvi', label: '💧 LVI-Tekniikan Kuvat', content: '', include: true, images: [] },
+      { key: 'sahko', label: '⚡ Sähköjärjestelmien Kuvat', content: '', include: true, images: [] },
+      { key: 'lähtötiedot', label: 'Lähtötiedot', content: '', include: true, images: [] },
+      { key: 'havainnot', label: 'Merkittävimmät havainnot', content: '', include: true, images: [] },
       { key: 'allekirjoitus', label: 'Allekirjoitukset', content: '', include: false, images: [] },
     ]
   },
 
   wk1: {
-    name: 'Kuntoarvio WK1',
+    name: 'KUNTOARVIO WK1',
     defaultSections: [
-      { key: 'kohteenkuvat', label: '📷 Ota kuvia kohteesta'},
+      
       { key: 'johdanto', label: '📘 Yleiskuvaus', content: '', include: true, images: [] },
       { key: 'kuntoarvio', label: '🔎 Kuntoarviointi', content: '', include: true, images: [] },
       { key: 'riskit', label: '⚠️ Riskit ja Huomiot', content: '', include: true, images: [] },
@@ -59,9 +81,9 @@ const templates = {
     ]
   },
     Markatila: {
-    name: 'Märkätila WK1',
+    name: 'MÄRKÄTILA WK1',
     defaultSections: [
-      { key: 'kohteenkuvat', label: '📷 Ota kuvia kohteesta'},
+      
       { key: 'johdanto', label: '📘 Yleiskuvaus', content: '', include: true, images: [] },
       { key: 'kuntoarvio', label: '🔎 Kuntoarviointi', content: '', include: true, images: [] },
       { key: 'riskit', label: '⚠️ Riskit ja Huomiot', content: '', include: true, images: [] },
@@ -70,9 +92,9 @@ const templates = {
     ]
   },
     wk3: {
-    name: 'Kuntoarvio WK3',
+    name: 'KUNTOARVIO WK3',
     defaultSections: [
-      { key: 'kohteenkuvat', label: '📷 Ota kuvia kohteesta'},
+      
       { key: 'johdanto', label: '📘 Yleiskuvaus', content: '', include: true, images: [] },
       { key: 'kuntoarvio', label: '🔎 Kuntoarviointi', content: '', include: true, images: [] },
       { key: 'riskit', label: '⚠️ Riskit ja Huomiot', content: '', include: true, images: [] },
@@ -90,15 +112,15 @@ const [sections, setSections] = useState(savedData.sections || templates[default
   
   
   const resetForm = () => {
-    setTitle('');
+   setTitle('W-PTS KATSELMUS');
     setCustomText('');
     setPropertyName('');
     setCoverImage(null);
     setRiskidata(Riskidataa);
     setSections([
+      
       { key: 'johdanto', label: '📝 Johdanto', content: '', include: false, images: [] },
       { key: 'jarjestelma', label: '⚙️ Järjestelmäkuvaukset ja Riskiluokitus', content: '', include: false, images: [] },
-      { key: 'kohteenkuvat', label: 'Kohteen Kuvat', content: '', include: false, images: [] },
       { key: 'rakennetekniikka', label: '🏗️ Rakennetekniikkan Kuvat', content: '', include: false, images: [] },
       { key: 'lvi', label: '💧 LVI-Tekniikan Kuvat', content: '', include: false, images: [] },
       { key: 'sahko', label: '⚡ Sähköjärjestelmien Kuvat', content: '', include: false, images: [] },
@@ -109,7 +131,11 @@ const [sections, setSections] = useState(savedData.sections || templates[default
     localStorage.removeItem('reportFormData');
   };
 
-
+useEffect(() => {
+  if (initialRakennusData) {
+    setRakennusData(initialRakennusData);
+  }
+}, [initialRakennusData]);
 useEffect(() => {
   const parsed = savedData;
   setTitle(parsed.title || '');
@@ -127,7 +153,7 @@ useEffect(() => {
       const docDefinition = await buildPdfContent();
       const pdfDocGenerator = pdfMake.createPdf(docDefinition);
       pdfDocGenerator.getBlob((blob) => {
-        if (previewUrl) URL.revokeObjectURL(previewUrl); // cleanup
+        if (previewUrl) URL.revokeObjectURL(previewUrl); 
         const blobUrl = URL.createObjectURL(blob);
         setPreviewUrl(blobUrl);
       });
@@ -199,97 +225,191 @@ useEffect(() => {
   const buildPdfContent = async () => {
   const content = [];
 
+  
   // Otsikkosivu
-  content.push(
-    { text: title || 'Raportin Otsikko', style: 'title', margin: [0, 60, 0, 20] },
-    coverImage
-      ? {
-          image: coverImage,
-          width: 300,
-          alignment: 'center',
-          margin: [0, 0, 0, 20],
-        }
-      : null,
-    { text: `Tarkastuspäivämäärä: ${customText}`, fontSize: 12, margin: [0, 0, 0, 40] }
-  );
-
-  // ➡️ Kohteen perustiedot
-  const yleistiedot = rakennusData?.properties?.yleistiedot || {};
-  const teknisettiedot = rakennusData?.properties?.teknisettiedot || {};
-  const allDetails = { ...yleistiedot, ...teknisettiedot };
-
-  content.push({ text: 'Kohteen Perustiedot', style: 'heading', pageBreak: 'before', margin: [0, 20, 0, 10] });
-
-  const detailsTable = Object.entries(allDetails).map(([key, value]) => {
-    const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-    let formattedValue = '';
-    let source = '-';
-    if (typeof value === 'object' && value !== null) {
-      formattedValue = value.value || '';
-      source = value.source || '-';
-    } else {
-      formattedValue = value || '';
-    }
-    return [formattedKey, formattedValue, source];
-  });
-
-  if (detailsTable.length) {
-    content.push({
-      table: {
-        widths: ['*', '*', '*'],
-        body: [['Kenttä', 'Arvo', 'Lähde'], ...detailsTable],
+content.push({
+  stack: [
+    {
+      columns: [
+  {
+    width: '65%',
+    stack: [
+      {
+        text: title || 'Raportin Otsikko',
+        style: 'title',
+        margin: [0, 20, 99, 255],
+        noWrap: true,
+        fontSize: 35,
+        absolutePosition: { x: 60, y: 70 }, 
+      noWrap: true,
+    },
+      coverImage
+        ? {
+            image: coverImage,
+            width: 300,
+            alignment: 'left',
+            margin: [20, 20, 0, 20],
+          }
+        : null,
+    ],
+  },
+  {
+    width: 1,
+    margin: [35, 0, 10, 0],
+    canvas: [
+      {
+        type: 'line',
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 600,
+        lineWidth: 2,
+        lineColor: '#333333',
       },
-      layout: 'lightHorizontalLines',
-      margin: [0, 0, 0, 20],
-    });
-  }
+    ],
+  },
+  {
+    width: '30%',
+    stack: [
+      {
+        text: 'INSINÖÖRITOIMISTO\nWAATIVA',
+        alignment: 'left',
+        fontSize: 11,
+        margin: [20, 75, 0, 74],
+      },
+      logoBase64
+        ? {
+            image: logoBase64,
+            width: 80,
+            alignment: 'center',
+            margin: [20, 75, 0, 74],
+          }
+        : null,
+    ],
+  },
+],
+  
+      columnGap: 20,
+    },
 
+   
+    {
+      text: `Tarkastuspäivämäärä: ${formatFinnishDate(customText)}`,
+      fontSize: 12,
+      absolutePosition: { x: 40, y: 785 },
+    },
+  ],
+  margin: [30, 60, 30, 0],
+   
+});
 
   const johdantoSection = sections.find((s) => s.key === 'johdanto' && s.include);
-  if (johdantoSection) {
-    content.push(
-      { text: johdantoSection.label.toUpperCase(), style: 'sectionTitle', pageBreak: 'before', margin: [0, 10, 0, 5] },
-      { text: johdantoSection.content, style: 'paragraph', margin: [0, 0, 0, 10] }
-    );
-  }
-
-
+if (johdantoSection) {
+  content.push(
+    {
+      text: johdantoSection.label.toUpperCase(),
+      style: 'sectionTitle',
+      pageBreak: 'before',
+      margin: [0, 10, 0, 5]
+    },
+    {
+      text: johdantoSection.content || '',
+      style: 'paragraph',
+      margin: [0, 0, 0, 10]
+    }
+  );
+}
+const rakennukset = rakennusData?.rakennukset_fulls || [];
+if (rakennukset.length > 0) {
   content.push({
-    text: 'SISÄLLYSLUETTELO',
+    text: '🏠 Kohteen tiedot',
     style: 'heading',
     pageBreak: 'before',
-    margin: [0, 20, 0, 10],
+    margin: [0, 10, 0, 10],
   });
+
+  rakennukset.forEach((rak) => {
+    const dataRows = [
+      ['Osoite', `${rak.osoite}, ${rak.postinumero} ${rak.toimipaikka}`],
+      ['Rakennustunnus', rak.rakennustunnus],
+      ['Rakennusvuosi', rak.rakennusvuosi],
+      ['Koordinaatti sijainti', rak.sijainti ? `${rak.sijainti.coordinates[1]}, ${rak.sijainti.coordinates[0]}` : '-'],
+      ['Rakennusluokitus', rak.rakennusluokitus],
+      ['Runkotapa', rak.runkotapa],
+      ['Käyttötilanne', rak.kayttotilanne],
+      ['Julkisivumateriaali', rak.julkisivumateriaali],
+      ['Lämmitystapa', rak.lammitystapa],
+      ['Energialähde', rak.lammitysenergialahde],
+      ['Rakennusaine', rak.rakennusaine],
+      ['Tilavuus', rak.tilavuus],
+      ['Kokonaisala', rak.kokonaisala],
+      ['Kerrosala', rak.kerrosala],
+      ['Huoneistoala', rak.huoneistoala],
+      ['Kerroksia', rak.kerroksia],
+    ];
+
+    const tableBody = dataRows.map(([label, value]) => [
+      { text: label, bold: true, fontSize: 11 },
+      { text: value || '-', fontSize: 11 }
+    ]);
+
+    content.push({
+      table: {
+        widths: ['30%', '70%'],
+        body: tableBody
+      },
+      layout: 'lightHorizontalLines',
+      margin: [0, 0, 0, 10]
+    });
+  });
+}
+ 
+
+
+
+
+content.push({
+  text: 'SISÄLLYSLUETTELO',
+  style: 'heading',
+  pageBreak: 'before',
+  margin: [0, 20, 0, 10],
+});
+
+content.push({
+  toc: {
+    title: { text: '' },
+    numberStyle: 'tocNumber',
+    textMargin: [0, 2, 0, 2],
+    dotLeader: true,
+  },
+  style: 'paragraph',
+});
+
 
   let pageCounter = 3;
   let tocIndex = 1;
 
-  if (johdantoSection) {
-    const label = johdantoSection.label.replace(/^(\W*\s*)/, '');
-    content.push({
-      columns: [
-        { text: `${tocIndex++}. ${label}`, style: 'paragraph', margin: [0, 2] },
-        { text: `${pageCounter++}`, alignment: 'right', style: 'paragraph', margin: [0, 2] },
-      ],
-    });
-  }
+
 
   sections.forEach((section) => {
-    if (section.include && section.key !== 'johdanto') {
-      const label = section.label.replace(/^(\W*\s*)/, '');
-      content.push({
-        columns: [
-          { text: `${tocIndex++}. ${label}`, style: 'paragraph', margin: [0, 2] },
-          { text: `${pageCounter++}`, alignment: 'right', style: 'paragraph', margin: [0, 2] },
-        ],
-      });
-    }
-  });
+  if (section.include) {
+    const label = section.label.replace(/^(\W*\s*)/, '');
+    const pageNum = pageCounter++;
+    const tocLine = `${tocIndex++}. ${label}`;
+    const dots = '.'.repeat(175 - tocLine.length - pageNum.toString().length);
+
+    content.push({
+      text: `${tocLine} ${dots} ${pageNum}`,
+      style: 'paragraph',
+      margin: [0, 2],
+    });
+  }
+});
 
 
   let first = true;
-  for (const section of sections) {
-    if (!section.include) continue;
+for (const section of sections) {
+  if (!section.include || section.key === 'johdanto') continue; 
 
     content.push({
       text: section.label.toUpperCase(),
@@ -305,7 +425,7 @@ useEffect(() => {
     }
 
     if (section.images && section.images.length) {
-      const imagesPerRow = 3;
+      const imagesPerRow = 2;
       const imageRows = [];
 
       for (let i = 0; i < section.images.length; i += imagesPerRow) {
@@ -313,7 +433,10 @@ useEffect(() => {
   stack: [
     {
       image: img.url,
-      width: 160,
+      width: 220,
+      height: 160,
+      fit: [300, 160],
+      alignment: 'center',
       margin: [0, 0, 0, 4],
     },
     {
@@ -323,7 +446,7 @@ useEffect(() => {
       margin: [0, 2, 0, 0],
     }
   ],
-  width: 'auto', 
+  width: 'auto',
 }));
 
   imageRows.push({ columns: rowImages, columnGap: 10 });
@@ -425,6 +548,7 @@ for (const [category, items] of Object.entries(grouped)) {
       paragraph: { font: 'Lato', fontSize: 11 },
     },
     header: (currentPage, pageCount) => {
+      if (currentPage === 1) return null;
       const sidePadding = 30;
       const bannerWidth = 595 - 2 * sidePadding;
       return {
@@ -498,14 +622,18 @@ return (
       <div className="p-4 space-y-6">
         <label className="font-semibold text-sm">Valitse raporttipohja:</label>
         <select
-          className="form-select mt-1"
-          value={selectedTemplate}
-          onChange={(e) => {
-            const newKey = e.target.value;
-            setSelectedTemplate(newKey);
-            setSections(templates[newKey].defaultSections);
-          }}
-        >
+  className="form-select mt-1"
+  value={selectedTemplate}
+onChange={(e) => {
+  const newKey = e.target.value;
+  const newTemplateName = templates[newKey]?.name || '';
+
+  setSelectedTemplate(newKey);
+  setSections(templates[newKey].defaultSections);
+  setTitle(newTemplateName); // ← always update title
+}}
+
+>
           {Object.entries(templates).map(([key, tpl]) => (
             <option key={key} value={key}>{tpl.name}</option>
           ))}
@@ -515,13 +643,9 @@ return (
           {/* Kansisivu */}
           <div className="border p-4 rounded shadow-sm">
             <h3 className="text-xl font-semibold mb-4">📄 Kansisivu</h3>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Raportin otsikko"
-              className="form-control mb-3"
-            />
+          <div className="form-control mb-3" readOnly>
+  {title}
+</div>
             <input
               type="file"
               accept="image/*"
@@ -535,44 +659,138 @@ return (
               placeholder="Kohteen nimi"
               className="form-control mb-3"
             />
-            <input
-              type="text"
-              value={customText}
-              onChange={(e) => setCustomText(e.target.value)}
-              placeholder="Tarkastuspäivämäärä"
-              className="form-control"
-            />
+            
+           <input
+  type="date"
+  value={customText}
+  onChange={(e) => setCustomText(e.target.value)}
+  className="form-control"
+/>
           </div>
+
+<div className="border p-4 rounded shadow-sm">
+  <h3 className="text-xl font-semibold mb-4">🏠 Kohteen tiedot</h3>
+
+  {rakennusData?.rakennukset_fulls?.map((rak, idx) => (
+    <div key={idx} className="mb-5">
+      <h5 className="fw-bold text-success mb-3">
+        {rak.osoite}, {rak.postinumero} {rak.toimipaikka}
+      </h5>
+
+      <div className="table-responsive">
+        <table className="table table-borderless">
+          <tbody>
+            {[
+              ['Toimipaikka', 'toimipaikka'],
+              ['Rakennustunnus', 'rakennustunnus'],
+              ['Rakennusvuosi', 'rakennusvuosi'],
+              ['Sijainti', null, rak.sijainti ? `${rak.sijainti.coordinates[1]}, ${rak.sijainti.coordinates[0]}` : '-'],
+              ['Rakennusluokitus', 'rakennusluokitus'],
+              ['Runkotapa', 'runkotapa'],
+              ['Käyttötilanne', 'kayttotilanne'],
+              ['Julkisivumateriaali', 'julkisivumateriaali'],
+              ['Lämmitystapa', 'lammitystapa'],
+              ['Energialähde', 'lammitysenergialahde'],
+              ['Rakennusaine', 'rakennusaine'],
+              ['Tilavuus', 'tilavuus'],
+              ['Kokonaisala', 'kokonaisala'],
+              ['Kerrosala', 'kerrosala'],
+              ['Huoneistoala', 'huoneistoala'],
+              ['Kerroksia', 'kerroksia'],
+            ].map(([label, key, customValue], i) => {
+              const value = customValue ?? rak[key] ?? '-';
+              const source = key ? rak.metadata?.[key]?.source ?? 'Ympäristö.fi-RYHTI' : 'Ympäristö.fi-RYHTI';
+
+              return (
+                <tr key={i}>
+                  <td className="fw-bold" style={{ width: '30%' }}>{label}</td>
+                  <td style={{ width: '40%' }}>{value}</td>
+                  <td style={{ width: '30%' }}>
+                    <span className="text-success">{source}</span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  ))}
+</div>
+
+{['rakennetekniikka', 'sahko', 'lvi'].map((key) => {
+  const sectionIndex = sections.findIndex((s) => s.key === key);
+  const labels = {
+    rakennetekniikka: '📷 Ota Rakennetekniikka-kuvia',
+    sahko: '📷 Ota Sähkö-kuvia',
+    lvi: '📷 Ota LVI-kuvia',
+  };
+
+  return sectionIndex !== -1 ? (
+    <div className="border p-4 rounded shadow-sm my-4" key={key}>
+      <h4 className="text-md fw-semibold mb-3">{labels[key]}</h4>
+      <ImageUploadCategorizer
+        sections={sections}
+        setSections={setSections}
+        sectionKey={key}
+      />
+    </div>
+  ) : null;
+})}
+
 
           
           <div className="accordion my-4" id="templateAccordion">
   {sections.map((section, index) => (
-    <div className="accordion-item" key={section.key}>
-      <h2 className="accordion-header" id={`template-heading-${index}`}>
-        <button
-          className={`accordion-button ${!section.include ? 'collapsed' : ''}`}
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target={`#template-collapse-${index}`}
-          aria-expanded={section.include ? 'true' : 'false'}
-          aria-controls={`template-collapse-${index}`}
-          onClick={() => {
-            const updated = [...sections];
-            updated[index].include = !updated[index].include;
+    <div
+  className={`accordion-item ${section.include ? 'active-section' : ''}`}
+  key={section.key}
+>
+     <h2
+  className={`accordion-header d-flex align-items-center justify-content-between ${section.include ? 'active-section' : ''}`}
+  id={`template-heading-${index}`}
+>
 
-            if (updated[index].include && section.key === 'johdanto' && !updated[index].content) {
-              updated[index].content = JohdantoText.Option1;
-            }
-            if (updated[index].include && section.key === 'jarjestelma' && !updated[index].content) {
-              updated[index].content = Jarjestelmakuvaus.option1;
-            }
+  <div className="d-flex w-100 justify-content-between align-items-center">
+    <button
+      className={`accordion-button ${!section.include ? 'collapsed' : ''}`}
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target={`#template-collapse-${index}`}
+      aria-expanded={section.include ? 'true' : 'false'}
+      aria-controls={`template-collapse-${index}`}
+      onClick={() => {
+        const updated = [...sections];
+        updated[index].include = !updated[index].include;
 
-            setSections(updated);
-          }}
-        >
-          {section.label}
-        </button>
-      </h2>
+        if (updated[index].include && section.key === 'johdanto' && !updated[index].content) {
+          updated[index].content = JohdantoText.Option1;
+        }
+        if (updated[index].include && section.key === 'jarjestelma' && !updated[index].content) {
+          updated[index].content = Jarjestelmakuvaus.option1;
+        }
+
+        setSections(updated);
+      }}
+    >
+      {section.label}
+    </button>
+
+    {section.key.startsWith('custom-') && (
+      <button
+        className="btn btn-sm btn-outline-danger me-3"
+        onClick={() => {
+          const updated = [...sections];
+          updated.splice(index, 1);
+          setSections(updated);
+        }}
+      >
+        🗑️
+      </button>
+    )}
+  </div>
+</h2>
+
 
       <div
         id={`template-collapse-${index}`}
@@ -663,86 +881,110 @@ return (
 )}
 
 
+{section.key === 'jarjestelma' && (
+  <div className="mt-4 space-y-2">
+   
 
-          
-          {section.key === 'jarjestelma' && (
-            <div className="mt-4 space-y-2">
-              <h4 className="text-md fw-semibold mb-3">Riskitaulu</h4>
-  {riskidata.map((item, riskIndex) => (
-  <div
-    key={item.id}
-    className="d-flex align-items-center mb-2"
-    style={{ gap: '1rem' }}
-  >
-    <div style={{ width: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-      <strong>{item.label}</strong>
-    </div>
+    {Object.entries(
+      riskidata.reduce((acc, item) => {
+        acc[item.category] = acc[item.category] || [];
+        acc[item.category].push(item);
+        return acc;
+      }, {})
+    ).map(([category, items]) => (
+      <div key={category} className="mb-4">
+        <h5 className="fw-bold border-bottom border-success pb-1 text-uppercase">
+          {category}
+        </h5>
 
-    <div
-      style={{
-        width: '30px',
-        textAlign: 'center',
-        fontSize: '1.2rem',
-        color:
-          item.risk === 'low'
-            ? 'green'
-            : item.risk === 'medium'
-            ? 'orange'
-            : 'red',
-      }}
-    >
-      ✓
-    </div>
-
-    <div style={{ width: '160px' }}>
-      <select
-        className="form-select form-select-sm"
-        value={item.risk}
-        onChange={(e) => {
-          const updated = [...riskidata];
-          updated[riskIndex].risk = e.target.value;
-          setRiskidata(updated);
-        }}
-      >
-        <option value="low">Matala riski</option>
-        <option value="medium">Keskitason riski</option>
-        <option value="high">Korkea riski</option>
-      </select>
-    </div>
-
-    <input
-      type="text"
-      className="form-control form-control-sm"
-      placeholder="Selite"
-      value={item.description || ''}
-      onChange={(e) => {
-        const updated = [...riskidata];
-        updated[riskIndex].description = e.target.value;
-        setRiskidata(updated);
-      }}
-      style={{ flex: 1, minWidth: '200px' }}
-    />
-  </div>
-))}
-
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="d-flex align-items-center mb-2"
+            style={{ gap: '1rem' }}
+          >
+            <div
+              style={{
+                width: '200px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              <strong>{item.label}</strong>
             </div>
-          )}
+
+            <div
+              style={{
+                width: '30px',
+                textAlign: 'center',
+                fontSize: '1.2rem',
+                color:
+                  item.risk === 'low'
+                    ? 'green'
+                    : item.risk === 'medium'
+                    ? 'orange'
+                    : 'red',
+              }}
+            >
+              ✓
+            </div>
+
+            <div style={{ width: '160px' }}>
+              <select
+                className="form-select form-select-sm"
+                value={item.risk}
+                onChange={(e) => {
+                  const updated = [...riskidata];
+                  updated[
+                    riskidata.findIndex((i) => i.id === item.id)
+                  ].risk = e.target.value;
+                  setRiskidata(updated);
+                }}
+              >
+                <option value="low">Matala riski</option>
+                <option value="medium">Keskitason riski</option>
+                <option value="high">Korkea riski</option>
+              </select>
+            </div>
+
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              placeholder="Selite"
+              value={item.description || ''}
+              onChange={(e) => {
+                const updated = [...riskidata];
+                updated[
+                  riskidata.findIndex((i) => i.id === item.id)
+                ].description = e.target.value;
+                setRiskidata(updated);
+              }}
+              style={{ flex: 1, minWidth: '200px' }}
+            />
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+)}    
         </div>
       </div>
     </div>
   ))}
 </div>
 
-
-          <button onClick={handleAddCustomSection} className="btn btn-outline-primary">
-            ➕ Lisää uusi osio
-          </button>
-
-          <div className="flex justify-center mt-6 gap-4">
-            <button onClick={handleExportPdf} className="btn btn-primary">
-              Lataa Raportti
-            </button>
-          </div>
+<div className="flex flex-row justify-end mt-6 gap-4">
+  <button className="btn btn-outline-success" onClick={handleAddCustomSection}>
+    ➕ Lisää uusi osio
+  </button>
+  <button className="btn btn-outline-success" onClick={handleExportPdf}>
+    📥 Lataa Raportti
+  </button>
+  <button onClick={resetForm} className="btn btn-outline-danger">
+    ♻️ Tyhjennä kentät
+  </button>
+</div>
 
          
         </div>
@@ -752,7 +994,7 @@ return (
     <Tab eventKey="pts" title="PTS (Pitkän tähtäimen suunnitelma)">
       <div className="p-4">
         <h3 className="text-xl font-semibold mb-4">📊 PTS (Pitkän tähtäimen suunnitelma)</h3>
-        <PTSLongTermTable />
+        <PTSLongTermTable kiinteistotunnus={kiinteistotunnus} />
       
         
       </div>

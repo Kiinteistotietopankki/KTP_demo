@@ -1,55 +1,49 @@
 import React, { useState, useEffect } from 'react';
 
-export default function LVITable({ onYhteensaChange, setData }) {
-const currentYear = new Date().getFullYear();
-const currentMonth = new Date().getMonth(); // 0 = Tammikuu ja  6 = heinäkuu
-const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
-const years = Array.from({ length: 11 }, (_, i) => startYear + i);
+export default function LVITable({ onYhteensaChange, setData, data }) {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul
+  const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
+  const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
-const initialData = [
-  {
-    header: 'Lämmöntuotanto',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-  {
-    header: 'Lämmitysverkosto',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-  {
-    header: 'Vesijohtoverkosto',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-  {
-    header: 'Ilmanvaihtojärjestelmä',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-];
+  const initialData = [
+    {
+      name: 'Lämmöntuotanto',
+      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+    },
+    {
+      name: 'Lämmitysverkosto',
+      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+    },
+    {
+      name: 'Vesijohtoverkosto',
+      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+    },
+    {
+      name: 'Ilmanvaihtojärjestelmä',
+      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
+    },
+  ];
 
+  // 🧠 Use external `data` if provided
+  const [tableData, setTableData] = useState(() =>
+    Array.isArray(data) && data.length > 0 ? data : initialData
+  );
 
-  const [tableData, setTableData] = useState(initialData);
+useEffect(() => {
+  if (Array.isArray(data) && data.length > 0) {
+    setTableData(data);
+  }
+}, [JSON.stringify(data)]);
 
+  // 🔄 Sync updated tableData to parent
+  useEffect(() => {
+    if (typeof setData === 'function') {
+      setData(tableData);
+    }
+  }, [tableData, setData]);
 
-  const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
-    const updated = [...tableData];
-    updated[sectionIdx].items[itemIdx].values[yearIdx] = value;
-    setTableData(updated);
-  };
-
-  const handleAddRow = (sectionIdx) => {
-  const updated = [...tableData];
-  updated[sectionIdx].items.push({
-    label: '',
-    kl: '',
-    values: Array(11).fill('')
-  });
-  setTableData(updated);
-};
-  const handleRemoveRow = (sectionIdx, itemIdx) => {
-    const updated = [...tableData];
-    updated[sectionIdx].items.splice(itemIdx, 1);
-    setTableData(updated);
-  };
-
+  // 💡 Compute YHTEENSÄ row
   const yhteensa = Array(11).fill(0);
   tableData.forEach(section => {
     section.items.forEach(item => {
@@ -60,16 +54,34 @@ const initialData = [
     });
   });
 
-useEffect(() => {
-  if (onYhteensaChange) {
-    onYhteensaChange([...yhteensa]); // spread to avoid mutation issues
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [JSON.stringify(yhteensa)]);
+  useEffect(() => {
+    if (onYhteensaChange) {
+      onYhteensaChange([...yhteensa]); // clone to avoid mutation
+    }
+  }, [JSON.stringify(yhteensa)]);
 
-useEffect(() => {
-  if (typeof setData === 'function') setData(tableData);
-}, [tableData]);
+  // 🔧 Event handlers
+  const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
+    const updated = [...tableData];
+    updated[sectionIdx].items[itemIdx].values[yearIdx] = value;
+    setTableData(updated);
+  };
+
+  const handleAddRow = (sectionIdx) => {
+    const updated = [...tableData];
+    updated[sectionIdx].items.push({
+      label: '',
+      kl: 'KL3',
+      values: Array(11).fill(''),
+    });
+    setTableData(updated);
+  };
+
+  const handleRemoveRow = (sectionIdx, itemIdx) => {
+    const updated = [...tableData];
+    updated[sectionIdx].items.splice(itemIdx, 1);
+    setTableData(updated);
+  };
 
   return (
     <div className="accordion my-4" id="lvijarjestelmatAccordion">
@@ -93,8 +105,8 @@ useEffect(() => {
           aria-labelledby="headingLVI"
           data-bs-parent="#lvijarjestelmatAccordion"
         >
-          <div className="accordion-body p-0">
-            <table className="table table-sm mb-0">
+          <div className="responsive-table-container">
+                  <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
                   <th style={{ minWidth: '180px' }}>Osa-alue</th>
@@ -110,18 +122,17 @@ useEffect(() => {
                   <React.Fragment key={sectionIdx}>
                     <tr className="bg-secondary text-white">
                       <td colSpan={years.length + 3} className="fw-semibold d-flex justify-content-between align-items-center">
-                        {section.header}
-                                                <button
-                            onClick={() => handleAddRow(sectionIdx)}
+                        {section.name}
+                        <button
+                          onClick={() => handleAddRow(sectionIdx)}
                           className="btn btn-sm btn-light text-dark border"
-
-                            title="Lisää rivi"
-                          >
-                            +
-                          </button>
-
+                          title="Lisää rivi"
+                        >
+                          +
+                        </button>
                       </td>
                     </tr>
+
                     {section.items.map((item, itemIdx) => (
                       <tr key={itemIdx}>
                         <td>
@@ -177,6 +188,7 @@ useEffect(() => {
                   </React.Fragment>
                 ))}
               </tbody>
+
               <tfoot>
                 <tr className="table-success fw-bold">
                   <td>YHTEENSÄ</td>
