@@ -1,4 +1,3 @@
-// components/TulosteetTab.js
 import { useState } from 'react';
 import { Button, Spinner, Modal, Alert } from 'react-bootstrap';
 import { saveAs } from 'file-saver';
@@ -71,45 +70,59 @@ const TulosteetTab = ({ kiinteistotunnus }) => {
   };
 
   return (
-    <div className="p-3">
+    <div className="container my-4">
       <h5 className="text-center mb-4">
         <span className="fs-5 text-primary fw-semibold">{kiinteistotunnus}</span>
       </h5>
+
       {error && <Alert variant="danger">{error}</Alert>}
-      
-      <div className="d-grid gap-2">
+
+      <div className="row g-3">
         {tulosteetList.map((doc, index) => (
-          <>
-          <Button
-            key={index}
-            variant="outline-primary"
-            className="text-center"
-            onClick={() => setSelectedTuloste(doc)}
-            disabled={loading}
-          >
-            {doc.label} — {doc.price.toFixed(2)} €
-          </Button>
-          <div className="border-top border-success my-1" style={{ height: '3px' }} />
-          </>
+          <div key={index} className="col-12 col-md-6 col-lg-4">
+            <button
+              onClick={() => setSelectedTuloste(doc)}
+              disabled={loading}
+              className="w-100 btn btn-outline-secondary text-start d-flex justify-content-between align-items-center p-3 shadow-sm border rounded transition"
+            >
+              <div>
+                <div className="fw-semibold">{doc.label}</div>
+                <small className="text-muted">{doc.price.toFixed(2)} €</small>
+              </div>
+              <i className="bi bi-chevron-right text-muted"></i>
+            </button>
+          </div>
         ))}
-        
       </div>
 
-      {/* Confirmation Modal */}
+      {loading && (
+        <div className="mt-4 text-muted">
+          <Spinner animation="border" size="sm" className="me-2" />
+          Ladataan...
+        </div>
+      )}
+
       <Modal show={!!selectedTuloste} onHide={handleCancel} centered>
         <Modal.Header closeButton>
           <Modal.Title>Vahvista tulosteen haku</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Haluatko hakea tulosteen <strong>{selectedTuloste?.label}</strong>?<br />
-          Tämä maksaa <strong>{selectedTuloste?.price.toFixed(2)} €</strong>.
+          <p>
+            Haluatko hakea tulosteen <strong>{selectedTuloste?.label}</strong>?
+          </p>
+          <p>
+            Tämä maksaa <strong>{selectedTuloste?.price.toFixed(2)} €</strong>.
+          </p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCancel} disabled={loading}>
             Peruuta
           </Button>
           <Button variant="primary" onClick={handleConfirmDownload} disabled={loading}>
-            {loading ? <Spinner animation="border" size="sm" /> : 'Vahvista ja lataa'}
+            {loading ? (
+              <Spinner animation="border" size="sm" className="me-2" />
+            ) : null}
+            Vahvista ja lataa
           </Button>
         </Modal.Footer>
       </Modal>
