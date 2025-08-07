@@ -53,7 +53,7 @@ export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
 useEffect(() => {
   if (!kiinteistotunnus) return;
 
-  const fetchPTS = async () => {
+    const fetchPTS = async () => {
     try {
       const listRes = await fetch(`http://localhost:3001/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`);
       const ptsList = await listRes.json();

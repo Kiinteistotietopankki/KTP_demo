@@ -3,7 +3,6 @@ import Badge from 'react-bootstrap/Badge';
 import { useParams } from 'react-router-dom';
 import MapVisual from '../components/MapVisual';
 import { Tab, Tabs } from 'react-bootstrap';
-import StickyAfterScroll from '../components/Stickyafterscroll';
 import { getKiinteistoWhole } from '../api/api';
 import PerustiedotAccordion from '../components/PerustiedotAccordion';
 import { Button, Modal } from 'react-bootstrap';
@@ -19,10 +18,10 @@ function Taloyhtiokortti() {
   const hasFetched = useRef(false);
   const [hasPTSData, setHasPTSData] = useState(null);
   const [showPTSModal, setShowPTSModal] = useState(false);
-    const [showReportModal, setShowReportModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [mapCoords, setMapCoords] = useState([]);
-const [activeTab, setActiveTab] = useState('perustiedot');
-const [existingPTSData, setExistingPTSData] = useState(null);
+  const [activeTab, setActiveTab] = useState('perustiedot');
+  const [existingPTSData, setExistingPTSData] = useState(null);
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Navbar, Nav } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import logo from '../assets/images/waativalogo.png'
+import config from '../devprodConfig';
 
 function Sidebar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const API_URL = config.apiBaseUrl;
+
   const checkAuth = () => {
-    fetch('http://localhost:3001/me', {
+    fetch(`${API_URL}/me`, {
       credentials: 'include',
     })
       .then(res => setIsAuthenticated(res.ok))
@@ -19,7 +20,7 @@ function Sidebar() {
   }, []);
 
   const handleLogout = async () => {
-    await fetch('http://localhost:3001/auth/logout', {
+    await fetch(`${API_URL}/auth/logout`, {
       method: 'GET',
       credentials: 'include',
     });
