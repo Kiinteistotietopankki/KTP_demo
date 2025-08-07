@@ -110,11 +110,22 @@ const MMLTabFetcher = ({ kohdetunnus }) => {
 
   return (
     <div className="container my-4">
-      <h5 className="mb-4">
-        Tietojen haku kohteelle: <span className="text-primary fw-semibold">{kohdetunnus}</span>
+      <h5 className="text-center mb-4">
+        <span className="fs-5 text-primary fw-semibold">{kohdetunnus}</span>
       </h5>
 
       {error && <Alert variant="danger">{error}</Alert>}
+
+      {data && (
+        <div className="mt-5 card border-primary">
+          <div className="card-header bg-primary text-white fw-bold">
+            {selected?.label}
+          </div>
+          <div className="card-body">
+            {renderData(data)}
+          </div>
+        </div>
+      )}
 
       {groupedMmlFetchOptions.map((group, gi) => (
         <div key={gi} className="mb-5">
@@ -142,20 +153,11 @@ const MMLTabFetcher = ({ kohdetunnus }) => {
       {loading && (
         <div className="mt-4 text-muted">
           <Spinner animation="border" size="sm" className="me-2" />
-          Ladataan...
+            Ladataan...
         </div>
       )}
 
-      {data && (
-        <div className="mt-5 card border-primary">
-          <div className="card-header bg-primary text-white fw-bold">
-            {selected?.label}
-          </div>
-          <div className="card-body">
-            {renderData(data)}
-          </div>
-        </div>
-      )}
+
 
       {/* Confirmation Modal */}
       <Modal show={!!selectedOptionToConfirm} onHide={handleCancel} centered>

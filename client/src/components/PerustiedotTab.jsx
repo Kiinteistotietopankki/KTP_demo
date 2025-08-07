@@ -4,6 +4,7 @@ import RakennustietoRow from './RakennustietoRow';
 import rakennusKoodit from '../assets/rakennusKoodit';
 import MapModalWrapper from './MapModalWrapper';
 import TilastoTable from './TilastoTable';
+import MMLTabFetcher from './MMLTabFetcher';
 
 export default function PerustiedotTab({card}) {
   const [showModal, setShowModal] = useState(false);
@@ -37,6 +38,7 @@ export default function PerustiedotTab({card}) {
             >
                 <Tab eventKey="Kiinteistö" title={<span className="text-white">Kiinteistö</span>} />
                 <Tab eventKey="Rakennukset" title={<span className="text-white">Rakennukset</span>} />
+                <Tab eventKey="Hae tietoja" title={<span className="text-white">Hae tietoja</span>} />
             </Tabs>
             </div>
 
@@ -348,6 +350,13 @@ export default function PerustiedotTab({card}) {
                 </div>
                 )}
             </div>
+
+            {perustiedotActiveKey === 'Hae tietoja' && card && (
+                <div>
+                    <MMLTabFetcher kohdetunnus={card?.kiinteistotunnus}></MMLTabFetcher>
+                </div>
+
+            )}
         
             </div>
         </div>
