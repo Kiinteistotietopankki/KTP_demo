@@ -9,20 +9,15 @@ import '../App.css';
 import { jsonToModelFormat } from '../assets/jsonToDBmodel';
 import { prettifyJson } from '../assets/prettifyJson';
 import { createKiinteisto } from '../api/api';
+import MapModalWrapper from './MapModalWrapper';
 
 function Resultdisplay({ data, setMapCoords }) {
   const [kiinteistot, setKiinteistot] = useState([]);
   const [selectedRakennukset, setSelectedRakennukset] = useState({});
-  
-  const [showReport, setShowReport] = useState(false);
-  const [reportRakennus, setReportRakennus] = useState(null);
-
-  const [korttiNappi, setKorttiNappi] = useState(false)
-
 
 
   //For alt ui 
-  const [selectedRakennus, setSelectedRakennus] = useState({});
+  const [selectedRakennus, setSelectedRakennus] = useState([]);
   const [selectedRakennusPerKiinteisto, setSelectedRakennusPerKiinteisto] = useState({});
 
 
@@ -74,36 +69,6 @@ function Resultdisplay({ data, setMapCoords }) {
     }
   };
 
-  const handleExport = () => {
-    const selectedData = [];
-    kiinteistot.forEach(kiinteisto => {
-      kiinteisto.rakennukset?.forEach(rakennus => {
-        if (selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value]) {
-          selectedData.push(rakennus);
-        }
-      });
-    });
-    selectedData.forEach(exportToExcel);
-  };
-
-
-  const handleCreateReport = () => {
-    let selected = null;
-    kiinteistot.forEach(kiinteisto => {
-      kiinteisto.rakennukset?.forEach(rakennus => {
-        if (selectedRakennukset[rakennus.properties.yleistiedot.Rakennustunnus?.value]) {
-          selected = rakennus;
-        }
-      });
-    });
-    if (selected) {
-      setReportRakennus(selected);
-      setShowReport(true);
-    } else {
-      alert("Valitse ensin rakennus");
-    }
-  };
-
   const [showCreatedModal, setShowCreatedModal] = useState(false);
 
   const luoKortti = (kiinteisto) => {
@@ -130,17 +95,7 @@ function Resultdisplay({ data, setMapCoords }) {
       </Modal.Body>
     </Modal>
     <div className="d-flex justify-content-between align-items-center mb-3">
-      {/* <div>
-        <Button variant="outline-primary" onClick={handleSelectAll} className="me-2">
-          {Object.keys(selectedRakennukset).length ? "Poista valinnat" : "Valitse kaikki"}
-        </Button>
-        <Button variant="success" onClick={handleExport} className="me-2">
-          <i className="bi bi-file-earmark-excel me-1"></i> Vie Exceliin
-        </Button>
-        <Button variant="danger" onClick={handleCreateReport}>
-          <i className="bi bi-file-earmark-pdf me-1"></i> Luo raportti
-        </Button>
-      </div> */}
+
     </div>
 
     {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
@@ -173,13 +128,7 @@ function Resultdisplay({ data, setMapCoords }) {
                     {" "} ({rakennus.properties.rakennustiedot["Rakennusluokitus"].value})
                   </label>
 
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
-                    onClick={() => setMapCoords(rakennus.geometry?.coordinates)}
-                  >
-                    <i className="bi bi-geo-alt-fill me-1"></i> Näytä kartalla
-                  </Button>
+                  <MapModalWrapper coords={[rakennus.geometry.coordinates[1],rakennus.geometry.coordinates[0]]} />
                 </Card.Header>
 
                 <Card.Body className="bg-light-subtle">
@@ -218,15 +167,11 @@ function Resultdisplay({ data, setMapCoords }) {
         </Card.Body>
       </Card>
     ))}
+    
+    {/* {selectedRakennus && (
+      <MapModalWrapper coords={selectedRakennus} />
+    )} */}
 
-    <Modal show={showReport} onHide={() => setShowReport(false)} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Muokkaa raporttia</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {reportRakennus && <EditableReport rakennus={reportRakennus} />}
-      </Modal.Body>
-    </Modal>
   </div>
   );
 }

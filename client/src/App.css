@@ -30,6 +30,11 @@
   font-size: 0.85rem;
 }
 
+.custom-btn1 .btn{
+  background-color: #027000 !important; /* or any color */
+  
+}
+
 .custom-tabs2 .nav-link {
   background-color: #04aa00;  /* green background for all tabs */
   color: black;               /* text color */              /* slightly faded for unselected */
