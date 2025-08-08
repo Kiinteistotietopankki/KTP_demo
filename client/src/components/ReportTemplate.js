@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake'
 import '../fonts/josefin-fonts.js';
 import'../fonts/Lato-fonts.js';
-
+import { Accordion } from 'react-bootstrap';
 import JohdantoText from '../Static/johdando';
 import Jarjestelmakuvaus from '../Static/Jarjestelmariskikuvaus';
 import PTSLongTermTable from './PTS/PTSLongTermTable.js';
@@ -668,55 +668,59 @@ onChange={(e) => {
             />
           </div>
 
-<div className="border p-4 rounded shadow-sm">
-  <h3 className="text-xl font-semibold mb-4">🏠 Kohteen tiedot</h3>
+<Accordion defaultActiveKey="0" className="mb-4">
+  <Accordion.Item eventKey="0">
+    <Accordion.Header>🏠 Kohteen tiedot</Accordion.Header>
+    <Accordion.Body>
+      {rakennusData?.rakennukset_fulls?.map((rak, idx) => (
+        <div key={idx} className="mb-5">
+          <h5 className="fw-bold text-success mb-3">
+            {rak.osoite}, {rak.postinumero} {rak.toimipaikka}
+          </h5>
 
-  {rakennusData?.rakennukset_fulls?.map((rak, idx) => (
-    <div key={idx} className="mb-5">
-      <h5 className="fw-bold text-success mb-3">
-        {rak.osoite}, {rak.postinumero} {rak.toimipaikka}
-      </h5>
+          <div className="table-responsive">
+            <table className="table table-borderless">
+              <tbody>
+                {[
+                  ['Toimipaikka', 'toimipaikka'],
+                  ['Rakennustunnus', 'rakennustunnus'],
+                  ['Rakennusvuosi', 'rakennusvuosi'],
+                  ['Sijainti', null, rak.sijainti ? `${rak.sijainti.coordinates[1]}, ${rak.sijainti.coordinates[0]}` : '-'],
+                  ['Rakennusluokitus', 'rakennusluokitus'],
+                  ['Runkotapa', 'runkotapa'],
+                  ['Käyttötilanne', 'kayttotilanne'],
+                  ['Julkisivumateriaali', 'julkisivumateriaali'],
+                  ['Lämmitystapa', 'lammitystapa'],
+                  ['Energialähde', 'lammitysenergialahde'],
+                  ['Rakennusaine', 'rakennusaine'],
+                  ['Tilavuus', 'tilavuus'],
+                  ['Kokonaisala', 'kokonaisala'],
+                  ['Kerrosala', 'kerrosala'],
+                  ['Huoneistoala', 'huoneistoala'],
+                  ['Kerroksia', 'kerroksia'],
+                ].map(([label, key, customValue], i) => {
+                  const value = customValue ?? rak[key] ?? '-';
+                  const source = key ? rak.metadata?.[key]?.source ?? 'Ympäristö.fi-RYHTI' : 'Ympäristö.fi-RYHTI';
 
-      <div className="table-responsive">
-        <table className="table table-borderless">
-          <tbody>
-            {[
-              ['Toimipaikka', 'toimipaikka'],
-              ['Rakennustunnus', 'rakennustunnus'],
-              ['Rakennusvuosi', 'rakennusvuosi'],
-              ['Sijainti', null, rak.sijainti ? `${rak.sijainti.coordinates[1]}, ${rak.sijainti.coordinates[0]}` : '-'],
-              ['Rakennusluokitus', 'rakennusluokitus'],
-              ['Runkotapa', 'runkotapa'],
-              ['Käyttötilanne', 'kayttotilanne'],
-              ['Julkisivumateriaali', 'julkisivumateriaali'],
-              ['Lämmitystapa', 'lammitystapa'],
-              ['Energialähde', 'lammitysenergialahde'],
-              ['Rakennusaine', 'rakennusaine'],
-              ['Tilavuus', 'tilavuus'],
-              ['Kokonaisala', 'kokonaisala'],
-              ['Kerrosala', 'kerrosala'],
-              ['Huoneistoala', 'huoneistoala'],
-              ['Kerroksia', 'kerroksia'],
-            ].map(([label, key, customValue], i) => {
-              const value = customValue ?? rak[key] ?? '-';
-              const source = key ? rak.metadata?.[key]?.source ?? 'Ympäristö.fi-RYHTI' : 'Ympäristö.fi-RYHTI';
+                  return (
+                    <tr key={i}>
+                      <td className="fw-bold" style={{ width: '30%' }}>{label}</td>
+                      <td style={{ width: '40%' }}>{value}</td>
+                      <td style={{ width: '30%' }}>
+                        <span className="text-success">{source}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+    </Accordion.Body>
+  </Accordion.Item>
+</Accordion>
 
-              return (
-                <tr key={i}>
-                  <td className="fw-bold" style={{ width: '30%' }}>{label}</td>
-                  <td style={{ width: '40%' }}>{value}</td>
-                  <td style={{ width: '30%' }}>
-                    <span className="text-success">{source}</span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  ))}
-</div>
 
 {['rakennetekniikka', 'sahko', 'lvi'].map((key) => {
   const sectionIndex = sections.findIndex((s) => s.key === key);
@@ -898,71 +902,61 @@ onChange={(e) => {
         </h5>
 
         {items.map((item) => (
-          <div
-            key={item.id}
-            className="d-flex align-items-center mb-2"
-            style={{ gap: '1rem' }}
-          >
-            <div
-              style={{
-                width: '200px',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              <strong>{item.label}</strong>
-            </div>
+          <div key={item.id} className="row align-items-center mb-3">
+  <div className="col-12 col-md-3">
+    <strong>{item.label}</strong>
+  </div>
 
-            <div
-              style={{
-                width: '30px',
-                textAlign: 'center',
-                fontSize: '1.2rem',
-                color:
-                  item.risk === 'low'
-                    ? 'green'
-                    : item.risk === 'medium'
-                    ? 'orange'
-                    : 'red',
-              }}
-            >
-              ✓
-            </div>
+  <div className="col-2 col-md-1 text-center">
+    <span
+      style={{
+        fontSize: '1.2rem',
+        color:
+          item.risk === 'low'
+            ? 'green'
+            : item.risk === 'medium'
+            ? 'orange'
+            : 'red',
+      }}
+    >
+      ✓
+    </span>
+  </div>
 
-            <div style={{ width: '160px' }}>
-              <select
-                className="form-select form-select-sm"
-                value={item.risk}
-                onChange={(e) => {
-                  const updated = [...riskidata];
-                  updated[
-                    riskidata.findIndex((i) => i.id === item.id)
-                  ].risk = e.target.value;
-                  setRiskidata(updated);
-                }}
-              >
-                <option value="low">Matala riski</option>
-                <option value="medium">Keskitason riski</option>
-                <option value="high">Korkea riski</option>
-              </select>
-            </div>
+  <div className="col-10 col-md-3 mb-2 mb-md-0">
+    <select
+      className="form-select form-select-sm"
+      value={item.risk}
+      onChange={(e) => {
+        const updated = [...riskidata];
+        updated[
+          riskidata.findIndex((i) => i.id === item.id)
+        ].risk = e.target.value;
+        setRiskidata(updated);
+      }}
+    >
+      <option value="low">Matala riski</option>
+      <option value="medium">Keskitason riski</option>
+      <option value="high">Korkea riski</option>
+    </select>
+  </div>
 
-            <input
-              type="text"
-              className="form-control form-control-sm"
-              placeholder="Selite"
-              value={item.description || ''}
-              onChange={(e) => {
-                const updated = [...riskidata];
-                updated[
-                  riskidata.findIndex((i) => i.id === item.id)
-                ].description = e.target.value;
-                setRiskidata(updated);
-              }}
-              style={{ flex: 1, minWidth: '200px' }}
-            />
-          </div>
+  <div className="col-12 col-md-5">
+    <input
+      type="text"
+      className="form-control form-control-sm"
+      placeholder="Selite"
+      value={item.description || ''}
+      onChange={(e) => {
+        const updated = [...riskidata];
+        updated[
+          riskidata.findIndex((i) => i.id === item.id)
+        ].description = e.target.value;
+        setRiskidata(updated);
+      }}
+    />
+  </div>
+</div>
         ))}
       </div>
     ))}
