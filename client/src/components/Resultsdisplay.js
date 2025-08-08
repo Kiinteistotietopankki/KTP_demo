@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Tabletemplate from './Tabletemplate';
-import { Accordion, Button, Card, Collapse, Modal } from 'react-bootstrap';
+import { Button, Card, Modal } from 'react-bootstrap';
 import exportToExcel from './Excelexport';
 import exportToPdf from './Pdfexport';
 import EditableReport from './ReportTemplate';
@@ -16,8 +16,8 @@ function Resultdisplay({ data, setMapCoords }) {
   const [response, setResponse] = useState({});
   const [showCreatedModal, setShowCreatedModal] = useState(false);
 
-  // Track which rakennus card is open, store by kiinteistoIndex + rakennusIndex key
-  const [openRakennusKey, setOpenRakennusKey] = useState(null);
+  // Store currently selected rakennus for modal
+  const [selectedRakennus, setSelectedRakennus] = useState(null);
 
   useEffect(() => {
     if (data[0]?.rakennukset.length) {
@@ -75,13 +75,19 @@ function Resultdisplay({ data, setMapCoords }) {
       .catch((err) => console.error('Api error', err));
   };
 
-  // Toggle collapse open/close for rakennus card
-  const toggleRakennus = (key) => {
-    setOpenRakennusKey(openRakennusKey === key ? null : key);
+  // Open rakennus detail modal
+  const openRakennusModal = (rakennus) => {
+    setSelectedRakennus(rakennus);
+  };
+
+  // Close rakennus detail modal
+  const closeRakennusModal = () => {
+    setSelectedRakennus(null);
   };
 
   return (
     <div className="mt-4">
+      {/* Success modal for Taloyhtiökortti creation */}
       <Modal show={showCreatedModal} onHide={() => setShowCreatedModal(false)} centered backdrop="static">
         <Modal.Body className="text-center">
           <i className="bi bi-check-circle-fill text-success" style={{ fontSize: '2rem' }}></i>
@@ -90,13 +96,12 @@ function Resultdisplay({ data, setMapCoords }) {
       </Modal>
 
       {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
-        <>
         <Card key={kiinteistoIndex} className="mb-4 border result-card">
-          <Card.Header 
+          <Card.Header
             className="bg-primary text-white d-flex justify-content-center align-items-center flex-wrap"
             style={{ flexDirection: 'column' }}
           >
-            <div 
+            <div
               className="d-flex align-items-center flex-wrap gap-2 justify-content-center"
               style={{ minWidth: 0, margin: '0 auto', maxWidth: '100%' }}
             >
@@ -108,7 +113,7 @@ function Resultdisplay({ data, setMapCoords }) {
                 KIINTEISTÖ
               </small>
 
-              <span 
+              <span
                 className="fw-bold text-truncate"
                 style={{ fontSize: '1.1rem', color: 'white', letterSpacing: '0.02em', maxWidth: '150px' }}
                 title={kiinteisto?.id_esitysmuoto_kiinteistotunnus || 'N/A'}
@@ -147,11 +152,9 @@ function Resultdisplay({ data, setMapCoords }) {
             </div>
           </Card.Header>
 
-          <Card.Body className="bg-light-subtle">
+          <Card.Body className="bg-light-subtle" style={{ border: '1px solid #04aa00' }}>
             {kiinteisto.rakennukset?.length > 0 ? (
               kiinteisto.rakennukset.map((rakennus, rakennusIndex) => {
-                const key = `${kiinteistoIndex}-${rakennusIndex}`;
-                const isOpen = openRakennusKey === key;
                 return (
                   <Card key={rakennusIndex} className="mb-3 border-0 shadow-sm">
                     <Card.Header className="d-flex justify-content-between align-items-center bg-white p-2">
@@ -160,10 +163,10 @@ function Resultdisplay({ data, setMapCoords }) {
                           variant="outline-secondary"
                           size="sm"
                           className="me-2"
-                          onClick={() => toggleRakennus(key)}
-                          aria-expanded={isOpen}
+                          onClick={() => openRakennusModal(rakennus)}
+                          aria-label="Näytä rakennuksen tiedot"
                         >
-                          <i className={`bi ${isOpen ? 'bi-caret-up-fill' : 'bi-caret-down-fill'}`}></i>
+                          <i className="bi bi-info-circle"></i>
                         </Button>
 
                         <label className="form-check-label fw-semibold text-secondary m-0">
@@ -173,20 +176,10 @@ function Resultdisplay({ data, setMapCoords }) {
                             : rakennus.properties.yleistiedot['Kohteen osoitteet']?.value || ''}{' '}
                           ({rakennus.properties.yleistiedot.Toimipaikka.value})
                         </label>
+
                         <MapModalWrapper coords={[rakennus.geometry.coordinates[1], rakennus.geometry.coordinates[0]]} />
                       </div>
-
-                      
                     </Card.Header>
-
-                    <Collapse in={isOpen}>
-                      <Card.Body className="bg-white p-1">
-                        <Tabletemplate properties={rakennus.properties.yleistiedot} />
-                        <Tabletemplate properties={rakennus.properties.teknisettiedot} />
-                        <Tabletemplate properties={rakennus.properties.rakennustiedot} />
-                        <Tabletemplate properties={rakennus.properties.aluetiedot} />
-                      </Card.Body>
-                    </Collapse>
                   </Card>
                 );
               })
@@ -195,8 +188,37 @@ function Resultdisplay({ data, setMapCoords }) {
             )}
           </Card.Body>
         </Card>
-        </>
       ))}
+
+      {/* Modal for showing rakennus details */}
+      <Modal
+        show={!!selectedRakennus}
+        onHide={closeRakennusModal}
+        size="lg"
+        centered
+        scrollable
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Rakennus: {selectedRakennus?.properties.yleistiedot.Rakennustunnus?.value || ''}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedRakennus && (
+            <>
+              <Tabletemplate properties={selectedRakennus.properties.yleistiedot} />
+              <Tabletemplate properties={selectedRakennus.properties.teknisettiedot} />
+              <Tabletemplate properties={selectedRakennus.properties.rakennustiedot} />
+              <Tabletemplate properties={selectedRakennus.properties.aluetiedot} />
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeRakennusModal}>
+            Sulje
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
