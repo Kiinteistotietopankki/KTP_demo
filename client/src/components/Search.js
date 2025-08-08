@@ -21,14 +21,23 @@ function Search({ afterSearch }) {
   const KH = useRef(new KiinteistoHaku()).current;
 
   const handleSearch = async () => {
+    // Prevent searching if only paikkakunta is filled
+    const trimmedKt = kiinteistotunnus.trim();
+    const trimmedOsoite = osoite.trim();
+    const trimmedKunta = paikkakunta.trim();
+
+    if (!trimmedKt && !trimmedOsoite && trimmedKunta) {
+      setError("Haku vaatii kiinteistötunnuksen tai osoitteen.");
+      setKiinteistoCount(0);
+      afterSearch([]);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      let trimmedKt = kiinteistotunnus.trim();
-      let ktKokomuoto = ktKokomuotoon(trimmedKt);
-      let trimmedOsoite = osoite.trim();
-      let trimmedKunta = paikkakunta.trim();
+      const ktKokomuoto = ktKokomuotoon(trimmedKt);
 
       const response = await searchKiinteistot(ktKokomuoto, trimmedOsoite, trimmedKunta);
       const data = response.data;
@@ -43,9 +52,7 @@ function Search({ afterSearch }) {
         afterSearch(data);
       }
     } catch (err) {
-      // Handle HTTP errors
       if (err.response) {
-        // HTTP status available
         switch (err.response.status) {
           case 403:
             setError("Käyttäjä ei ole kirjautunut sisään tai oikeudet puuttuvat (403)");
@@ -60,7 +67,6 @@ function Search({ afterSearch }) {
             setError(`Virhe haussa: ${err.response.status}`);
         }
       } else {
-        // Network or other errors
         setError("Verkkovirhe tai palvelin ei vastaa");
       }
       setKiinteistoCount(0);
