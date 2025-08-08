@@ -12,7 +12,7 @@ import PTSLongTermTable from './PTS/PTSLongTermTable.js';
 import { Tab, Tabs } from 'react-bootstrap';
 import ImageUploadCategorizer from './ImageUpload.js';
 import logo from '../assets/images/waativalogo.png'; 
-
+import config from '../devprodConfig';
 const PropertyDetailsForm = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: initialRakennusData }) => {
   const savedData = JSON.parse(localStorage.getItem('reportFormData')) || {};
   useEffect(() => {
@@ -484,38 +484,39 @@ for (const section of sections) {
     if (section.content) {
       content.push({ text: section.content, style: 'paragraph', margin: [0, 0, 0, 10] });
     }
+if (section.images && section.images.length) {
+  const imageRows = [];
 
-    if (section.images && section.images.length) {
-      const imagesPerRow = 2;
-      const imageRows = [];
+  for (let i = 0; i < section.images.length; i += 2) {
+    const row = section.images.slice(i, i + 2).map((img) => ({
+      stack: [
+     {
+  image: img.url,
+  width: 240,
+  height: 160,
+  preserveAspectRatio: false,  
+  alignment: 'center',
+  margin: [0, 0, 0, 5],
+},
+        {
+          text: img.caption || '',
+          fontSize: 9,
+          alignment: 'center',
+          italics: true, 
+          margin: [0, 2, 0, 0],
+        }
+      ],
+      width: '50%', 
+    }));
 
-      for (let i = 0; i < section.images.length; i += imagesPerRow) {
- const rowImages = section.images.slice(i, i + imagesPerRow).map((img) => ({
-  stack: [
-    {
-      image: img.url,
-      width: 220,
-      height: 160,
-      fit: [300, 160],
-      alignment: 'center',
-      margin: [0, 0, 0, 4],
-    },
-    {
-      text: img.caption || '',
-      fontSize: 9,
-      alignment: 'center',
-      margin: [0, 2, 0, 0],
-    }
-  ],
-  width: 'auto',
-}));
+    imageRows.push({
+      columns: row,
+      columnGap: 10,
+    });
+  }
 
-  imageRows.push({ columns: rowImages, columnGap: 10 });
+  content.push(...imageRows, { text: '', margin: [0, 10] });
 }
-
-
-      content.push(...imageRows, { text: '', margin: [0, 10] });
-    }
 
     if (section.key === 'jarjestelma') {
       content.push(
@@ -633,35 +634,34 @@ for (const [category, items] of Object.entries(grouped)) {
 
   return docDefinition;
 };
-
-   const handleExportPdf = async () => {
+const handleExportPdf = async () => {
   const docDefinition = await buildPdfContent();
+
   const pdfDocGenerator = pdfMake.createPdf(docDefinition);
 
   pdfDocGenerator.getBlob(async (blob) => {
-    try {
-      const formData = new FormData();
-      const templateName = templates[selectedTemplate]?.name || 'Raportti';
-      const fileName = `${templateName}_${PropertyName || 'Kohde'}.pdf`;
+    const templateName = templates[selectedTemplate]?.name || 'Raportti';
+    const fileName = `${templateName}_${PropertyName || 'Kohde'}.pdf`;
 
+    try {
+      
+      const formData = new FormData();
       formData.append('pdf', blob, fileName);
 
-      const response = await fetch('http://localhost:3001/uploadpdf', {
-        method: 'POST',
-        body: formData,
-      });
+   
 
-      const data = await response.json();
-      console.log('✅ Upload to SharePoint result:', data);
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url); 
+
     } catch (err) {
       console.error('❌ Upload error:', err);
     }
-
-    const templateName = templates[selectedTemplate]?.name || 'Raportti';
-    const fileName = `${templateName}_${PropertyName || 'Kohde'}.pdf`;
-    pdfDocGenerator.download(fileName);
   });
-  resetForm();
 };
 
   const handleCoverImageUpload = (e) => {
