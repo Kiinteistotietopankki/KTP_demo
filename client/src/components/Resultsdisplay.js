@@ -152,12 +152,12 @@ function Resultdisplay({ data, setMapCoords }) {
             </div>
           </Card.Header>
 
-          <Card.Body className="bg-light-subtle" style={{ border: '1px solid #04aa00' }}>
+          <Card.Body className="bg-light-subtle" style={{ border: '1px solid #04aa00', borderRadius: '0.2rem' }}>
             {kiinteisto.rakennukset?.length > 0 ? (
               kiinteisto.rakennukset.map((rakennus, rakennusIndex) => {
                 return (
                   <Card key={rakennusIndex} className="mb-3 border-0 shadow-sm">
-                    <Card.Header className="d-flex justify-content-between align-items-center bg-white p-2">
+                    <Card.Header className="d-flex justify-content-between align-items-center bg-white">
                       <div className="d-flex align-items-center">
                         <Button
                           variant="outline-secondary"
