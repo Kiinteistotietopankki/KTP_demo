@@ -60,6 +60,7 @@ export default function DokumentitTab({ kiinteisto }) {
         size="xl"
         centered
         scrollable
+        dialogClassName="fullscreen-modal-sm"
       >
         <Modal.Header closeButton>
           <Modal.Title>📄 Luo uusi raportti</Modal.Title>

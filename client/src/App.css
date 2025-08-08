@@ -226,4 +226,21 @@ textarea.form-control {
   min-width: 900px; 
 }
 
+@media (max-width: 768px) {
+  .modal.fullscreen-modal-sm .modal-dialog {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+  }
+
+  .modal.fullscreen-modal-sm .modal-content {
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .modal.fullscreen-modal-sm .modal-body {
+    overflow-y: auto;
+  }
+}
 
