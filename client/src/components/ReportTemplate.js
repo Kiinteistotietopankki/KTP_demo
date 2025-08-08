@@ -25,7 +25,7 @@ const PropertyDetailsForm = ({ rakennus, kiinteistotunnus, initialTab, rakennusD
   const [activeTab, setActiveTab] = useState(initialTab || 'report');
   const [title, setTitle] = useState(savedData.title || '');
   const [customText, setCustomText] = useState(savedData.customText || '');
-  
+  const card = rakennusData;
   const [PropertyName, setPropertyName] = useState(savedData.PropertyName || '');
   const [propertyId, setPropertyId] = useState(kiinteistotunnus);
   const [coverImage, setCoverImage] = useState(savedData.coverImage || null);
@@ -328,43 +328,104 @@ if (rakennukset.length > 0) {
     margin: [0, 10, 0, 10],
   });
 
-  rakennukset.forEach((rak) => {
-    const dataRows = [
-      ['Osoite', `${rak.osoite}, ${rak.postinumero} ${rak.toimipaikka}`],
-      ['Rakennustunnus', rak.rakennustunnus],
-      ['Rakennusvuosi', rak.rakennusvuosi],
-      ['Koordinaatti sijainti', rak.sijainti ? `${rak.sijainti.coordinates[1]}, ${rak.sijainti.coordinates[0]}` : '-'],
-      ['Rakennusluokitus', rak.rakennusluokitus],
-      ['Runkotapa', rak.runkotapa],
-      ['Käyttötilanne', rak.kayttotilanne],
-      ['Julkisivumateriaali', rak.julkisivumateriaali],
-      ['Lämmitystapa', rak.lammitystapa],
-      ['Energialähde', rak.lammitysenergialahde],
-      ['Rakennusaine', rak.rakennusaine],
-      ['Tilavuus', rak.tilavuus],
-      ['Kokonaisala', rak.kokonaisala],
-      ['Kerrosala', rak.kerrosala],
-      ['Huoneistoala', rak.huoneistoala],
-      ['Kerroksia', rak.kerroksia],
-    ];
+  const rak = rakennukset[0];
 
-    const tableBody = dataRows.map(([label, value]) => [
+  const sections = [
+    {
+      title: 'Yleiset tiedot',
+      rows: [
+        ['Kohteen nimi', PropertyName || 'Asunto Oy Mallila'],
+        ['Osoitteet', rak.osoite || '—'],
+        ['Toimipaikka', `${rak.postinumero || ''} ${rak.toimipaikka || ''}`.trim()],
+      ],
+    },
+    {
+      title: 'Kiinteistötiedot',
+      rows: [
+        ['Kiinteistötunnus', rakennusData?.kiinteistotunnus || '—'],
+        ['Tontin koko', '50505 m²'],
+        ['Tontin omistaja', 'Mallilla Oy'],
+        ['Yhteystiedot', '0441010101'],
+      ],
+    },
+    {
+      title: 'Rakennukset',
+      rows: [
+        ['Rakennusten lkm.', rakennukset.length],
+        ['Ulkorakennusten lkm.', rakennukset.length],
+      ],
+    },
+    {
+      title: 'Vuodet',
+      rows: [
+        ['Rakennusvuosi', rak.rakennusvuosi || '—'],
+        ['Peruskorjausvuosi', '—'],
+        ['Laajennusvuosi', '—'],
+      ],
+    },
+    {
+      title: 'Alat',
+      rows: [
+        ['Kokonaisala', rak.kokonaisala ? `${rak.kokonaisala} m²` : '—'],
+        ['Kerrosala', rak.kerrosala ? `${rak.kerrosala} m²` : '—'],
+        ['Huoneistoala', rak.huoneistoala ? `${rak.huoneistoala} m²` : '—'],
+        ['Tilavuus', rak.tilavuus ? `${rak.tilavuus} m³` : '—'],
+        ['Kerroksia', rak.kerroksia ?? '—'],
+        ['Kellarikerroksia', '—'],
+      ],
+    },
+  ];
+
+  const noLinesLayout = {
+    hLineWidth: () => 0,
+    vLineWidth: () => 0,
+    paddingTop: () => 3,
+    paddingBottom: () => 3,
+    paddingLeft: () => 2,
+    paddingRight: () => 2,
+  };
+
+  sections.forEach((section) => {
+    content.push({
+      stack: [
+        {
+          text: section.title,
+          bold: true,
+          fontSize: 13,
+          margin: [0, 12, 0, 4],
+        },
+        {
+          canvas: [
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 2,
+              lineColor: '#198754', // Bootstrap green
+            },
+          ],
+          margin: [0, 2, 0, 6],
+        },
+      ],
+    });
+
+    const tableBody = section.rows.map(([label, value]) => [
       { text: label, bold: true, fontSize: 11 },
-      { text: value || '-', fontSize: 11 }
+      { text: value || '—', fontSize: 11 },
     ]);
 
     content.push({
       table: {
-        widths: ['30%', '70%'],
-        body: tableBody
+        widths: ['40%', '60%'],
+        body: tableBody,
       },
-      layout: 'lightHorizontalLines',
-      margin: [0, 0, 0, 10]
+      layout: noLinesLayout,
+      margin: [0, 0, 0, 10],
     });
   });
 }
- 
-
 
 
 
@@ -672,54 +733,128 @@ onChange={(e) => {
   <Accordion.Item eventKey="0">
     <Accordion.Header>🏠 Kohteen tiedot</Accordion.Header>
     <Accordion.Body>
-      {rakennusData?.rakennukset_fulls?.map((rak, idx) => (
-        <div key={idx} className="mb-5">
-          <h5 className="fw-bold text-success mb-3">
-            {rak.osoite}, {rak.postinumero} {rak.toimipaikka}
-          </h5>
+      <div className="mb-4 px-2 px-md-4">
 
-          <div className="table-responsive">
-            <table className="table table-borderless">
-              <tbody>
-                {[
-                  ['Toimipaikka', 'toimipaikka'],
-                  ['Rakennustunnus', 'rakennustunnus'],
-                  ['Rakennusvuosi', 'rakennusvuosi'],
-                  ['Sijainti', null, rak.sijainti ? `${rak.sijainti.coordinates[1]}, ${rak.sijainti.coordinates[0]}` : '-'],
-                  ['Rakennusluokitus', 'rakennusluokitus'],
-                  ['Runkotapa', 'runkotapa'],
-                  ['Käyttötilanne', 'kayttotilanne'],
-                  ['Julkisivumateriaali', 'julkisivumateriaali'],
-                  ['Lämmitystapa', 'lammitystapa'],
-                  ['Energialähde', 'lammitysenergialahde'],
-                  ['Rakennusaine', 'rakennusaine'],
-                  ['Tilavuus', 'tilavuus'],
-                  ['Kokonaisala', 'kokonaisala'],
-                  ['Kerrosala', 'kerrosala'],
-                  ['Huoneistoala', 'huoneistoala'],
-                  ['Kerroksia', 'kerroksia'],
-                ].map(([label, key, customValue], i) => {
-                  const value = customValue ?? rak[key] ?? '-';
-                  const source = key ? rak.metadata?.[key]?.source ?? 'Ympäristö.fi-RYHTI' : 'Ympäristö.fi-RYHTI';
-
-                  return (
-                    <tr key={i}>
-                      <td className="fw-bold" style={{ width: '30%' }}>{label}</td>
-                      <td style={{ width: '40%' }}>{value}</td>
-                      <td style={{ width: '30%' }}>
-                        <span className="text-success">{source}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+        {/* Section 1: Yleiset tiedot */}
+        <div className="table-responsive">
+          <table className="table">
+            <tbody>
+              <tr>
+                <td className="fw-semibold" style={{ width: '40%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                  Kohteen nimi
+                </td>
+                <td style={{ width: '60%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                  Asunto Oy Mallila
+                </td>
+              </tr>
+              <tr>
+                <td className="fw-semibold" style={{ width: '40%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                  Osoitteet
+                </td>
+                <td style={{ width: '60%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                  {card?.rakennukset_fulls[0]?.osoite || '—'}
+                </td>
+              </tr>
+              <tr>
+                <td className="fw-semibold" style={{ width: '40%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                  Toimipaikka
+                </td>
+                <td style={{ width: '60%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                  {card?.rakennukset_fulls[0]?.postinumero} {card?.rakennukset_fulls[0]?.toimipaikka}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      ))}
+
+        <div className="border-top border-success my-3" style={{ height: '3px' }} />
+
+        {/* Section 2: Kiinteistötiedot */}
+        <div className="table-responsive">
+          <table className="table">
+            <tbody>
+              {[
+                ['Kiinteistötunnus', card?.kiinteistotunnus || '—'],
+                ['Tontin koko', '50505 m²'],
+                ['Tontin omistaja', 'Mallilla Oy'],
+                ['Yhteystiedot', '0441010101'],
+              ].map(([label, value], idx) => (
+                <tr key={idx}>
+                  <td className="fw-semibold" style={{ width: '40%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{label}</td>
+                  <td style={{ width: '60%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="border-top border-success my-3" style={{ height: '3px' }} />
+
+        {/* Section 3: Rakennusten lkm */}
+        <div className="table-responsive">
+          <table className="table">
+            <tbody>
+              {[
+                ['Rakennusten lkm.', card?.rakennukset_fulls?.length || '—'],
+                ['Ulkorakennusten lkm.', card?.rakennukset_fulls?.length || '—'],
+              ].map(([label, value], idx) => (
+                <tr key={idx}>
+                  <td className="fw-semibold" style={{ width: '40%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{label}</td>
+                  <td style={{ width: '60%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="border-top border-success my-3" style={{ height: '3px' }} />
+
+        {/* Section 4: Vuodet */}
+        <div className="table-responsive">
+          <table className="table">
+            <tbody>
+              {[
+                ['Rakennusvuosi', card?.rakennukset_fulls[0]?.rakennusvuosi || '—'],
+                ['Peruskorjausvuosi', '—'],
+                ['Laajennusvuosi', '—'],
+              ].map(([label, value], idx) => (
+                <tr key={idx}>
+                  <td className="fw-semibold" style={{ width: '40%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{label}</td>
+                  <td style={{ width: '60%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="border-top border-success my-3" style={{ height: '3px' }} />
+
+        {/* Section 5: Mitat */}
+        <div className="table-responsive">
+          <table className="table">
+            <tbody>
+              {[
+                ['Kokonaisala', `${card?.rakennukset_fulls[0]?.kokonaisala} m²`],
+                ['Kerrosala', `${card?.rakennukset_fulls[0]?.kerrosala} m²`],
+                ['Huoneistoala', `${card?.rakennukset_fulls[0]?.huoneistoala} m²`],
+                ['Tilavuus', `${card?.rakennukset_fulls[0]?.tilavuus} m³`],
+                ['Kerroksia', card?.rakennukset_fulls[0]?.kerroksia],
+                ['Kellarikerroksia', '—'],
+              ].map(([label, value], idx) => (
+                <tr key={idx}>
+                  <td className="fw-semibold" style={{ width: '40%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{label}</td>
+                  <td style={{ width: '60%', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+      </div>
     </Accordion.Body>
   </Accordion.Item>
 </Accordion>
+
 
 
 {['rakennetekniikka', 'sahko', 'lvi'].map((key) => {
@@ -975,9 +1110,15 @@ onChange={(e) => {
   <button className="btn btn-outline-success" onClick={handleExportPdf}>
     📥 Lataa Raportti
   </button>
-  <button onClick={resetForm} className="btn btn-outline-danger">
-    ♻️ Tyhjennä kentät
-  </button>
+<button
+  onClick={() => {
+    const confirmClear = window.confirm('Haluatko varmasti tyhjentää raportin? Tämä poistaa kaikki tiedot.');
+    if (confirmClear) resetForm();
+  }}
+  className="btn btn-outline-danger"
+>
+  ♻️ Tyhjennä kentät
+</button>
 </div>
 
          
