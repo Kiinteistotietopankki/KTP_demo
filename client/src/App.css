@@ -23,12 +23,7 @@
   /* font-weight: bold; */
 }
 
-.custom-tabs2 .nav-link.active {
-  background-color: #027000 !important; /* or any color */
-  color: #ba3b46b9 !important; /* green text to match success theme */
-  /* font-weight: bold; */
-  font-size: 0.85rem;
-}
+
 
 .custom-btn1 .btn{
   background-color: #027000 !important; /* or any color */
@@ -50,9 +45,18 @@
   background-color: #04aa00;  /* green background for all tabs */
   color: black;               /* text color */              /* slightly faded for unselected */
   transition: background-color 0.3s, opacity 0.3s;
-  margin-left: 3px;
-  font-size: 0.85rem;   /* smaller text */
-  padding: 0.25rem 0.75rem; /* smaller padding */
+  margin-left: 5px;           /* reduced from 3px */
+  font-size: 0.85rem;         /* smaller text */
+  padding: 0.2rem 0.4rem;     /* reduced padding from 0.25rem 0.75rem */
+  white-space: nowrap;        /* prevent wrapping inside tab */
+}
+
+.custom-tabs2 .nav-link.active {
+  background-color: #027000 !important; /* or any color */
+  color: #ba3b46b9 !important;           /* green text to match success theme */
+  /* font-weight: bold; */
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 @media (max-width: 576px) {
