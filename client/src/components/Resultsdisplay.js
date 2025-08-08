@@ -91,7 +91,7 @@ function Resultdisplay({ data, setMapCoords }) {
 
       {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
         <Card key={kiinteistoIndex} className="mb-4 border rounded-3">
-          <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center p-3 rounded-top-4">
+          <Card.Header className="bg-primary text-white d-flex justify-content-between">
             <h5 className="mb-0">
               Kiinteistö:{' '}
               <span className="fw-bold">
@@ -141,9 +141,10 @@ function Resultdisplay({ data, setMapCoords }) {
                             : rakennus.properties.yleistiedot['Kohteen osoitteet']?.value || ''}{' '}
                           ({rakennus.properties.rakennustiedot['Rakennusluokitus'].value})
                         </label>
+                        <MapModalWrapper coords={[rakennus.geometry.coordinates[1], rakennus.geometry.coordinates[0]]} />
                       </div>
 
-                      <MapModalWrapper coords={[rakennus.geometry.coordinates[1], rakennus.geometry.coordinates[0]]} />
+                      
                     </Card.Header>
 
                     <Collapse in={isOpen}>

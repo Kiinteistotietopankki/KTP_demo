@@ -7,7 +7,16 @@ export default function MapModalWrapper({ coords }) {
 
   return (
     <>
-      <Button variant="success" onClick={() => setShowMapModal(true)}>
+      <Button
+        variant="success"
+        className="btn-thin mx-2 my-2"
+        onClick={() => setShowMapModal(true)}
+        style={{
+          'padding': '3px 3px',
+          'font-size': '1rem',
+          'line-height': '1.25',
+        }}
+      >
         Näytä kartalla
       </Button>
 

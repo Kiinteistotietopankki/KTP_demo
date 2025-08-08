@@ -158,7 +158,7 @@ function Search({ afterSearch }) {
 
       <div className='featureAmount-container d-flex align-items-center'>
         {kiinteistoCount > 0 ? (
-          <span className="badge bg-success">
+          <span className="badge rounded-pill bg-warning text-dark fw-bold px-2 py-2 my-2">
             Kiinteistöjä: {kiinteistoCount}
           </span>
         ) : (
