@@ -90,38 +90,70 @@ function Resultdisplay({ data, setMapCoords }) {
       </Modal>
 
       {kiinteistot.map((kiinteisto, kiinteistoIndex) => (
-        <Card key={kiinteistoIndex} className="mb-4 border rounded-3">
-          <Card.Header className="bg-primary text-white d-flex justify-content-between">
-            <h5 className="mb-0">
-              Kiinteistö:{' '}
-              <span className="fw-bold">
-                {kiinteisto?.id_esitysmuoto_kiinteistotunnus  || 'N/A'},{' '}
-                {kiinteisto?.rakennukset[0].properties.yleistiedot.Toimipaikka.value}
-                  <Button
-                    variant="outline-light"
-                    size="sm"
-                    className="ms-2"
-                    onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}
-                  >
-                    <i className="bi bi-clipboard"></i>
-                  </Button>
-              </span>
-            </h5>
-            <div>
+        <>
+        <Card key={kiinteistoIndex} className="mb-4 border result-card">
+          <Card.Header 
+            className="bg-primary text-white d-flex justify-content-center align-items-center flex-wrap"
+            style={{ flexDirection: 'column' }}
+          >
+            <div 
+              className="d-flex align-items-center flex-wrap gap-2 justify-content-center"
+              style={{ minWidth: 0, margin: '0 auto', maxWidth: '100%' }}
+            >
+              <small
+                className="text-white-50"
+                style={{ fontSize: '1rem', fontWeight: '400' }}
+                title="Toimipaikka"
+              >
+                KIINTEISTÖ
+              </small>
 
-              <Button variant="light" size="sm" onClick={() => luoKortti(kiinteisto)}>
-                <i className="bi bi-plus-circle me-1"></i> Luo taloyhtiökortti
+              <span 
+                className="fw-bold text-truncate"
+                style={{ fontSize: '1.1rem', color: 'white', letterSpacing: '0.02em', maxWidth: '150px' }}
+                title={kiinteisto?.id_esitysmuoto_kiinteistotunnus || 'N/A'}
+              >
+                {kiinteisto?.id_esitysmuoto_kiinteistotunnus || 'N/A'}
+              </span>
+
+              <Button
+                variant="outline-light"
+                size="sm"
+                className="p-1 flex-shrink-0"
+                onClick={() => copyText(kiinteisto?.id_esitysmuoto_kiinteistotunnus)}
+                aria-label="Kopioi kiinteistötunnus"
+                title="Kopioi kiinteistötunnus"
+                style={{
+                  padding: '0.15rem 0.25rem',
+                  minWidth: 'auto',
+                  fontSize: '0.8rem',
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <i className="bi bi-clipboard" style={{ fontSize: '0.9rem' }}></i> Kopioi
+              </Button>
+
+              <Button
+                variant="outline-light"
+                size="sm"
+                className="rounded-pill fw-semibold"
+                onClick={() => luoKortti(kiinteisto)}
+                style={{ whiteSpace: 'nowrap', padding: '0.25rem 0.75rem' }}
+              >
+                <i className="bi bi-plus-circle me-2"></i>
+                Luo kortti
               </Button>
             </div>
           </Card.Header>
 
-          <Card.Body className="bg-light-subtle p-3">
+          <Card.Body className="bg-light-subtle">
             {kiinteisto.rakennukset?.length > 0 ? (
               kiinteisto.rakennukset.map((rakennus, rakennusIndex) => {
                 const key = `${kiinteistoIndex}-${rakennusIndex}`;
                 const isOpen = openRakennusKey === key;
                 return (
-                  <Card key={rakennusIndex} className="mb-3 border-0 shadow-sm rounded-3">
+                  <Card key={rakennusIndex} className="mb-3 border-0 shadow-sm">
                     <Card.Header className="d-flex justify-content-between align-items-center bg-white p-2">
                       <div className="d-flex align-items-center">
                         <Button
@@ -139,7 +171,7 @@ function Resultdisplay({ data, setMapCoords }) {
                           {Array.isArray(rakennus.properties.yleistiedot['Kohteen osoitteet']?.value)
                             ? rakennus.properties.yleistiedot['Kohteen osoitteet'].value.join(', ')
                             : rakennus.properties.yleistiedot['Kohteen osoitteet']?.value || ''}{' '}
-                          ({rakennus.properties.rakennustiedot['Rakennusluokitus'].value})
+                          ({rakennus.properties.yleistiedot.Toimipaikka.value})
                         </label>
                         <MapModalWrapper coords={[rakennus.geometry.coordinates[1], rakennus.geometry.coordinates[0]]} />
                       </div>
@@ -163,6 +195,7 @@ function Resultdisplay({ data, setMapCoords }) {
             )}
           </Card.Body>
         </Card>
+        </>
       ))}
     </div>
   );

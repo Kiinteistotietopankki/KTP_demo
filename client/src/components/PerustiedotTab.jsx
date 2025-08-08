@@ -236,11 +236,12 @@ export default function PerustiedotTab({card}) {
                 >
                 <Modal.Header closeButton className="bg-success bg-opacity-10 border-success">
                     <Modal.Title className="text-success">Rakennuksen tiedot</Modal.Title>
+                    {selectedRakennus?.sijainti?.coordinates?.[1] && (
+                        <MapModalWrapper coords={[selectedRakennus.sijainti.coordinates[1], selectedRakennus.sijainti.coordinates[0]]} />
+                        )}
                 </Modal.Header>
                 
-                {selectedRakennus?.sijainti?.coordinates?.[1] && (
-                <MapModalWrapper coords={[selectedRakennus.sijainti.coordinates[1], selectedRakennus.sijainti.coordinates[0]]} />
-                )}
+
                                 
 
                 <Modal.Body className="px-4 py-3">

@@ -8,16 +8,13 @@ export default function MapModalWrapper({ coords }) {
   return (
     <>
       <Button
-        variant="success"
-        className="btn-thin mx-2 my-2"
+        variant="outline-success"
+        size="sm"
+        className="rounded-pill fw-semibold shadow-sm mx-2 my-2 text-nowrap"
         onClick={() => setShowMapModal(true)}
-        style={{
-          'padding': '3px 3px',
-          'font-size': '1rem',
-          'line-height': '1.25',
-        }}
       >
-        Näytä kartalla
+        <i className="bi bi-geo-alt-fill me-2"></i>
+        Kartta
       </Button>
 
       <Modal
