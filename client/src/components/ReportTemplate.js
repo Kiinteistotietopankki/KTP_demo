@@ -644,8 +644,8 @@ onChange={(e) => {
           <div className="border p-4 rounded shadow-sm">
             <h3 className="text-xl font-semibold mb-4">📄 Kansisivu</h3>
           <div className="form-control mb-3" readOnly>
-  {title}
-</div>
+              {title}
+            </div>
             <input
               type="file"
               accept="image/*"
@@ -661,11 +661,11 @@ onChange={(e) => {
             />
             
            <input
-  type="date"
-  value={customText}
-  onChange={(e) => setCustomText(e.target.value)}
-  className="form-control"
-/>
+              type="date"
+              value={customText}
+              onChange={(e) => setCustomText(e.target.value)}
+              className="form-control"
+            />
           </div>
 
 <div className="border p-4 rounded shadow-sm">
@@ -721,9 +721,9 @@ onChange={(e) => {
 {['rakennetekniikka', 'sahko', 'lvi'].map((key) => {
   const sectionIndex = sections.findIndex((s) => s.key === key);
   const labels = {
-    rakennetekniikka: '📷 Ota Rakennetekniikka-kuvia',
-    sahko: '📷 Ota Sähkö-kuvia',
-    lvi: '📷 Ota LVI-kuvia',
+    rakennetekniikka: '📷 Rakenne-kuvat',
+    sahko: '📷 Sähkö-kuvat',
+    lvi: '📷 LVI-kuvat',
   };
 
   return sectionIndex !== -1 ? (
