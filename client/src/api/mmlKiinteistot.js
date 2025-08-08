@@ -6,7 +6,8 @@ const API_URL = config.apiBaseUrl;
 const BASE_URL = "/api/mml";
 
 const api = axios.create({
-  baseURL: API_URL+BASE_URL,
+  baseURL: API_URL + BASE_URL,
+  withCredentials: true
 });
 
 // 🧩 Generic GET helper
