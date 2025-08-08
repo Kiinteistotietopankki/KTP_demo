@@ -1,115 +1,82 @@
 import React from 'react';
-import { Table } from 'react-bootstrap';
 
 const TableTemplate = ({ properties = {}, tableTitle }) => {
-  const headers = Object.keys(properties).map((key) => ({
-    key,
-    label: key
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, (str) => str.toUpperCase())
-  }));
+  const entries = Object.entries(properties);
 
-  return (
-    <div className="mb-4">
-      {tableTitle && (
-        <h5 className="mb-3 text-primary fw-semibold">{tableTitle}</h5>
-      )}
+  const fontFamily = `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif`;
 
-      <div
-        className="table-responsive"
-        style={{
-          overflowX: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          width: '100%',
-        }}
-      >
-        <Table
-          className="table-sm mb-0 shadow rounded-3 overflow-hidden"
-          style={{
-            fontSize: '0.9rem',
-            width: '100%',
-            borderCollapse: 'separate',
-            borderSpacing: '0',
-          }}
-        >
-          <thead
-            style={{
-              background: 'linear-gradient(to right, #e9f0ff, #f4f8ff)',
-              color: '#2c3e50',
-              fontWeight: '600',
-              fontSize: '0.95rem'
-            }}
+    return (
+      <div className="mb-1" style={{ fontFamily }}>
+        {/* Responsive font size styles */}
+        <style>
+          {`
+            .responsive-table {
+              font-size: 0.9rem;
+            }
+            @media (max-width: 576px) {
+              .responsive-table {
+                font-size: 0.75rem; /* smaller text on xs devices */
+              }
+              .responsive-table th {
+                white-space: normal; /* allow label wrap on mobile */
+              }
+            }
+          `}
+        </style>
+
+        {tableTitle && (
+          <h5
+            className="mb-3 text-primary fw-semibold"
+            style={{ fontWeight: 600 }}
           >
-            <tr>
-              <th
-                style={{
-                  width: '35%',
-                  whiteSpace: 'nowrap',
-                  borderBottom: '2px solid #dee2e6',
-                  padding: '0.75rem',
-                }}
-              >
-                Ominaisuus
-              </th>
-              <th
-                style={{
-                  width: '65%',
-                  wordBreak: 'break-word',
-                  borderBottom: '2px solid #dee2e6',
-                  padding: '0.75rem',
-                }}
-              >
-                Arvo
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {headers.map(({ key, label }, index) => {
-              const { value } = properties[key] || {};
-              const displayValue = Array.isArray(value)
-                ? value.join(', ')
-                : value ?? '-';
+            {tableTitle}
+          </h5>
+        )}
 
-              return (
-                <tr
-                  key={key}
-                  style={{
-                    backgroundColor: index % 2 === 0 ? '#f8f9fa' : '#ffffff',
-                    transition: 'background-color 0.2s, transform 0.2s',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#eef5ff';
-                    e.currentTarget.style.transform = 'scale(1.01)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      index % 2 === 0 ? '#f8f9fa' : '#ffffff';
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }}
-                >
-                    <td
-                    className="fw-semibold"
-                    style={{
-                        padding: '0.65rem',
-                        whiteSpace: 'nowrap',   // ✅ Prevents line wrapping
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        maxWidth: '1px'         // ✅ Forces ellipsis when too long
-                    }}
-                    >
-                    {label}
-                    </td>
-                  <td className="text-break" style={{ padding: '0.65rem' }}>
-                    {displayValue}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
+        {entries.length === 0 ? (
+          <p className="text-muted fst-italic">Ei tietoja saatavilla</p>
+        ) : (
+          <div className="table-responsive">
+            <table
+              className="table table-bordered align-middle responsive-table"
+              style={{ fontFamily }}
+            >
+              <tbody>
+                {entries.map(([key, { value } = {}]) => {
+                  const label = key
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, (str) => str.toUpperCase());
+                  const displayValue = Array.isArray(value)
+                    ? value.join(', ')
+                    : value ?? '-';
+
+                  return (
+                    <tr key={key}>
+                      <th
+                        scope="row"
+                        style={{
+                          backgroundColor: '#f8f9fa',
+                          fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                          width: '30%',
+                        }}
+                        title={label}
+                      >
+                        {label}
+                      </th>
+                      <td style={{ color: '#212529' }} title={displayValue}>
+                        {displayValue}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default TableTemplate;

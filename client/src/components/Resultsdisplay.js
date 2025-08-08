@@ -206,10 +206,22 @@ function Resultdisplay({ data, setMapCoords }) {
         <Modal.Body>
           {selectedRakennus && (
             <>
-              <Tabletemplate properties={selectedRakennus.properties.yleistiedot} />
-              <Tabletemplate properties={selectedRakennus.properties.teknisettiedot} />
-              <Tabletemplate properties={selectedRakennus.properties.rakennustiedot} />
-              <Tabletemplate properties={selectedRakennus.properties.aluetiedot} />
+            <h6 className="text-success fw-light mb-2">Yleistiedot</h6>
+            <div className="border-top border-success my-1" style={{ height: '3px' }} />
+            <Tabletemplate properties={selectedRakennus.properties.yleistiedot} />
+
+            <h6 className="text-success fw-light mb-2">Tekniset tiedot</h6>
+            <div className="border-top border-success my-1" style={{ height: '3px' }} />
+            <Tabletemplate properties={selectedRakennus.properties.teknisettiedot} />
+
+          
+            <h6 className="text-success fw-light mb-2">Rakennustiedot</h6>
+            <div className="border-top border-success my-1" style={{ height: '3px' }} />
+            <Tabletemplate properties={selectedRakennus.properties.rakennustiedot} />
+
+            <h6 className="text-success fw-light mb-2">Aluetiedot</h6>
+            <div className="border-top border-success my-1" style={{ height: '3px' }} />
+            <Tabletemplate properties={selectedRakennus.properties.aluetiedot} />
             </>
           )}
         </Modal.Body>
