@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Tab, Tabs, Button, Modal } from 'react-bootstrap'
 import TulosteetTab from './TulosteetTab'
-import PropertyDetailsForm from './ReportTemplate'
+import PropertyDetailsForm from './report/ReportTemplate'
 
 export default function DokumentitTab({ kiinteisto }) {
   const [dokumentitActiveKey, setDokumentitActiveKey] = useState('Omat_dokumentit')
@@ -53,7 +53,6 @@ export default function DokumentitTab({ kiinteisto }) {
         </div>
       </div>
 
-      {/* 📄 Modal for Report Creation */}
       <Modal
         show={showReportModal}
         onHide={handleCloseModal}

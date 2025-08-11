@@ -6,7 +6,7 @@ import { Card, CardHeader, Col, Row, Tab, Table, Tabs } from 'react-bootstrap';
 import { getKiinteistoWhole } from '../api/api';
 import PerustiedotAccordion from '../components/PerustiedotAccordion';
 import { Button, Modal } from 'react-bootstrap';
-import PropertyDetailsForm from '../components/ReportTemplate'; 
+import PropertyDetailsForm from '../components/report/ReportTemplate.js';
 import TilastoTable from '../components/TilastoTable';
 import TulosteetTab from '../components/TulosteetTab';
 import MMLTabFetcher from '../components/MMLTabFetcher';

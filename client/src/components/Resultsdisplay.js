@@ -3,7 +3,7 @@ import Tabletemplate from './Tabletemplate';
 import { Button, Card, Modal } from 'react-bootstrap';
 import exportToExcel from './Excelexport';
 import exportToPdf from './Pdfexport';
-import EditableReport from './ReportTemplate';
+import PropertyDetailsForm from './report/ReportTemplate.js'
 import '../App.css';
 import { jsonToModelFormat } from '../assets/jsonToDBmodel';
 import { prettifyJson } from '../assets/prettifyJson';

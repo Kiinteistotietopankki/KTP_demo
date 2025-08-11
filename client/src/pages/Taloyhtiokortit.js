@@ -2,7 +2,7 @@ import { Button, Card, Form, InputGroup, Modal, Badge, Dropdown } from 'react-bo
 import { Link } from 'react-router-dom';
 import { getKiinteistotWithRakennukset } from '../api/api';
 import { useEffect, useState } from 'react';
-import PropertyDetailsForm from '../components/ReportTemplate'; 
+import PropertyDetailsForm from '../components/report/ReportTemplate'; 
 
 function Taloyhtiokortit() {
   const [kiinteistot, setKiinteistot] = useState([]);
