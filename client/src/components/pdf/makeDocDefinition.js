@@ -12,6 +12,56 @@ export default function makeDocDefinition({
 }) {
   const content = [];
 
+  const CONTENT_WIDTH = 515;
+
+  
+  let sectionCounter = 0;
+  let currentSub = 0;
+
+  const pushNumberedSection = (arr, { title, pageBreak = 'before', tocItem = true, id }) => {
+    sectionCounter += 1;
+    currentSub = 0; 
+    arr.push({
+      stack: [
+        { text: `${sectionCounter} ${title.toUpperCase()}`, style: 'sectionHeading', pageBreak, tocItem, id },
+        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: CONTENT_WIDTH, y2: 0, lineWidth: 1.5, lineColor: '#000' }] },
+      ],
+      margin: [0, 10, 0, 18],
+    });
+  };
+
+  const pushSubsection = (arr, { title, tocItem = true, id }) => {
+    currentSub += 1;
+    arr.push({
+      text: `${sectionCounter}.${currentSub} ${title.toUpperCase()}`,
+      style: 'subHeading',
+      margin: [0, 12, 0, 6],
+      tocItem,
+      id,
+    });
+  };
+// Turn a big blob of text into nicely spaced paragraphs
+function pushCleanParagraphs(arr, rawText) {
+  if (!rawText) return;
+  const parts = String(rawText)
+    .replace(/\r\n/g, '\n')          // normalize newlines
+    .replace(/[ \t]+\n/g, '\n')      // trim trailing spaces on lines
+    .replace(/\n{3,}/g, '\n\n')      // collapse 3+ newlines to 2
+    .split(/\n\s*\n/);               // split on blank line
+
+  parts.forEach((p, i) => {
+    const t = p.trim();
+    if (!t) return;
+    arr.push({
+      text: t,
+      style: 'paragraph',
+      alignment: 'justify',
+      lineHeight: 1.35,
+      margin: [0, 0, 0, i === parts.length - 1 ? 10 : 6], // paragraph spacing
+    });
+  });
+}
+
   // --- Cover page ---
   content.push({
     stack: [
@@ -28,7 +78,9 @@ export default function makeDocDefinition({
                 absolutePosition: { x: 60, y: 70 },
                 noWrap: true,
               },
-              coverImage ? { image: coverImage, width: 300, alignment: 'left', margin: [20, 20, 0, 20] } : null,
+              coverImage
+                ? { image: coverImage, width: 300, alignment: 'left', margin: [20, 20, 0, 20] }
+                : null,
             ].filter(Boolean),
           },
           {
@@ -40,7 +92,9 @@ export default function makeDocDefinition({
             width: '30%',
             stack: [
               { text: 'INSINÖÖRITOIMISTO\nWAATIVA', alignment: 'left', fontSize: 11, margin: [20, 75, 0, 74] },
-              logoBase64 ? { image: logoBase64, width: 80, alignment: 'center', margin: [20, 75, 0, 74] } : null,
+              logoBase64
+                ? { image: logoBase64, width: 80, alignment: 'center', margin: [20, 75, 0, 74] }
+                : null,
             ].filter(Boolean),
           },
         ],
@@ -54,60 +108,153 @@ export default function makeDocDefinition({
     ],
     margin: [30, 60, 30, 0],
   });
+function fillJohdantoTemplate(template, fields = {}) {
+  return template
+    .replace('{{toimeksiantaja}}', fields.toimeksiantaja || '')
+    .replace('{{koordinaattori}}', fields.koordinaattori || '')
+    .replace('{{koordinaattori_title}}', fields.koordinaattori_title || '')
+    .replace('{{rakennustekniikka}}', fields.rakennustekniikka || '')
+    .replace('{{rakennustekniikka_title}}', fields.rakennustekniikka_title || '')
+    .replace('{{lvia}}', fields.lvia || '')
+    .replace('{{lvia_title}}', fields.lvia_title || '')
+    .replace('{{sahko}}', fields.sahko || '')
+    .replace('{{sahko_title}}', fields.sahko_title || '');
+}
 
-  // --- Johdanto ---
-  const intro = sections.find((s) => s.key === 'johdanto' && s.include);
-  if (intro) {
-    content.push(
-     { text: intro.label.toUpperCase(), style: 'sectionTitle', pageBreak: 'before', margin: [0, 10, 0, 35], tocItem: true },
-      { text: intro.content || '', style: 'paragraph', margin: [0, 0, 0, 10] }
-      
-    );
+const intro = sections.find((s) => s.key === 'johdanto' && s.include);
+if (intro) {
+  pushNumberedSection(content, { title: intro.label, pageBreak: 'before', tocItem: true });
+
+  // Build the aligned table
+  const henkilötTable = {
+    table: {
+      widths: [130, 'auto', '*'],
+      body: [
+        ['Koordinaattori:', intro.fields?.koordinaattori || '', intro.fields?.koordinaattori_title || ''],
+        ['Rakennustekniikka:', intro.fields?.rakennustekniikka || '', intro.fields?.rakennustekniikka_title || ''],
+        ['LVIA-järjestelmät:', intro.fields?.lvia || '', intro.fields?.lvia_title || ''],
+        ['Sähköjärjestelmät:', intro.fields?.sahko || '', intro.fields?.sahko_title || ''],
+      ]
+    },
+     layout: {
+    hLineWidth: () => 0,
+    vLineWidth: () => 0,
+    paddingLeft: () => 0,
+    paddingRight: () => 20, 
+    paddingTop: () => 2,
+    paddingBottom: () => 2
+  },
+  fontSize: 11,
+  margin: [0, 5, 0, 10]
+};
+
+
+  const lines = (intro.content || '').split('\n');
+  const beforeLines = [];
+  const afterLines = [];
+  let foundBlock = false;
+
+  for (const line of lines) {
+    if (
+      line.includes('{{koordinaattori}}') ||
+      line.includes('{{rakennustekniikka}}') ||
+      line.includes('{{lvia}}') ||
+      line.includes('{{sahko}}')
+    ) {
+      foundBlock = true;
+      continue; 
+    }
+    if (!foundBlock) beforeLines.push(line);
+    else afterLines.push(line);
   }
+
+  if (beforeLines.join('\n').trim()) {
+    content.push({ text: fillJohdantoTemplate(beforeLines.join('\n'), intro.fields), style: 'paragraph', margin: [0, 0, 0, 10] });
+  }
+
+  content.push(henkilötTable);
+
+  if (afterLines.join('\n').trim()) {
+    content.push({ text: fillJohdantoTemplate(afterLines.join('\n'), intro.fields), style: 'paragraph', margin: [0, 0, 0, 10] });
+  }
+
+ 
+  content.push(
+    { text: 'Käytetyt kuntoluokat:', fontSize: 11, semibold: true, margin: [0, 10, 0, 10] },
+    {
+      text: [
+        { text: 'KL 5', color: '#04aa00', fontSize: 11, semibold: true },
+        { text: '   Uusi, ei toimenpiteitä seuraavan 10 vuoden kuluessa\n', fontSize: 11 },
+        { text: 'KL 4', color: '#04aa00', fontSize: 11, semibold: true },
+        { text: '   Hyvä, kevyt huoltokorjaus 6-10 vuoden kuluessa\n', fontSize: 11 },
+        { text: 'KL 3', color: '#FFC107', fontSize: 11, semibold:true },
+        { text: '   Tyydyttävä, kevyt huoltokorjaus 1-5 vuoden kuluessa tai peruskorjaus 6-10 vuoden kuluessa\n', fontSize: 11 },
+        { text: 'KL 2', color: '#ba3b46', fontSize: 11, semibold: true },
+        { text: '   Välttävä, peruskorjaus 1-5 vuoden kuluessa tai uusiminen 6-10 vuoden kuluessa\n', fontSize: 11 },
+        { text: 'KL 1', color: '#ba3b46', fontSize: 11, semibold:true },
+        { text: '   Heikko, uusitaan 1-5 vuoden kuluessa', fontSize: 11 },
+      ],
+      margin: [0, 0, 0, 10],
+    }
+  );
+}
+
 
   // --- Kohteen tiedot ---
   const rakennukset = rakennusData?.rakennukset_fulls || [];
   if (rakennukset.length > 0) {
-    content.push({
-      text: 'Kohteen Perustiedot',
-      style: 'heading',
+    pushNumberedSection(content, {
+      title: 'Kohteen Perustiedot',
       pageBreak: 'before',
-      margin: [0, 10, 0, 10],
-        tocItem: true,
-  id: 'kohteen-perustiedot'
-});
-   
+      tocItem: true,
+      id: 'kohteen-perustiedot',
+    });
 
     const rak = rakennukset[0];
     const infoSections = [
-      { title: 'Yleiset tiedot', rows: [
-        ['Kohteen nimi', propertyName || 'Asunto Oy Mallila'],
-        ['Osoitteet', rak.osoite || '—'],
-        ['Toimipaikka', `${rak.postinumero || ''} ${rak.toimipaikka || ''}`.trim()],
-      ]},
-      { title: 'Kiinteistötiedot', rows: [
-        ['Kiinteistötunnus', rakennusData?.kiinteistotunnus || '—'],
-        ['Tontin koko', '50505 m²'],
-        ['Tontin omistaja', 'Mallilla Oy'],
-        ['Yhteystiedot', '0441010101'],
-      ]},
-      { title: 'Rakennukset', rows: [
-        ['Rakennusten lkm.', rakennukset.length],
-        ['Ulkorakennusten lkm.', rakennukset.length],
-      ]},
-      { title: 'Vuodet', rows: [
-        ['Rakennusvuosi', rak.rakennusvuosi || '—'],
-        ['Peruskorjausvuosi', '—'],
-        ['Laajennusvuosi', '—'],
-      ]},
-      { title: 'Alat', rows: [
-        ['Kokonaisala', rak.kokonaisala ? `${rak.kokonaisala} m²` : '—'],
-        ['Kerrosala', rak.kerrosala ? `${rak.kerrosala} m²` : '—'],
-        ['Huoneistoala', rak.huoneistoala ? `${rak.huoneistoala} m²` : '—'],
-        ['Tilavuus', rak.tilavuus ? `${rak.tilavuus} m³` : '—'],
-        ['Kerroksia', rak.kerroksia ?? '—'],
-        ['Kellarikerroksia', '—'],
-      ]},
+      {
+        title: 'Yleiset tiedot',
+        rows: [
+          ['Kohteen nimi', propertyName || 'Asunto Oy Mallila'],
+          ['Osoitteet', rak.osoite || '—'],
+          ['Toimipaikka', `${rak.postinumero || ''} ${rak.toimipaikka || ''}`.trim()],
+        ],
+      },
+      {
+        title: 'Kiinteistötiedot',
+        rows: [
+          ['Kiinteistötunnus', rakennusData?.kiinteistotunnus || '—'],
+          ['Tontin koko', '50505 m²'],
+          ['Tontin omistaja', 'Mallilla Oy'],
+          ['Yhteystiedot', '0441010101'],
+        ],
+      },
+      {
+        title: 'Rakennukset',
+        rows: [
+          ['Rakennusten lkm.', rakennukset.length],
+          ['Ulkorakennusten lkm.', rakennukset.length],
+        ],
+      },
+      {
+        title: 'Vuodet',
+        rows: [
+          ['Rakennusvuosi', rak.rakennusvuosi || '—'],
+          ['Peruskorjausvuosi', '—'],
+          ['Laajennusvuosi', '—'],
+        ],
+      },
+      {
+        title: 'Alat',
+        rows: [
+          ['Kokonaisala', rak.kokonaisala ? `${rak.kokonaisala} m²` : '—'],
+          ['Kerrosala', rak.kerrosala ? `${rak.kerrosala} m²` : '—'],
+          ['Huoneistoala', rak.huoneistoala ? `${rak.huoneistoala} m²` : '—'],
+          ['Tilavuus', rak.tilavuus ? `${rak.tilavuus} m³` : '—'],
+          ['Kerroksia', rak.kerroksia ?? '—'],
+          ['Kellarikerroksia', '—'],
+        ],
+      },
     ];
 
     const noLinesLayout = {
@@ -122,13 +269,13 @@ export default function makeDocDefinition({
     infoSections.forEach((section) => {
       content.push({
         stack: [
-          { text: section.title, bold: true, fontSize: 13, margin: [0, 12, 0, 4], },
-          { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 2, lineColor: '#198754' }], margin: [0, 2, 0, 6] },
+          { text: section.title, semibold: true, fontSize: 13, margin: [0, 12, 0, 4] },
+          { canvas: [{ type: 'line', x1: 0, y1: 0, x2: CONTENT_WIDTH, y2: 0, lineWidth: 2, lineColor: '#198754' }], margin: [0, 2, 0, 6] },
         ],
       });
 
       const tableBody = section.rows.map(([label, value]) => [
-        { text: label, bold: true, fontSize: 11 },
+        { text: label, semibold: true, fontSize: 11 },
         { text: value || '—', fontSize: 11 },
       ]);
 
@@ -139,25 +286,38 @@ export default function makeDocDefinition({
       });
     });
   }
-   content.push({ text: 'SISÄLLYSLUETTELO', style: 'heading', pageBreak: 'before', margin: [0, 20, 0, 10] });
- content.push({
- toc: {
-    title: { text: '' },
-    numberStyle: 'tocNumber',
-    textMargin: [0, 2, 0, 2],
-    dotLeader: true,
-  },
-   style: 'paragraph',
- });
 
-  // --- Rest of sections ---
+  // --- SISÄLLYSLUETTELO ---
+  content.push({ text: 'SISÄLLYSLUETTELO', style: 'heading', pageBreak: 'before', margin: [0, 20, 0, 10] });
+  content.push({
+    toc: {
+      title: { text: '' },
+      numberStyle: 'tocNumber',
+      textMargin: [0, 2, 0, 2],
+      dotLeader: true,
+    },
+    style: 'paragraph',
+  });
+
+ 
   for (const s of sections) {
     if (!s.include || s.key === 'johdanto') continue;
 
-    content.push({ text: s.label.toUpperCase(), style: 'sectionTitle', pageBreak: 'before', margin: [0, 10, 0, 5],tocItem: true });
-    
+    pushNumberedSection(content, { title: s.label, pageBreak: 'before', tocItem: true });
 
-    if (s.content) content.push({ text: s.content, style: 'paragraph', margin: [0, 0, 0, 10] });
+  if (s.content) {
+  pushCleanParagraphs(content, s.content);
+}
+
+   
+    if (Array.isArray(s.subsections)) {
+      s.subsections.forEach((sub) => {
+        pushSubsection(content, { title: sub.label, tocItem: true });
+       if (sub.text) {
+  pushCleanParagraphs(content, sub.text);
+}
+      });
+    }
 
     if (s.images?.length) {
       const rows = [];
@@ -202,7 +362,7 @@ export default function makeDocDefinition({
       }, {});
 
       for (const [category, items] of Object.entries(grouped)) {
-        const tableBody = items.map(item => [
+        const tableBody = items.map((item) => [
           { text: item.label, fontSize: 11 },
           {
             columns: [
@@ -210,13 +370,13 @@ export default function makeDocDefinition({
               { text: item.description || '', fontSize: 11 },
             ],
             columnGap: 6,
-          }
+          },
         ]);
 
         content.push({
           stack: [
-            { text: category.toUpperCase(), fontSize: 14, bold: true, margin: [0, 2, 0, 0] },
-            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1, lineColor: '#008000' }], margin: [0, 2, 0, 2] },
+            { text: category.toUpperCase(), fontSize: 14, semibold: true, margin: [0, 2, 0, 0] },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: CONTENT_WIDTH, y2: 0, lineWidth: 1, lineColor: '#008000' }], margin: [0, 2, 0, 2] },
             { table: { widths: ['30%', '70%'], body: tableBody }, layout: tableLayout, margin: [0, 0, 0, 4] },
           ],
           unbreakable: true,
@@ -232,15 +392,10 @@ export default function makeDocDefinition({
     styles: {
       title: { font: 'JosefinSans', fontSize: 36, semibold: true },
       heading: { font: 'JosefinSans', fontSize: 18, semibold: true },
-      sectionTitle: {  font: 'JosefinSans',
-    fontSize: 16,
-    semibold: true,
-    decoration: 'underline', // <- underline text
-    decorationStyle: 'solid',
-    decorationColor: '#000000'},
-      paragraph: { font: 'Lato', fontSize: 11 },
-    
-},
+      sectionHeading: { font: 'JosefinSans', fontSize: 16, semibold: true },
+      subHeading: { font: 'JosefinSans', fontSize: 13, semibold: true }, 
+      paragraph: { font: 'Lato', fontSize: 11, alignment: 'justify', lineHeight: 1.35, characterSpacing: 0.1 },
+    },
     header: (currentPage) => {
       if (currentPage === 1) return null;
       const sidePadding = 30;
@@ -249,7 +404,12 @@ export default function makeDocDefinition({
         margin: [0, 0, 0, 10],
         stack: [
           { canvas: [{ type: 'rect', x: sidePadding, y: 0, w: bannerWidth, h: 20, color: '#008000' }] },
-          { text: `${new Date().toLocaleDateString('fi-FI')}  |  ${propertyName || 'ASUNTO OY MALLILIA'}`, fontSize: 9, color: 'white', absolutePosition: { x: sidePadding + 5, y: 5 } },
+          {
+            text: `${new Date().toLocaleDateString('fi-FI')}  |  ${propertyName || 'ASUNTO OY MALLILIA'}`,
+            fontSize: 9,
+            color: 'white',
+            absolutePosition: { x: sidePadding + 5, y: 5 },
+          },
         ],
       };
     },

@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from 'react';
 
-export default function TutkimustarpeetTaulu({ onYhteensaChange }) {
+export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData  }) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
   const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
-  const initialData = [
-    {
-      header: 'Tutkimustarpeet',
-      kl: 'KL3',
-      items: [
-        { label: '', values: Array(11).fill('') },
-       
-      ]
-    }
-  ];
+const initialData = [
+  {
+    header: 'Tutkimustarpeet',
+    kl: 'KL3',
+    items: [
+      { label: '', kl: 'KL3', values: Array(11).fill('') }, 
+    ]
+  }
+];
 
-  const [tableData, setTableData] = useState(initialData);
+const handleAddRow = (sectionIdx) => {
+  const updated = [...tableData];
+  updated[sectionIdx].items.push({
+    label: '',
+    kl: 'KL3', 
+    values: Array(11).fill('')
+  });
+  setTableData(updated);
+};
+
+
 
 
   const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
@@ -26,15 +35,7 @@ export default function TutkimustarpeetTaulu({ onYhteensaChange }) {
     setTableData(updated);
   };
 
-  const handleAddRow = (sectionIdx) => {
-  const updated = [...tableData];
-  updated[sectionIdx].items.push({
-    label: '',
-    kl: '', 
-    values: Array(11).fill('')
-  });
-  setTableData(updated);
-};
+
 
   const handleRemoveRow = (sectionIdx, itemIdx) => {
     const updated = [...tableData];
@@ -42,6 +43,24 @@ export default function TutkimustarpeetTaulu({ onYhteensaChange }) {
     setTableData(updated);
   };
 
+const [tableData, setTableData] = useState(() =>
+    Array.isArray(data) && data.length > 0 ? data : initialData
+  );
+
+useEffect(() => {
+  if (Array.isArray(data) && data.length > 0) {
+    setTableData(data);
+  }
+}, [JSON.stringify(data)]);
+
+ 
+  useEffect(() => {
+    if (typeof setData === 'function') {
+      setData(tableData);
+    }
+  }, [tableData, setData]);
+
+  
   const yhteensa = Array(11).fill(0);
   tableData.forEach(section => {
     section.items.forEach(item => {
@@ -52,12 +71,11 @@ export default function TutkimustarpeetTaulu({ onYhteensaChange }) {
     });
   });
 
-useEffect(() => {
-  if (onYhteensaChange) {
-    onYhteensaChange([...yhteensa]); 
-  }
-  
-}, [JSON.stringify(yhteensa)]);
+  useEffect(() => {
+    if (onYhteensaChange) {
+      onYhteensaChange([...yhteensa]); 
+    }
+  }, [JSON.stringify(yhteensa)]);
 
   return (
     <div className="accordion my-4" id="tutkimusAccordion">

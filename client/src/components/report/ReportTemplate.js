@@ -41,7 +41,7 @@ const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: 
     if (initialRakennusData) setRakennusData(initialRakennusData);
   }, [initialRakennusData]);
 
-  // persist form
+ 
   useEffect(() => {
     setSavedData({
       ...savedData,

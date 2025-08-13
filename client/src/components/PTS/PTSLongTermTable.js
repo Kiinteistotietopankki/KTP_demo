@@ -82,7 +82,7 @@ useEffect(() => {
       const entries = fullPTS.entries || [];
       console.log("📦 Raw fetched entries:", entries);
 
-      // Step 4: Split entries by category
+      
       const filterByCategory = (cat) => entries.filter(e => e.category === cat);
 
       const tekniikka = filterByCategory('Rakennetekniikka');
@@ -93,7 +93,7 @@ useEffect(() => {
   tekniikka, lvi, sahko, tutkimus
 });
 
-      // Step 5: Format them into state shape
+      
     const mapToSection = (items) => {
   const grouped = {};
 
@@ -134,7 +134,7 @@ console.log("values array for:", entry.label, values);
       setSahkoData(mapToSection(sahko));
       setTutkimusData(mapToSection(tutkimus));
 
-      // Step 6: Compute totals
+      
   const getTotals = (entries) => {
   const sums = Array(11).fill(0);
   entries.forEach(e => {
@@ -178,12 +178,13 @@ console.log("values array for:", entry.label, values);
             if (item.label === 'Rakennetekniikka') item.values = tekniikkaYhteensa;
             if (item.label === 'LVI Järjestelmät') item.values = lviYhteensa;
             if (item.label === 'Sähköjärjestelmät') item.values = sahkoYhteensa;
+            if (item.label === 'Lisätutkimukset') item.values = tutkimusYhteensa;
           });
         });
       }
     });
     setData(updated);
-  }, [tekniikkaYhteensa, lviYhteensa, sahkoYhteensa]);
+  }, [tekniikkaYhteensa, lviYhteensa, sahkoYhteensa, tutkimusYhteensa]);
 
   const chartData = years.map((year, idx) => {
     const sub = data[0].subcategories[0];
@@ -212,7 +213,7 @@ const handleSavePTS = async () => {
           return hasLabel || hasKL || hasValues;
         })
         .map(item => ({
-          id: item.id || undefined, // Include `id` if present (important for PUT)
+          id: item.id || undefined, 
           category,
           section: section.name || section.header || '',
           label: item.label || '',
@@ -241,12 +242,12 @@ const handleSavePTS = async () => {
   };
 
   try {
-    // Step 1: Check if a PTS already exists
+    // Check if a PTS already exists
     const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`,{ credentials: 'include'
 });
     const ptsList = await listRes.json();
 
-    const existingPTS = ptsList?.[0]; // may be undefined
+    const existingPTS = ptsList?.[0]; 
     const method = existingPTS ? 'PUT' : 'POST';
     const url = existingPTS
       ? `${config.apiBaseUrl}/api/pts/${existingPTS.id}`
@@ -302,7 +303,7 @@ const handleSavePTS = async () => {
                     <thead className="table-light">
   <tr>
     <th className="text-start">Osa-alue</th>
-    <th className="text-end font-monospace">Yhteensä</th> {/* ← Move this here */}
+    <th className="text-end font-monospace">Yhteensä</th> 
     {years.map((year) => (
       <th key={year} className="text-end font-monospace">{year}</th>
     ))}
@@ -333,7 +334,7 @@ const handleSavePTS = async () => {
       item.label === 'LVI Järjestelmät' ? lviYhteensa :
       item.label === 'Sähköjärjestelmät' ? sahkoYhteensa :
       item.label === 'Lisätutkimukset' ? tutkimusYhteensa :
-      item.values // fallback
+      item.values
     ).map((val, yearIdx) => (
       <td key={yearIdx} className="text-end">{val}</td>
     ))
@@ -356,9 +357,9 @@ const handleSavePTS = async () => {
                     </tbody>
                 <tfoot>
   <tr className="table-success fw-bold">
-    <td className="text-start">YHTEENSÄ</td> {/* 1: label column */}
+    <td className="text-start">YHTEENSÄ</td> 
     
-    <td className="text-end font-monospace"> {/* 2: total of all row sums */}
+    <td className="text-end font-monospace"> 
       {sub.items
         .filter((i) => i.label !== 'Yhteensä')
         .reduce((acc, item) =>
@@ -370,7 +371,7 @@ const handleSavePTS = async () => {
         , 0)}
     </td>
 
-    {/* 3–13: yearly column totals */}
+    
     {Array.from({ length: 11 }, (_, idx) => {
       const colSum = sub.items
         .filter((i) => i.label !== 'Yhteensä')

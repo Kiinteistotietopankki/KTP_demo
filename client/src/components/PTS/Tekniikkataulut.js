@@ -18,7 +18,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange }) {
 
   useEffect(() => {
   if (!Array.isArray(data) || data.length === 0) {
-    // Use initial fallback only once
+    
     if (tableData.length === 0) {
    const fallback = initialData;
       setTableData(fallback);
@@ -36,7 +36,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange }) {
     }))
   }));
 
-  // Only set if it's truly different to avoid flicker
+
   const jsonNew = JSON.stringify(normalized);
   const jsonOld = JSON.stringify(tableData);
   if (jsonNew !== jsonOld) {

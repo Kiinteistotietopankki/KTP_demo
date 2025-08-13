@@ -42,7 +42,7 @@ export default function CoverPageForm({
         className="form-control mb-3"
       />
 
-      {/* Preview if cover image exists */}
+      
       {coverImage && (
         <div className="mb-3">
           <div className="position-relative d-inline-block">
