@@ -52,8 +52,8 @@ export const reportTemplates = Object.freeze({
       { key: 'energia',label: 'Energiataloudellinen selvitys',      content: '', include: true, images: [] },
       { key: 'rakennekunto',label: 'Rakennetekninen kuntoarvio',      content: '', include: true, images: [] },
       { key: 'lvikunto',label: 'LVI-järjestelmien kuntoarvio',      content: '', include: true, images: [] },
-       { key: 'sähkökunto',label: 'Sähköjärjestelmien kuntoarvio',      content: '', include: true, images: [] },
-        { key: 'allekirjoitus',label: 'Allekirjoitukset',      content: Allekirjoitus.Option1, include: true, images: [] },
+      { key: 'sähkökunto',label: 'Sähköjärjestelmien kuntoarvio',      content: '', include: true, images: [] },
+      { key: 'allekirjoitus',label: 'Allekirjoitukset',      content: Allekirjoitus.Option1, include: true, images: [] },
     ],
   },
 });
