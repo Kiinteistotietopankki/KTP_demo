@@ -11,6 +11,7 @@ import LVITable from './LVItaulu';
 import SahkotekniikkaTable from './Sähkötekniikkataulu';
 import TutkimustarpeetTaulu from './Tutkimustarpeettaulu';
 import config from '../../devprodConfig';
+import PiechartPTS from './PiechartPTS';
 
 export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
   const currentYear = new Date().getFullYear();
@@ -462,31 +463,12 @@ const handleSavePTS = async () => {
 
         {/* Pie Chart */}
         <Tab eventKey="pie" title="Ympyrädiagrammi">
-          <ResponsiveContainer width="100%" height={350}>
-            <PieChart>
-              <Tooltip />
-              <Legend />
-              <Pie
-                data={[
-                  { name: 'Rakennetekniikka', value: tekniikkaYhteensa.reduce((a, b) => a + b, 0) },
-                  { name: 'LVI Järjestelmät', value: lviYhteensa.reduce((a, b) => a + b, 0) },
-                  { name: 'Sähköjärjestelmät', value: sahkoYhteensa.reduce((a, b) => a + b, 0) },
-                  { name: 'Lisätutkimukset', value: tutkimusYhteensa.reduce((a, b) => a + b, 0) }
-                ]}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={120}
-                label
-              >
-                <Cell fill="#7AA668" />
-                <Cell fill="#A7BFA2" />
-                <Cell fill="#C8D1BC" />
-                <Cell fill="#2F5930" />
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
+          <PiechartPTS
+            tekniikkaYhteensa={tekniikkaYhteensa}
+            lviYhteensa={lviYhteensa}
+            sahkoYhteensa={sahkoYhteensa}
+            tutkimusYhteensa={tutkimusYhteensa}
+          />
         </Tab>
       </Tabs>
     </div>
