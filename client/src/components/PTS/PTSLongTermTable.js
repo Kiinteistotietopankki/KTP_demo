@@ -275,212 +275,223 @@ const handleSavePTS = async () => {
 };
 
 
-  return (
-    <div className="accordion my-4" id="ptsAccordion">
-      {data.map((cat, catIdx) => (
-        <React.Fragment key={catIdx}>
-          {cat.subcategories.map((sub, subIdx) => (
-            <div className="accordion-item" key={subIdx}>
-              <h2 className="accordion-header" id={`heading-${subIdx}`}>
-                <button
-                  className="accordion-button"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target={`#collapse-${subIdx}`}
-                  aria-expanded="true"
-                  aria-controls={`collapse-${subIdx}`}
-                >
-                  {sub.name}
-                </button>
-              </h2>
-
-              <div
-                id={`collapse-${subIdx}`}
-                className="accordion-collapse collapse show"
-                aria-labelledby={`heading-${subIdx}`}
+return (
+  <div className="accordion my-4" id="ptsAccordion">
+    {data.map((cat, catIdx) => (
+      <React.Fragment key={catIdx}>
+        {cat.subcategories.map((sub, subIdx) => (
+          <div className="accordion-item" key={subIdx}>
+            <h2 className="accordion-header" id={`heading-${subIdx}`}>
+              <button
+                className="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target={`#collapse-${subIdx}`}
+                aria-expanded="true"
+                aria-controls={`collapse-${subIdx}`}
               >
-               <div className="responsive-table-container">
-  <table className="table table-sm mb-0">
-                    <thead className="table-light">
-  <tr>
-    <th className="text-start">Osa-alue</th>
-    <th className="text-end font-monospace">Yhteensä</th> 
-    {years.map((year) => (
-      <th key={year} className="text-end font-monospace">{year}</th>
-    ))}
-  </tr>
-</thead>
-                    <tbody>
-                      {sub.items
-                        .filter((item) => item.label !== 'Yhteensä')
-                        .map((item, itemIdx) => {
-                          const rowTotal = item.values.reduce((sum, val) => {
-                            const num = parseFloat(val);
+                {sub.name}
+              </button>
+            </h2>
+
+            <div
+              id={`collapse-${subIdx}`}
+              className="accordion-collapse collapse show"
+              aria-labelledby={`heading-${subIdx}`}
+            >
+              <div className="responsive-table-container">
+                <table className="table table-sm mb-0">
+                  <thead className="table-light">
+                    <tr>
+                      <th className="text-start">Osa-alue</th>
+                      <th className="text-end font-monospace">Yhteensä</th>
+                      {years.map((year) => (
+                        <th key={year} className="text-end font-monospace">
+                          {year}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {sub.items
+                      .filter((item) => item.label !== 'Yhteensä')
+                      .map((item, itemIdx) => {
+                        const rowTotal = item.values.reduce((sum, val) => {
+                          const num = parseFloat(val);
+                          return !isNaN(num) ? sum + num : sum;
+                        }, 0);
+
+                        return (
+                          <tr key={itemIdx}>
+                            <td>{item.label}</td>
+                            <td className="text-end font-monospace">{rowTotal}</td>
+
+                            {sub.name === 'Toimenpide-ehdotukset yhteensä'
+                              ? (
+                                  item.label === 'Rakennetekniikka'
+                                    ? tekniikkaYhteensa
+                                    : item.label === 'LVI Järjestelmät'
+                                    ? lviYhteensa
+                                    : item.label === 'Sähköjärjestelmät'
+                                    ? sahkoYhteensa
+                                    : item.label === 'Lisätutkimukset'
+                                    ? tutkimusYhteensa
+                                    : item.values
+                                ).map((val, yearIdx) => (
+                                  <td key={yearIdx} className="text-end">
+                                    {val}
+                                  </td>
+                                ))
+                              : item.values.map((val, yearIdx) => (
+                                  <td key={yearIdx}>
+                                    <input
+                                      type="text"
+                                      value={val}
+                                      onChange={(e) =>
+                                        handleValueChange(
+                                          catIdx,
+                                          subIdx,
+                                          itemIdx,
+                                          yearIdx,
+                                          e.target.value
+                                        )
+                                      }
+                                      className="form-control form-control-sm text-end"
+                                    />
+                                  </td>
+                                ))}
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+
+                  <tfoot>
+                    <tr className="table-success fw-bold">
+                      <td className="text-start">YHTEENSÄ</td>
+                      <td className="text-end font-monospace">
+                        {sub.items
+                          .filter((i) => i.label !== 'Yhteensä')
+                          .reduce(
+                            (acc, item) =>
+                              acc +
+                              item.values.reduce((sum, val) => {
+                                const num = parseFloat(val);
+                                return !isNaN(num) ? sum + num : sum;
+                              }, 0),
+                            0
+                          )}
+                      </td>
+
+                      {Array.from({ length: 11 }, (_, idx) => {
+                        const colSum = sub.items
+                          .filter((i) => i.label !== 'Yhteensä')
+                          .reduce((sum, item) => {
+                            const num = parseFloat(item.values[idx]);
                             return !isNaN(num) ? sum + num : sum;
                           }, 0);
 
-                          return (
-                            <tr key={itemIdx}>
-  <td>{item.label}</td>
-  <td className="text-end font-monospace">
-    {item.values.reduce((sum, val) => {
-      const num = parseFloat(val);
-      return !isNaN(num) ? sum + num : sum;
-    }, 0)}
-  </td>
-
-  {sub.name === 'Toimenpide-ehdotukset yhteensä'
-    ? (
-      item.label === 'Rakennetekniikka' ? tekniikkaYhteensa :
-      item.label === 'LVI Järjestelmät' ? lviYhteensa :
-      item.label === 'Sähköjärjestelmät' ? sahkoYhteensa :
-      item.label === 'Lisätutkimukset' ? tutkimusYhteensa :
-      item.values
-    ).map((val, yearIdx) => (
-      <td key={yearIdx} className="text-end">{val}</td>
-    ))
-    : item.values.map((val, yearIdx) => (
-      <td key={yearIdx}>
-        <input
-          type="text"
-          value={val}
-          onChange={(e) =>
-            handleValueChange(catIdx, subIdx, itemIdx, yearIdx, e.target.value)
-          }
-          className="form-control form-control-sm text-end"
-        />
-      </td>
-    ))}
-</tr>
-                            
-                          );
-                        })}
-                    </tbody>
-                <tfoot>
-  <tr className="table-success fw-bold">
-    <td className="text-start">YHTEENSÄ</td> 
-    
-    <td className="text-end font-monospace"> 
-      {sub.items
-        .filter((i) => i.label !== 'Yhteensä')
-        .reduce((acc, item) =>
-          acc +
-          item.values.reduce((sum, val) => {
-            const num = parseFloat(val);
-            return !isNaN(num) ? sum + num : sum;
-          }, 0)
-        , 0)}
-    </td>
-
-    
-    {Array.from({ length: 11 }, (_, idx) => {
-      const colSum = sub.items
-        .filter((i) => i.label !== 'Yhteensä')
-        .reduce((sum, item) => {
-          const num = parseFloat(item.values[idx]);
-          return !isNaN(num) ? sum + num : sum;
-        }, 0);
-      return (
-        <td key={idx} className="text-end font-monospace">{colSum}</td>
-      );
-    })}
-  </tr>
-</tfoot>
-                  </table>
-                </div>
+                        return (
+                          <td key={idx} className="text-end font-monospace">
+                            {colSum}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
             </div>
-          ))}
-        </React.Fragment>
-      ))}
+          </div>
+        ))}
+      </React.Fragment>
+    ))}
 
-   
-     <TutkimustarpeetTaulu
-  data={tutkimusData}
-  setData={setTutkimusData}
-  onYhteensaChange={setTutkimusYhteensa}
-/>
+    <TutkimustarpeetTaulu
+      data={tutkimusData}
+      setData={setTutkimusData}
+      onYhteensaChange={setTutkimusYhteensa}
+    />
 
-<Tekniikkataulut
-  data={tekniikkaData}
-  setData={setTekniikkaData}
-  onYhteensaChange={setTekniikkaYhteensa}
-/>
+    <Tekniikkataulut
+      data={tekniikkaData}
+      setData={setTekniikkaData}
+      onYhteensaChange={setTekniikkaYhteensa}
+    />
 
-<LVITable
-  data={lviData}
-  setData={setLviData}
-  onYhteensaChange={setLviYhteensa}
-/>
+    <LVITable
+      data={lviData}
+      setData={setLviData}
+      onYhteensaChange={setLviYhteensa}
+    />
 
-<SahkotekniikkaTable
-  data={sahkoData}
-  setData={setSahkoData}
-  onYhteensaChange={setSahkoYhteensa}
-/>
+    <SahkotekniikkaTable
+      data={sahkoData}
+      setData={setSahkoData}
+      onYhteensaChange={setSahkoYhteensa}
+    />
 
-<div className="accordion-item">
-  <h2 className="accordion-header" id="heading-charts">
-    <button
-      className="accordion-button collapsed"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#collapse-charts"
-      aria-expanded="false"
-      aria-controls="collapse-charts"
-    >
-      📊 Toimenpiteiden jakautuminen (Kaaviot)
-    </button>
-  </h2>
-
-  <div
-    id="collapse-charts"
-    className="accordion-collapse collapse"
-    aria-labelledby="heading-charts"
-  >
-    <div className="accordion-body">
-      <Tabs defaultActiveKey="bar" className="mb-3" fill>
-
-        {/* Bar Chart */}
-          <Tab eventKey="bar" title="Pylväskaavio">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="year" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                
-                {/* All bars with the same stackId will stack on top of each other */}
-                <Bar dataKey="Lisätutkimukset" fill="#2F5930" stackId="a" />
-                <Bar dataKey="Rakennetekniikka" fill="#7AA668" stackId="a" />
-                <Bar dataKey="LVI Järjestelmät" fill="#A7BFA2" stackId="a" />
-                <Bar dataKey="Sähköjärjestelmät" fill="#C8D1BC" stackId="a" />
-                
-              </BarChart>
-            </ResponsiveContainer>
-          </Tab>
-
-        {/* Pie Chart */}
-        <Tab eventKey="pie" title="Ympyrädiagrammi">
-          <PiechartPTS
-            tekniikkaYhteensa={tekniikkaYhteensa}
-            lviYhteensa={lviYhteensa}
-            sahkoYhteensa={sahkoYhteensa}
-            tutkimusYhteensa={tutkimusYhteensa}
-          />
-        </Tab>
-      </Tabs>
-    </div>
-  </div>
-</div>
-
-
-      <div className="text-end p-4">
-        <button className="btn btn-success" onClick={handleSavePTS}>
-          💾 Tallenna PTS
+    <div className="accordion-item">
+      <h2 className="accordion-header" id="heading-charts">
+        <button
+          className="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#collapse-charts"
+          aria-expanded="false"
+          aria-controls="collapse-charts"
+        >
+          📊 Toimenpiteiden jakautuminen (Kaaviot)
         </button>
+      </h2>
+
+      <div
+        id="collapse-charts"
+        className="accordion-collapse collapse"
+        aria-labelledby="heading-charts"
+      >
+        <div className="accordion-body">
+          <Tabs defaultActiveKey="bar" className="mb-3" fill>
+            {/* Bar Chart */}
+            <Tab eventKey="bar" title="Pylväskaavio">
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Lisätutkimukset" fill="#2F5930" stackId="a" />
+                  <Bar dataKey="Rakennetekniikka" fill="#7AA668" stackId="a" />
+                  <Bar dataKey="LVI Järjestelmät" fill="#A7BFA2" stackId="a" />
+                  <Bar dataKey="Sähköjärjestelmät" fill="#C8D1BC" stackId="a" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Tab>
+
+            {/* Pie Chart */}
+            <Tab eventKey="pie" title="Ympyrädiagrammi">
+              <PiechartPTS
+                tekniikkaYhteensa={tekniikkaYhteensa}
+                lviYhteensa={lviYhteensa}
+                sahkoYhteensa={sahkoYhteensa}
+                tutkimusYhteensa={tutkimusYhteensa}
+              />
+            </Tab>
+          </Tabs>
+        </div>
       </div>
     </div>
-  );
+
+    <div className="text-end p-4">
+      <button className="btn btn-success" onClick={handleSavePTS}>
+        💾 Tallenna PTS
+      </button>
+    </div>
+  </div>
+);
+
 }
