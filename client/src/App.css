@@ -70,6 +70,10 @@
   }
 }
 
+.recharts-legend-item-text {
+  color: #000 !important; /* force black text */
+}
+
 .layout{
   display: flex;
   flex-direction: row;

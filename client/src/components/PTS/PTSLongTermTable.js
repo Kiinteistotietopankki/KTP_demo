@@ -441,21 +441,24 @@ const handleSavePTS = async () => {
       <Tabs defaultActiveKey="bar" className="mb-3" fill>
 
         {/* Bar Chart */}
-        <Tab eventKey="bar" title="Pylväskaavio">
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Rakennetekniikka" fill="#ff7f50" />
-              <Bar dataKey="LVI Järjestelmät" fill="#579797ff" />
-              <Bar dataKey="Sähköjärjestelmät" fill="#a6a837ff" />
-              <Bar dataKey="Lisätutkimukset" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Tab>
+          <Tab eventKey="bar" title="Pylväskaavio">
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                
+                {/* All bars with the same stackId will stack on top of each other */}
+                <Bar dataKey="Lisätutkimukset" fill="#2F5930" stackId="a" />
+                <Bar dataKey="Rakennetekniikka" fill="#7AA668" stackId="a" />
+                <Bar dataKey="LVI Järjestelmät" fill="#A7BFA2" stackId="a" />
+                <Bar dataKey="Sähköjärjestelmät" fill="#C8D1BC" stackId="a" />
+                
+              </BarChart>
+            </ResponsiveContainer>
+          </Tab>
 
         {/* Pie Chart */}
         <Tab eventKey="pie" title="Ympyrädiagrammi">
@@ -477,10 +480,10 @@ const handleSavePTS = async () => {
                 outerRadius={120}
                 label
               >
-                <Cell fill="#ff7f50" />
-                <Cell fill="#579797ff" />
-                <Cell fill="#a6a837ff" />
-                <Cell fill="#8884d8" />
+                <Cell fill="#7AA668" />
+                <Cell fill="#A7BFA2" />
+                <Cell fill="#C8D1BC" />
+                <Cell fill="#2F5930" />
               </Pie>
             </PieChart>
           </ResponsiveContainer>
