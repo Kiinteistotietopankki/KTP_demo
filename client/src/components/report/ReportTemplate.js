@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import { Tab, Tabs } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake';
 import 'handsontable/dist/handsontable.full.min.css';
 
@@ -20,10 +19,14 @@ import { Riskidataa } from '../../assets/Riskidata';
 import '../../fonts/josefin-fonts.js';
 import '../../fonts/Lato-fonts.js';
 
-const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: initialRakennusData }) => {
+const ReportTemplate = ({
+  rakennus,
+  kiinteistotunnus,
+  rakennusData: initialRakennusData,
+  activeTab,
+  setActiveTab
+}) => {
   const [savedData, setSavedData] = useLocalStorage('reportFormData', {});
-  const [activeTab, setActiveTab] = useState(initialTab || 'report');
-
   const [rakennusData, setRakennusData] = useState(initialRakennusData || null);
   const [selectedTemplate, setSelectedTemplate] = useState(savedData.selectedTemplate || 'wpts');
   const [sections, setSections] = useState(savedData.sections || reportTemplates[selectedTemplate].defaultSections);
@@ -41,7 +44,6 @@ const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: 
     if (initialRakennusData) setRakennusData(initialRakennusData);
   }, [initialRakennusData]);
 
- 
   useEffect(() => {
     setSavedData({
       ...savedData,
@@ -53,7 +55,6 @@ const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: 
       sections,
       selectedTemplate,
     });
-    
   }, [title, dateIso, propertyName, coverImage, riskidata, sections, selectedTemplate]);
 
   // preview generation
@@ -124,9 +125,9 @@ const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: 
   };
 
   return (
-    <Tabs activeKey={activeTab} onSelect={setActiveTab} id="report-tabs" className="mb-3">
-      <Tab eventKey="report" title="Raportti">
-        <div className="p-4 space-y-6">
+    <>
+      {activeTab === 'report' && (
+        <div className="p-1 space-y-6">
           <CoverPageForm
             title={title}
             setTitle={setTitle}
@@ -183,19 +184,19 @@ const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: 
             </button>
           </div>
         </div>
-      </Tab>
+      )}
 
-      <Tab eventKey="pts" title="PTS (Pitkän tähtäimen suunnitelma)">
-        <div className="p-4">
+      {activeTab === 'pts' && (
+        <div className="p-1">
           <h3 className="text-xl font-semibold mb-4">📊 PTS (Pitkän tähtäimen suunnitelma)</h3>
-       <PTSLongTermTable kiinteistotunnus={kiinteistotunnus} />
+          <PTSLongTermTable kiinteistotunnus={kiinteistotunnus} />
         </div>
-      </Tab>
+      )}
 
-      <Tab eventKey="preview" title=" Raportin esikatselu">
+      {activeTab === 'preview' && (
         <PreviewPane previewUrl={previewUrl} onDownload={handleExportPdf} />
-      </Tab>
-    </Tabs>
+      )}
+    </>
   );
 };
 
