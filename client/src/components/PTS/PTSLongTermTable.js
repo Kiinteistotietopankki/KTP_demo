@@ -279,15 +279,15 @@ const handleSavePTS = async () => {
   }
 };
 
-  const tableRef = useRef(null);
+  const mainTableRef = useRef(null);
 
   useEffect(() => {
     try {
       console.log('Before if image');
-      console.log('tableRef.current:', tableRef.current);
+      console.log('tableRef.current:', mainTableRef.current);
       console.log('setPtsImages:', setPtsImages);
 
-      if (!tableRef.current) {
+      if (!mainTableRef.current) {
         console.warn('tableRef.current is null or undefined. Cannot capture table.');
         return;
       }
@@ -300,7 +300,7 @@ const handleSavePTS = async () => {
       console.log('Before image async');
       const captureTable = async () => {
         try {
-          const canvas = await html2canvas(tableRef.current, { scale: 2, useCORS: true });
+          const canvas = await html2canvas(mainTableRef.current, { scale: 2, useCORS: true });
           const dataUrl = canvas.toDataURL('image/png');
           setPtsImages(dataUrl);
           console.log('Main PTS table image saved to a variable!');
@@ -313,7 +313,7 @@ const handleSavePTS = async () => {
     } catch (err) {
       console.error('Unexpected error in useEffect:', err);
     }
-  }, [tableRef.current, data, setPtsImages]);
+  }, [setPtsImages]);
 
 
 return (
@@ -343,7 +343,7 @@ return (
               aria-labelledby={`heading-${subIdx}`}
             >
 
-              <div className="table-responsive" ref={tableRef}>
+              <div className="table-responsive" ref={mainTableRef}>
                 <table className="table table-sm table-borderless table-striped mb-0">
                   <thead className="table-light">
                     <tr>
