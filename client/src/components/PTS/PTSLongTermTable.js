@@ -279,41 +279,32 @@ const handleSavePTS = async () => {
   }
 };
 
-  const mainTableRef = useRef(null);
+const mainTableRef = useRef(null);
+const pieChartRef = useRef(null);
 
-  useEffect(() => {
+useEffect(() => {
+  const captureElement = async (ref) => {
+    if (!ref.current) return null;
     try {
-      console.log('Before if image');
-      console.log('tableRef.current:', mainTableRef.current);
-      console.log('setPtsImages:', setPtsImages);
-
-      if (!mainTableRef.current) {
-        console.warn('tableRef.current is null or undefined. Cannot capture table.');
-        return;
-      }
-
-      if (!setPtsImages) {
-        console.warn('setPtsImages function is not available.');
-        return;
-      }
-
-      console.log('Before image async');
-      const captureTable = async () => {
-        try {
-          const canvas = await html2canvas(mainTableRef.current, { scale: 2, useCORS: true });
-          const dataUrl = canvas.toDataURL('image/png');
-          setPtsImages(dataUrl);
-          console.log('Main PTS table image saved to a variable!');
-        } catch (innerErr) {
-          console.error('Error during html2canvas capture:', innerErr);
-        }
-      };
-
-      captureTable();
+      const canvas = await html2canvas(ref.current, { scale: 2, useCORS: true });
+      return canvas.toDataURL('image/png');
     } catch (err) {
-      console.error('Unexpected error in useEffect:', err);
+      console.error('Error capturing element:', err);
+      return null;
     }
-  }, [setPtsImages]);
+  };
+
+  const captureAll = async () => {
+    const tableImage = await captureElement(mainTableRef);
+    const pieChartImage = await captureElement(pieChartRef);
+
+    const imagesArray = [tableImage, pieChartImage].filter(Boolean); // remove nulls
+    setPtsImages(imagesArray);
+    console.log('All images saved in ptsImages array!');
+  };
+
+  captureAll();
+}, [setPtsImages]);
 
 
 return (
@@ -518,12 +509,14 @@ return (
 
             {/* Pie Chart */}
             <Tab eventKey="pie" title="Ympyrädiagrammi">
-              <PiechartPTS
-                tekniikkaYhteensa={tekniikkaYhteensa}
-                lviYhteensa={lviYhteensa}
-                sahkoYhteensa={sahkoYhteensa}
-                tutkimusYhteensa={tutkimusYhteensa}
-              />
+              <div ref={pieChartRef}>
+                <PiechartPTS
+                  tekniikkaYhteensa={tekniikkaYhteensa}
+                  lviYhteensa={lviYhteensa}
+                  sahkoYhteensa={sahkoYhteensa}
+                  tutkimusYhteensa={tutkimusYhteensa}
+                />
+              </div>
             </Tab>
           </Tabs>
         </div>

@@ -41,7 +41,7 @@ const ReportTemplate = ({
   const logoBase64 = useBase64Image(logo);
 
   //pts images
-  const [ptsImages, setPtsImages] = useState('null');
+  const [ptsImages, setPtsImages] = useState([]);
 
   useEffect(() => {
     if (initialRakennusData) setRakennusData(initialRakennusData);

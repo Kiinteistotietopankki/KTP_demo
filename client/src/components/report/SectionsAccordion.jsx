@@ -299,26 +299,27 @@ export default function SectionsAccordion({
                   setRiskidata={setRiskidata}
                 />
               )}
-              {section.key === 'pts-ehdotukset' && (
-                <div className="my-3 text-center">
-                  {ptsImagesPrew ? (
-                    <img
-                      src={ptsImagesPrew}
-                      alt="PTS Main"
-                      style={{
-                        maxWidth: '100%',
-                        height: 'auto',
-                        borderRadius: 6,
-                        marginBottom: 8
-                      }}
-                    />
-                  ) : (
-                    <p>No PTS image available</p>
-                  )}
-                </div>
-
-                )
-              }
+                {section.key === 'pts-ehdotukset' && (
+                  <div className="my-3 text-center">
+                    {ptsImagesPrew && ptsImagesPrew.length > 0 ? (
+                      ptsImagesPrew.map((imgSrc, index) => (
+                        <img
+                          key={index}
+                          src={imgSrc}
+                          alt={`PTS Image ${index + 1}`}
+                          style={{
+                            maxWidth: '100%',
+                            height: 'auto',
+                            borderRadius: 6,
+                            marginBottom: 8
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <p>No PTS image available</p>
+                    )}
+                  </div>
+                )}
             </div>
           </div>
         </div>
