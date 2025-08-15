@@ -155,7 +155,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange }) {
           data-bs-parent="#rakennetekniikkaAccordion"
         >
               <div className="responsive-table-container">
-  <table className="table table-sm mb-0">
+              <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
                   <th>Osa-alue</th>

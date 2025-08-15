@@ -102,6 +102,16 @@
   }
 }
 
+/* Accordion värityylit */
+
+.accordion-button {
+  /* background-color: #d4edda; */
+  color: #027000; 
+}
+.accordion-button:not(.collapsed) {
+  background-color: #c3e6cb; 
+}
+
 /* ====== */
 
 .app-container {

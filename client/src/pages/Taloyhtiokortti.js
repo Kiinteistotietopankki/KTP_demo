@@ -115,7 +115,6 @@ function Taloyhtiokortti() {
                   <p className="text-muted">Tarkistetaan PTS-tietoja...</p>
                 ) : hasPTSData === true ? (
                   <>
-                    <h5 className="mb-3 fw-bold text-success">📋 PTS-suunnitelma </h5>
                     <PTSLongTermTable kiinteistotunnus={card?.kiinteistotunnus} />
                     <div className="mt-3 text-end">
                     

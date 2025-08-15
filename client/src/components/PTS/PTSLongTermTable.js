@@ -52,122 +52,124 @@ export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
     updated[catIdx].subcategories[subIdx].items[itemIdx].values[yearIdx] = value;
     setData(updated);
   };
-useEffect(() => {
-  if (!kiinteistotunnus) return;
 
-    const fetchPTS = async () => {
-    try {
-      const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`
-      , {
-          credentials: 'include', 
-        });
-      const ptsList = await listRes.json();
+  useEffect(() => {
+    if (!kiinteistotunnus) return;
 
-      if (!ptsList.length) {
-        console.log("ℹ️ Ei PTS-raportteja löytynyt");
+      const fetchPTS = async () => {
+      try {
+        const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`
+        , {
+            credentials: 'include', 
+          });
+        const ptsList = await listRes.json();
 
-        if (onDataLoaded) {
-          onDataLoaded({ hasPTSData: false });
+        if (!ptsList.length) {
+          console.log("ℹ️ Ei PTS-raportteja löytynyt");
+
+          if (onDataLoaded) {
+            onDataLoaded({ hasPTSData: false });
+          }
+
+          return;
         }
 
-        return;
-      }
-
-      const latestPTSId = ptsList[0].id;
-      const fullRes = await fetch(`${config.apiBaseUrl}/api/pts/${latestPTSId}`,{ credentials: 'include'
-});
-      const fullPTS = await fullRes.json();
-
-    
-
-      const entries = fullPTS.entries || [];
-      console.log("📦 Raw fetched entries:", entries);
+        const latestPTSId = ptsList[0].id;
+        const fullRes = await fetch(`${config.apiBaseUrl}/api/pts/${latestPTSId}`,
+          { credentials: 'include'
+        });
+        const fullPTS = await fullRes.json();
 
       
-      const filterByCategory = (cat) => entries.filter(e => e.category === cat);
 
-      const tekniikka = filterByCategory('Rakennetekniikka');
-      const lvi = filterByCategory('LVI Järjestelmät');
-      const sahko = filterByCategory('Sähköjärjestelmät');
-      const tutkimus = filterByCategory('Lisätutkimukset');
-      console.log("🔧 Split entries:", {
-  tekniikka, lvi, sahko, tutkimus
-});
+        const entries = fullPTS.entries || [];
+        console.log("📦 Raw fetched entries:", entries);
 
-      
-    const mapToSection = (items) => {
-  const grouped = {};
+        
+        const filterByCategory = (cat) => entries.filter(e => e.category === cat);
 
-  items.forEach(entry => {
-    const key = entry.section || 'Muu';
-    if (!grouped[key]) grouped[key] = [];
-let parsedValuesByYear = {};
-try {
-  parsedValuesByYear = typeof entry.values_by_year === 'string'
-    ? JSON.parse(entry.values_by_year)
-    : entry.values_by_year || {};
-} catch (err) {
+        const tekniikka = filterByCategory('Rakennetekniikka');
+        const lvi = filterByCategory('LVI Järjestelmät');
+        const sahko = filterByCategory('Sähköjärjestelmät');
+        const tutkimus = filterByCategory('Lisätutkimukset');
+        console.log("🔧 Split entries:", {
+    tekniikka, lvi, sahko, tutkimus
+  });
 
-}
-    // 🔧 Build `values[]` array from values_by_year.y1 to y11
-   const values = Array.from({ length: 11 }, (_, i) => {
-  const raw = parsedValuesByYear[`y${i + 1}`];
-  return raw !== undefined && raw !== null ? String(raw) : '0';
-});
-console.log("values array for:", entry.label, values);
-    grouped[key].push({
-      label: entry.label || '',
-      kl: entry.kl_rating || '',
-      values
+        
+      const mapToSection = (items) => {
+    const grouped = {};
+
+    items.forEach(entry => {
+      const key = entry.section || 'Muu';
+      if (!grouped[key]) grouped[key] = [];
+      let parsedValuesByYear = {};
+      try {
+        parsedValuesByYear = typeof entry.values_by_year === 'string'
+          ? JSON.parse(entry.values_by_year)
+          : entry.values_by_year || {};
+      } catch (err) {
+
+    }
+      // 🔧 Build `values[]` array from values_by_year.y1 to y11
+    const values = Array.from({ length: 11 }, (_, i) => {
+    const raw = parsedValuesByYear[`y${i + 1}`];
+    return raw !== undefined && raw !== null ? String(raw) : '0';
+  });
+  console.log("values array for:", entry.label, values);
+      grouped[key].push({
+        label: entry.label || '',
+        kl: entry.kl_rating || '',
+        values
+      });
     });
-  });
 
-  return Object.entries(grouped).map(([section, items]) => ({
-    name: section,
-    items
-  }));
-};
-
-
-      setTekniikkaData(mapToSection(tekniikka));
-      setLviData(mapToSection(lvi));
-      console.log("📋 Mapped LVI Data:", mapToSection(lvi));
-      setSahkoData(mapToSection(sahko));
-      setTutkimusData(mapToSection(tutkimus));
-
-      
-  const getTotals = (entries) => {
-  const sums = Array(11).fill(0);
-  entries.forEach(e => {
-    const source = typeof e.values_by_year === 'string'
-      ? JSON.parse(e.values_by_year)
-      : e.values_by_year || {};
-
-    for (let i = 0; i < 11; i++) {
-      const val = source[`y${i + 1}`];
-      const num = parseFloat(val);
-      if (!isNaN(num)) sums[i] += num;
-    }
-  });
-  return sums;
-};
-
-      setTekniikkaYhteensa(getTotals(tekniikka));
-      setLviYhteensa(getTotals(lvi));
-      setSahkoYhteensa(getTotals(sahko));
-      setTutkimusYhteensa(getTotals(tutkimus));
-        if (onDataLoaded) {
-        onDataLoaded({ hasPTSData: true });
-      }
-      console.log("✅ onDataLoaded called with: hasPTSData = true");
-
-    } catch (err) {
-      console.error("❌ Virhe ladattaessa PTS-tietoja:", err);
-    }
+    return Object.entries(grouped).map(([section, items]) => ({
+      name: section,
+      items
+    }));
   };
 
-  fetchPTS();
-}, [kiinteistotunnus]);
+
+        setTekniikkaData(mapToSection(tekniikka));
+        setLviData(mapToSection(lvi));
+        console.log("📋 Mapped LVI Data:", mapToSection(lvi));
+        setSahkoData(mapToSection(sahko));
+        setTutkimusData(mapToSection(tutkimus));
+
+        
+    const getTotals = (entries) => {
+    const sums = Array(11).fill(0);
+    entries.forEach(e => {
+      const source = typeof e.values_by_year === 'string'
+        ? JSON.parse(e.values_by_year)
+        : e.values_by_year || {};
+
+      for (let i = 0; i < 11; i++) {
+        const val = source[`y${i + 1}`];
+        const num = parseFloat(val);
+        if (!isNaN(num)) sums[i] += num;
+      }
+    });
+    return sums;
+  };
+
+        setTekniikkaYhteensa(getTotals(tekniikka));
+        setLviYhteensa(getTotals(lvi));
+        setSahkoYhteensa(getTotals(sahko));
+        setTutkimusYhteensa(getTotals(tutkimus));
+          if (onDataLoaded) {
+          onDataLoaded({ hasPTSData: true });
+        }
+        console.log("✅ onDataLoaded called with: hasPTSData = true");
+
+      } catch (err) {
+        console.error("❌ Virhe ladattaessa PTS-tietoja:", err);
+      }
+    };
+
+    fetchPTS();
+  }, [kiinteistotunnus]);
 
 
   useEffect(() => {
@@ -276,6 +278,8 @@ const handleSavePTS = async () => {
 
 
 return (
+  <div className="container-fluid px-3 px-md-4 mb-4">
+  <div className="mx-auto" style={{ maxWidth: '960px' }}>
   <div className="accordion my-4" id="ptsAccordion">
     {data.map((cat, catIdx) => (
       <React.Fragment key={catIdx}>
@@ -299,8 +303,8 @@ return (
               className="accordion-collapse collapse show"
               aria-labelledby={`heading-${subIdx}`}
             >
-              <div className="responsive-table-container">
-                <table className="table table-sm mb-0">
+              <div className="table-responsive">
+                <table className="table table-sm table-borderless table-striped mb-0">
                   <thead className="table-light">
                     <tr>
                       <th className="text-start">Osa-alue</th>
@@ -491,6 +495,8 @@ return (
         💾 Tallenna PTS
       </button>
     </div>
+  </div>
+  </div>
   </div>
 );
 
