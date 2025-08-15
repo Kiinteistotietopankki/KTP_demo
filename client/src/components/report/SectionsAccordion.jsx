@@ -30,6 +30,7 @@ export default function SectionsAccordion({
   setSections,
   riskidata,
   setRiskidata,
+  ptsMainImage
 }) {
  
   const addSubsection = (sectionIndex) => {
@@ -299,7 +300,23 @@ export default function SectionsAccordion({
                 />
               )}
               {section.key === 'pts-ehdotukset' && (
-                  <div>jöö</div>
+                <div className="my-3 text-center">
+                  {ptsMainImage ? (
+                    <img
+                      src={ptsMainImage}
+                      alt="PTS Main"
+                      style={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        borderRadius: 6,
+                        marginBottom: 8
+                      }}
+                    />
+                  ) : (
+                    <p>No PTS image available</p>
+                  )}
+                </div>
+
                 )
               }
             </div>

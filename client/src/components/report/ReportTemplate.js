@@ -41,7 +41,7 @@ const ReportTemplate = ({
   const logoBase64 = useBase64Image(logo);
 
   //pts images
-  const [ptsMaintableIMG, setPtsMaintableIMG] = useState(null);
+  const [ptsMaintableIMG, setPtsMaintableIMG] = useState('null');
 
   useEffect(() => {
     if (initialRakennusData) setRakennusData(initialRakennusData);
@@ -158,6 +158,7 @@ const ReportTemplate = ({
             setSections={setSections}
             riskidata={riskidata}
             setRiskidata={setRiskidata}
+            ptsMainImage={ptsMaintableIMG}
           />
 
           <div className="flex flex-row justify-end mt-6 gap-4">
@@ -192,7 +193,10 @@ const ReportTemplate = ({
       {activeTab === 'pts' && (
         <div className="p-1">
           <h3 className="text-xl font-semibold mb-4">📊 PTS (Pitkän tähtäimen suunnitelma)</h3>
-          <PTSLongTermTable kiinteistotunnus={kiinteistotunnus} />
+          <PTSLongTermTable
+            kiinteistotunnus={kiinteistotunnus}
+            setCapturedImage={setPtsMaintableIMG} // pass setter as prop
+          />
         </div>
       )}
 
