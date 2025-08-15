@@ -40,6 +40,9 @@ const ReportTemplate = ({
   const [previewUrl, setPreviewUrl] = useState(null);
   const logoBase64 = useBase64Image(logo);
 
+  //pts images
+  const [ptsMaintableIMG, setPtsMaintableIMG] = useState(null);
+
   useEffect(() => {
     if (initialRakennusData) setRakennusData(initialRakennusData);
   }, [initialRakennusData]);

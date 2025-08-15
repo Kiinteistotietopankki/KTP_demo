@@ -16,7 +16,7 @@ import config from '../../devprodConfig';
 import PiechartPTS from './PiechartPTS';
 import html2canvas from 'html2canvas';
 
-export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
+export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setCapturedImage=null}) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -86,7 +86,7 @@ export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
       
 
         const entries = fullPTS.entries || [];
-        console.log("📦 Raw fetched entries:", entries);
+        // console.log("📦 Raw fetched entries:", entries);
 
         
         const filterByCategory = (cat) => entries.filter(e => e.category === cat);
@@ -95,9 +95,9 @@ export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
         const lvi = filterByCategory('LVI Järjestelmät');
         const sahko = filterByCategory('Sähköjärjestelmät');
         const tutkimus = filterByCategory('Lisätutkimukset');
-        console.log("🔧 Split entries:", {
-    tekniikka, lvi, sahko, tutkimus
-  });
+  //       console.log("🔧 Split entries:", {
+  //   tekniikka, lvi, sahko, tutkimus
+  // });
 
         
       const mapToSection = (items) => {
@@ -119,7 +119,7 @@ export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
     const raw = parsedValuesByYear[`y${i + 1}`];
     return raw !== undefined && raw !== null ? String(raw) : '0';
   });
-  console.log("values array for:", entry.label, values);
+  // console.log("values array for:", entry.label, values);
       grouped[key].push({
         label: entry.label || '',
         kl: entry.kl_rating || '',
@@ -136,7 +136,7 @@ export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
 
         setTekniikkaData(mapToSection(tekniikka));
         setLviData(mapToSection(lvi));
-        console.log("📋 Mapped LVI Data:", mapToSection(lvi));
+        // console.log("📋 Mapped LVI Data:", mapToSection(lvi));
         setSahkoData(mapToSection(sahko));
         setTutkimusData(mapToSection(tutkimus));
 
@@ -281,16 +281,18 @@ const handleSavePTS = async () => {
 
   const tableRef = useRef(null);
 
-  const handleDownloadImage = () => {
-    if (tableRef.current) {
-      html2canvas(tableRef.current).then((canvas) => {
-        const link = document.createElement('a');
-        link.download = 'table.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-      });
-    }
-  };
+  useEffect(() => {
+    if (!tableRef.current || !setCapturedImage) return;
+    
+    const captureTable = async () => {
+      const canvas = await html2canvas(tableRef.current, { scale: 2, useCORS: true });
+      const dataUrl = canvas.toDataURL('image/png');
+      setCapturedImage(dataUrl);
+      console.log('Main PTS table image saved to a variable!');
+    };
+
+    captureTable();
+  }, [tableRef.current, data, setCapturedImage]); // add data as dependency
 
 
 return (
@@ -320,9 +322,6 @@ return (
               aria-labelledby={`heading-${subIdx}`}
             >
 
-              <button className="btn btn-primary mb-2" onClick={handleDownloadImage}>
-                Download Table as Image
-              </button>
               <div className="table-responsive" ref={tableRef}>
                 <table className="table table-sm table-borderless table-striped mb-0">
                   <thead className="table-light">
