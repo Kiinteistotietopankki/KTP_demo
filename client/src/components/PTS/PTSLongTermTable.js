@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   BarChart, Bar,
   PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer
 } from 'recharts';
+
+
 
 import { Tabs, Tab } from 'react-bootstrap';
 import Tekniikkataulut from './Tekniikkataulut';
@@ -12,6 +14,7 @@ import SahkotekniikkaTable from './Sähkötekniikkataulu';
 import TutkimustarpeetTaulu from './Tutkimustarpeettaulu';
 import config from '../../devprodConfig';
 import PiechartPTS from './PiechartPTS';
+import html2canvas from 'html2canvas';
 
 export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
   const currentYear = new Date().getFullYear();
@@ -276,6 +279,19 @@ const handleSavePTS = async () => {
   }
 };
 
+  const tableRef = useRef(null);
+
+  const handleDownloadImage = () => {
+    if (tableRef.current) {
+      html2canvas(tableRef.current).then((canvas) => {
+        const link = document.createElement('a');
+        link.download = 'table.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+  };
+
 
 return (
   <div className="container-fluid px-3 px-md-4 mb-4">
@@ -303,7 +319,11 @@ return (
               className="accordion-collapse collapse show"
               aria-labelledby={`heading-${subIdx}`}
             >
-              <div className="table-responsive">
+
+              <button className="btn btn-primary mb-2" onClick={handleDownloadImage}>
+                Download Table as Image
+              </button>
+              <div className="table-responsive" ref={tableRef}>
                 <table className="table table-sm table-borderless table-striped mb-0">
                   <thead className="table-light">
                     <tr>
