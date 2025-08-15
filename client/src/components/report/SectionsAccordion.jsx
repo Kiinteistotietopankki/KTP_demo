@@ -30,7 +30,7 @@ export default function SectionsAccordion({
   setSections,
   riskidata,
   setRiskidata,
-  ptsMainImage
+  ptsImagesPrew
 }) {
  
   const addSubsection = (sectionIndex) => {
@@ -301,9 +301,9 @@ export default function SectionsAccordion({
               )}
               {section.key === 'pts-ehdotukset' && (
                 <div className="my-3 text-center">
-                  {ptsMainImage ? (
+                  {ptsImagesPrew ? (
                     <img
-                      src={ptsMainImage}
+                      src={ptsImagesPrew}
                       alt="PTS Main"
                       style={{
                         maxWidth: '100%',

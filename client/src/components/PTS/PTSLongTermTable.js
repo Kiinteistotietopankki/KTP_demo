@@ -16,7 +16,7 @@ import config from '../../devprodConfig';
 import PiechartPTS from './PiechartPTS';
 import html2canvas from 'html2canvas';
 
-export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setCapturedImage}) {
+export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPtsImages}) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -285,15 +285,15 @@ const handleSavePTS = async () => {
     try {
       console.log('Before if image');
       console.log('tableRef.current:', tableRef.current);
-      console.log('setCapturedImage:', setCapturedImage);
+      console.log('setPtsImages:', setPtsImages);
 
       if (!tableRef.current) {
         console.warn('tableRef.current is null or undefined. Cannot capture table.');
         return;
       }
 
-      if (!setCapturedImage) {
-        console.warn('setCapturedImage function is not available.');
+      if (!setPtsImages) {
+        console.warn('setPtsImages function is not available.');
         return;
       }
 
@@ -302,7 +302,7 @@ const handleSavePTS = async () => {
         try {
           const canvas = await html2canvas(tableRef.current, { scale: 2, useCORS: true });
           const dataUrl = canvas.toDataURL('image/png');
-          setCapturedImage(dataUrl);
+          setPtsImages(dataUrl);
           console.log('Main PTS table image saved to a variable!');
         } catch (innerErr) {
           console.error('Error during html2canvas capture:', innerErr);
@@ -313,7 +313,7 @@ const handleSavePTS = async () => {
     } catch (err) {
       console.error('Unexpected error in useEffect:', err);
     }
-  }, [tableRef.current, data, setCapturedImage]);
+  }, [tableRef.current, data, setPtsImages]);
 
 
 return (
