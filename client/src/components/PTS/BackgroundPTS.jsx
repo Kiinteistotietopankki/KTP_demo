@@ -5,9 +5,10 @@ const BackgroundPTS = ({ kiinteistotunnus, setPtsImages }) => {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
+    console.log()
     const timer = setTimeout(() => {
       setShow(false); // unmount after 5 seconds
-    }, 5000);
+    }, 6000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -19,6 +20,7 @@ const BackgroundPTS = ({ kiinteistotunnus, setPtsImages }) => {
       <PTSLongTermTable
         kiinteistotunnus={kiinteistotunnus}
         setPtsImages={setPtsImages}
+        onBackground={true}
       />
     </div>
   );

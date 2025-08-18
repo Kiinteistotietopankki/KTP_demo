@@ -45,6 +45,27 @@ const ReportTemplate = ({
   const [ptsImages, setPtsImages] = useState([]);
 
   useEffect(() => {
+    if (ptsImages.length > 0) {
+      console.log("Type of first element:", typeof ptsImages[0]);
+      console.log("First element value:", ptsImages[0]);
+    } else {
+      console.log("ptsImages array is empty");
+    }
+  }, [ptsImages]);
+
+    // Logging coverImage
+  useEffect(() => {
+    if (coverImage) {
+      console.log("Type of coverImage:", typeof coverImage);
+      console.log("Cover image value:", coverImage);
+    } else {
+      console.log("coverImage is null or empty");
+    }
+  }, [coverImage]);
+
+
+
+  useEffect(() => {
     if (initialRakennusData) setRakennusData(initialRakennusData);
   }, [initialRakennusData]);
 
@@ -59,7 +80,7 @@ const ReportTemplate = ({
       sections,
       selectedTemplate,
     });
-  }, [title, dateIso, propertyName, coverImage, riskidata, sections, selectedTemplate]);
+  }, [title, dateIso, propertyName, coverImage, riskidata, sections, selectedTemplate, ptsImages]);
 
   // preview generation
   useEffect(() => {
@@ -84,7 +105,7 @@ const ReportTemplate = ({
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
-  }, [activeTab, title, propertyName, dateIso, coverImage, logoBase64, sections, riskidata, rakennusData]); // eslint-disable-line
+  }, [activeTab, title, propertyName, dateIso, coverImage, logoBase64, sections, riskidata, rakennusData, ptsImages]); // eslint-disable-line
 
   const handleExportPdf = () => {
     const docDefinition = makeDocDefinition({

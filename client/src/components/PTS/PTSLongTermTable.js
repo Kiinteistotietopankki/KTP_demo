@@ -16,7 +16,7 @@ import config from '../../devprodConfig';
 import PiechartPTS from './PiechartPTS';
 import html2canvas from 'html2canvas';
 
-export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPtsImages=null}) {
+export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPtsImages=null, onBackground=false}) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -284,6 +284,8 @@ const pieChartRef = useRef(null);
 const yhteensaRef = useRef(null);
 
 useEffect(() => {
+  if (!onBackground) return;
+
   let resizeObserver;
   let captureTimeout;
 
@@ -295,9 +297,7 @@ useEffect(() => {
         useCORS: true,
       });
       const img = canvas.toDataURL("image/png");
-      if (setPtsImages) {
-        setPtsImages([img]);
-      }
+      if (setPtsImages) setPtsImages([img]);
       console.log("Captured yhteensaRef as image!");
     } catch (err) {
       console.error("Error capturing element:", err);
@@ -305,12 +305,8 @@ useEffect(() => {
   };
 
   const scheduleCapture = () => {
-    // Clear any previous timeout to avoid duplicate captures
     if (captureTimeout) clearTimeout(captureTimeout);
-    // Give charts a short time to finish rendering
-    captureTimeout = setTimeout(() => {
-      captureElement();
-    }, 5000); // tweak delay as needed
+    captureTimeout = setTimeout(captureElement, 6000); // tweak delay if needed
   };
 
   if (yhteensaRef.current) {
@@ -322,10 +318,11 @@ useEffect(() => {
   return () => {
     if (resizeObserver && yhteensaRef.current) {
       resizeObserver.unobserve(yhteensaRef.current);
+      resizeObserver = null;
     }
     if (captureTimeout) clearTimeout(captureTimeout);
   };
-}, [setPtsImages]);
+}, [onBackground, setPtsImages, yhteensaRef]);
 
 
 return (

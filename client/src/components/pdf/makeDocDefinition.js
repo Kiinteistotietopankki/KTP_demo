@@ -335,6 +335,30 @@ if (intro) {
       content.push(...rows, { text: '', margin: [0, 10] });
     }
 
+    if (s.key === 'pts-ehdotukset' && Array.isArray(ptsImages) && ptsImages.length) {
+      const rows = [];
+      for (let i = 0; i < ptsImages.length; i += 2) {
+        const row = ptsImages.slice(i, i + 2).map((imgStr) => ({
+          stack: [
+            imgStr
+              ? {
+                  image: imgStr,
+                  width: 240,
+                  height: 160,
+                  preserveAspectRatio: false,
+                  alignment: 'center',
+                  margin: [0, 0, 0, 5],
+                }
+              : { text: 'Image not available', italics: true, alignment: 'center', margin: [0, 0, 0, 5] },
+            { text: '', fontSize: 9, alignment: 'center', italics: true, margin: [0, 2, 0, 0] },
+          ],
+          width: '50%',
+        }));
+        rows.push({ columns: row, columnGap: 10 });
+      }
+      content.push(...rows, { text: '', margin: [0, 10] });
+    }
+
     if (s.key === 'jarjestelma') {
       content.push(
         { text: 'Riskiluokitus', fontSize: 14, semibold: true, margin: [0, 10, 0, 10] },
@@ -385,6 +409,11 @@ if (intro) {
       }
     }
   }
+
+
+
+
+
 
   return {
     content,
