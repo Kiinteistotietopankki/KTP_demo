@@ -4,14 +4,15 @@ import PTSLongTermTable from './PTSLongTermTable';
 const BackgroundPTS = ({ kiinteistotunnus, setPtsImages }) => {
   const [show, setShow] = useState(true);
 
-  useEffect(() => {
-    console.log()
+    useEffect(() => {
+    setShow(true); // reset to true whenever kiinteistotunnus changes
+
     const timer = setTimeout(() => {
-      setShow(false); // unmount after 5 seconds
-    }, 6000);
+        setShow(false);
+    }, 10000);
 
     return () => clearTimeout(timer);
-  }, []);
+    }, [kiinteistotunnus]); // dependency on kiinteistotunnus
 
   if (!show) return null;
 

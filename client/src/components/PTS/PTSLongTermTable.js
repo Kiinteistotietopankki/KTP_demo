@@ -306,7 +306,7 @@ useEffect(() => {
 
   const scheduleCapture = () => {
     if (captureTimeout) clearTimeout(captureTimeout);
-    captureTimeout = setTimeout(captureElement, 6000); // tweak delay if needed
+    captureTimeout = setTimeout(captureElement, 6000); 
   };
 
   if (yhteensaRef.current) {
@@ -353,31 +353,40 @@ return (
             >
             <div ref={yhteensaRef}> 
 
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Lisätutkimukset" fill="#2F5930" stackId="a" />
-              <Bar dataKey="Rakennetekniikka" fill="#7AA668" stackId="a" />
-              <Bar dataKey="LVI Järjestelmät" fill="#A7BFA2" stackId="a" />
-              <Bar dataKey="Sähköjärjestelmät" fill="#C8D1BC" stackId="a" />
-            </BarChart>
-          </ResponsiveContainer>
+            {chartData && chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Lisätutkimukset" fill="#2F5930" stackId="a" />
+                  <Bar dataKey="Rakennetekniikka" fill="#7AA668" stackId="a" />
+                  <Bar dataKey="LVI Järjestelmät" fill="#A7BFA2" stackId="a" />
+                  <Bar dataKey="Sähköjärjestelmät" fill="#C8D1BC" stackId="a" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p>No data available for the bar chart.</p>
+            )}
 
-          <div ref={pieChartRef} className='py-4'>
-            <PiechartPTS
-              tekniikkaYhteensa={tekniikkaYhteensa}
-              lviYhteensa={lviYhteensa}
-              sahkoYhteensa={sahkoYhteensa}
-              tutkimusYhteensa={tutkimusYhteensa}
-            />
-          </div>
+            {/* Pie chart */}
+            {tekniikkaYhteensa || lviYhteensa || sahkoYhteensa || tutkimusYhteensa ? (
+              <div ref={pieChartRef} className='py-4'>
+                <PiechartPTS
+                  tekniikkaYhteensa={tekniikkaYhteensa}
+                  lviYhteensa={lviYhteensa}
+                  sahkoYhteensa={sahkoYhteensa}
+                  tutkimusYhteensa={tutkimusYhteensa}
+                />
+              </div>
+            ) : (
+              <p>No data available for the pie chart.</p>
+            )}
 
               <div className="table-responsive" ref={mainTableRef}>
                 <table className="table table-sm table-borderless table-striped mb-0">
@@ -512,57 +521,6 @@ return (
       setData={setSahkoData}
       onYhteensaChange={setSahkoYhteensa}
     />
-
-    {/* <div className="accordion-item">
-      <h2 className="accordion-header" id="heading-charts">
-        <button
-          className="accordion-button collapsed"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#collapse-charts"
-          aria-expanded="false"
-          aria-controls="collapse-charts"
-        >
-          📊 Toimenpiteiden jakautuminen (Kaaviot)
-        </button>
-      </h2>
-
-      <div
-        id="collapse-charts"
-        className="accordion-collapse collapse"
-        aria-labelledby="heading-charts"
-      >
-
-        <div className="accordion-body">
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Lisätutkimukset" fill="#2F5930" stackId="a" />
-              <Bar dataKey="Rakennetekniikka" fill="#7AA668" stackId="a" />
-              <Bar dataKey="LVI Järjestelmät" fill="#A7BFA2" stackId="a" />
-              <Bar dataKey="Sähköjärjestelmät" fill="#C8D1BC" stackId="a" />
-            </BarChart>
-          </ResponsiveContainer>
-
-          <div ref={pieChartRef} className='py-4'>
-            <PiechartPTS
-              tekniikkaYhteensa={tekniikkaYhteensa}
-              lviYhteensa={lviYhteensa}
-              sahkoYhteensa={sahkoYhteensa}
-              tutkimusYhteensa={tutkimusYhteensa}
-            />
-          </div>
-        </div>
-
-      </div>
-    </div> */}
 
     <div className="text-end p-4">
       <button className="btn btn-success" onClick={handleSavePTS}>

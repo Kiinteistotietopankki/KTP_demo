@@ -299,9 +299,10 @@ export default function SectionsAccordion({
                   setRiskidata={setRiskidata}
                 />
               )}
-                {section.key === 'pts-ehdotukset' && (
-                  <div className="my-3 text-center">
-                    {ptsImagesPrew && ptsImagesPrew.length > 0 ? (
+              {section.key === 'pts-ehdotukset' && (
+                <div className="my-3 text-center">
+                  {ptsImagesPrew && ptsImagesPrew.length > 0 ? (
+                    ptsImagesPrew[0].startsWith('data:image') ? (
                       ptsImagesPrew.map((imgSrc, index) => (
                         <img
                           key={index}
@@ -311,15 +312,28 @@ export default function SectionsAccordion({
                             maxWidth: '100%',
                             height: 'auto',
                             borderRadius: 6,
-                            marginBottom: 8
+                            marginBottom: 8,
                           }}
                         />
                       ))
                     ) : (
-                      <p>No PTS image available</p>
-                    )}
-                  </div>
-                )}
+                      <div className="d-flex flex-column align-items-center gap-2">
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <span>Luodaan kuvia PTS-tauluista...</span>
+                      </div>
+                    )
+                  ) : (
+                    <div className="d-flex flex-column align-items-center gap-2">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                      <span>Luodaan kuvia PTS-tauluista...</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
