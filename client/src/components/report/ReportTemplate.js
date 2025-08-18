@@ -73,6 +73,7 @@ const ReportTemplate = ({
       sections,
       riskidata,
       rakennusData,
+      ptsImages
     });
     const pdfDoc = pdfMake.createPdf(docDefinition);
     pdfDoc.getBlob((blob) => {
@@ -95,6 +96,7 @@ const ReportTemplate = ({
       sections,
       riskidata,
       rakennusData,
+      ptsImages
     });
     const pdfDoc = pdfMake.createPdf(docDefinition);
     pdfDoc.getBlob((blob) => {

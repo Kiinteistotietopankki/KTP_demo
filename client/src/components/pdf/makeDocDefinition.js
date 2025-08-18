@@ -9,7 +9,7 @@ export default function makeDocDefinition({
   sections,
   riskidata,
   rakennusData,
-  ptsImage=null
+  ptsImages
 }) {
   const content = [];
 
