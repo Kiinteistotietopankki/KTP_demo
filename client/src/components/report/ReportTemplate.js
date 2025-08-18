@@ -18,6 +18,7 @@ import { Riskidataa } from '../../assets/Riskidata';
 
 import '../../fonts/josefin-fonts.js';
 import '../../fonts/Lato-fonts.js';
+import BackgroundPTS from '../PTS/BackgroundPTS.jsx';
 
 const ReportTemplate = ({
   rakennus,
@@ -202,6 +203,11 @@ const ReportTemplate = ({
 
         </div>
       )}
+
+      <BackgroundPTS
+        kiinteistotunnus={kiinteistotunnus}
+        setPtsImages={setPtsImages}
+      />
 
       {activeTab === 'preview' && (
         <PreviewPane previewUrl={previewUrl} onDownload={handleExportPdf} />

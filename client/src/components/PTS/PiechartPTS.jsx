@@ -23,25 +23,37 @@ export default function PiechartPTS({ tekniikkaYhteensa, lviYhteensa, sahkoYhtee
   ];
 
   return (
-    <ResponsiveContainer width="100%" height={350}>
-      <PieChart>
-        <Tooltip />
-        <Legend />
-        <Pie
-          data={data}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="50%"
-          outerRadius={outerRadius}
-          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+<ResponsiveContainer width="100%" height={350}>
+  <PieChart>
+    <Tooltip />
+    <Legend /> 
+    <Pie
+      data={data}
+      dataKey="value"
+      nameKey="name"
+      cx="50%"
+      cy="50%"
+      outerRadius={outerRadius}
+      labelLine={false}   // ⬅️ disables the connector lines
+      label={({ percent, x, y }) => (
+        <text
+          x={x}
+          y={y}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="#000"
+          fontSize='0.90rem'
         >
-          <Cell fill="#7AA668" />
-          <Cell fill="#A7BFA2" />
-          <Cell fill="#C8D1BC" />
-          <Cell fill="#2F5930" />
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
+          {`${(percent * 100).toFixed(1)}%`}
+        </text>
+      )}
+    >
+      <Cell fill="#7AA668" />
+      <Cell fill="#A7BFA2" />
+      <Cell fill="#C8D1BC" />
+      <Cell fill="#2F5930" />
+    </Pie>
+  </PieChart>
+</ResponsiveContainer>
   );
 }

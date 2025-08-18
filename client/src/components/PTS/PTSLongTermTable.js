@@ -16,7 +16,7 @@ import config from '../../devprodConfig';
 import PiechartPTS from './PiechartPTS';
 import html2canvas from 'html2canvas';
 
-export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPtsImages}) {
+export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPtsImages=null}) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -281,29 +281,50 @@ const handleSavePTS = async () => {
 
 const mainTableRef = useRef(null);
 const pieChartRef = useRef(null);
+const yhteensaRef = useRef(null);
 
 useEffect(() => {
-  const captureElement = async (ref) => {
-    if (!ref.current) return null;
+  let resizeObserver;
+  let captureTimeout;
+
+  const captureElement = async () => {
+    if (!yhteensaRef.current) return;
     try {
-      const canvas = await html2canvas(ref.current, { scale: 2, useCORS: true });
-      return canvas.toDataURL('image/png');
+      const canvas = await html2canvas(yhteensaRef.current, {
+        scale: 2,
+        useCORS: true,
+      });
+      const img = canvas.toDataURL("image/png");
+      if (setPtsImages) {
+        setPtsImages([img]);
+      }
+      console.log("Captured yhteensaRef as image!");
     } catch (err) {
-      console.error('Error capturing element:', err);
-      return null;
+      console.error("Error capturing element:", err);
     }
   };
 
-  const captureAll = async () => {
-    const tableImage = await captureElement(mainTableRef);
-    const pieChartImage = await captureElement(pieChartRef);
-
-    const imagesArray = [tableImage, pieChartImage].filter(Boolean); // remove nulls
-    setPtsImages(imagesArray);
-    console.log('All images saved in ptsImages array!');
+  const scheduleCapture = () => {
+    // Clear any previous timeout to avoid duplicate captures
+    if (captureTimeout) clearTimeout(captureTimeout);
+    // Give charts a short time to finish rendering
+    captureTimeout = setTimeout(() => {
+      captureElement();
+    }, 5000); // tweak delay as needed
   };
 
-  captureAll();
+  if (yhteensaRef.current) {
+    scheduleCapture(); // initial capture
+    resizeObserver = new ResizeObserver(scheduleCapture);
+    resizeObserver.observe(yhteensaRef.current);
+  }
+
+  return () => {
+    if (resizeObserver && yhteensaRef.current) {
+      resizeObserver.unobserve(yhteensaRef.current);
+    }
+    if (captureTimeout) clearTimeout(captureTimeout);
+  };
 }, [setPtsImages]);
 
 
@@ -333,6 +354,33 @@ return (
               className="accordion-collapse collapse show"
               aria-labelledby={`heading-${subIdx}`}
             >
+            <div ref={yhteensaRef}> 
+
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="Lisätutkimukset" fill="#2F5930" stackId="a" />
+              <Bar dataKey="Rakennetekniikka" fill="#7AA668" stackId="a" />
+              <Bar dataKey="LVI Järjestelmät" fill="#A7BFA2" stackId="a" />
+              <Bar dataKey="Sähköjärjestelmät" fill="#C8D1BC" stackId="a" />
+            </BarChart>
+          </ResponsiveContainer>
+
+          <div ref={pieChartRef} className='py-4'>
+            <PiechartPTS
+              tekniikkaYhteensa={tekniikkaYhteensa}
+              lviYhteensa={lviYhteensa}
+              sahkoYhteensa={sahkoYhteensa}
+              tutkimusYhteensa={tutkimusYhteensa}
+            />
+          </div>
 
               <div className="table-responsive" ref={mainTableRef}>
                 <table className="table table-sm table-borderless table-striped mb-0">
@@ -437,6 +485,8 @@ return (
                 </table>
               </div>
             </div>
+            </div>
+
           </div>
         ))}
       </React.Fragment>
@@ -466,7 +516,7 @@ return (
       onYhteensaChange={setSahkoYhteensa}
     />
 
-    <div className="accordion-item">
+    {/* <div className="accordion-item">
       <h2 className="accordion-header" id="heading-charts">
         <button
           className="accordion-button collapsed"
@@ -485,43 +535,37 @@ return (
         className="accordion-collapse collapse"
         aria-labelledby="heading-charts"
       >
-        <div className="accordion-body">
-          <Tabs defaultActiveKey="bar" className="mb-3" fill>
-            {/* Bar Chart */}
-            <Tab eventKey="bar" title="Pylväskaavio">
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="Lisätutkimukset" fill="#2F5930" stackId="a" />
-                  <Bar dataKey="Rakennetekniikka" fill="#7AA668" stackId="a" />
-                  <Bar dataKey="LVI Järjestelmät" fill="#A7BFA2" stackId="a" />
-                  <Bar dataKey="Sähköjärjestelmät" fill="#C8D1BC" stackId="a" />
-                </BarChart>
-              </ResponsiveContainer>
-            </Tab>
 
-            {/* Pie Chart */}
-            <Tab eventKey="pie" title="Ympyrädiagrammi">
-              <div ref={pieChartRef}>
-                <PiechartPTS
-                  tekniikkaYhteensa={tekniikkaYhteensa}
-                  lviYhteensa={lviYhteensa}
-                  sahkoYhteensa={sahkoYhteensa}
-                  tutkimusYhteensa={tutkimusYhteensa}
-                />
-              </div>
-            </Tab>
-          </Tabs>
+        <div className="accordion-body">
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="Lisätutkimukset" fill="#2F5930" stackId="a" />
+              <Bar dataKey="Rakennetekniikka" fill="#7AA668" stackId="a" />
+              <Bar dataKey="LVI Järjestelmät" fill="#A7BFA2" stackId="a" />
+              <Bar dataKey="Sähköjärjestelmät" fill="#C8D1BC" stackId="a" />
+            </BarChart>
+          </ResponsiveContainer>
+
+          <div ref={pieChartRef} className='py-4'>
+            <PiechartPTS
+              tekniikkaYhteensa={tekniikkaYhteensa}
+              lviYhteensa={lviYhteensa}
+              sahkoYhteensa={sahkoYhteensa}
+              tutkimusYhteensa={tutkimusYhteensa}
+            />
+          </div>
         </div>
+
       </div>
-    </div>
+    </div> */}
 
     <div className="text-end p-4">
       <button className="btn btn-success" onClick={handleSavePTS}>
