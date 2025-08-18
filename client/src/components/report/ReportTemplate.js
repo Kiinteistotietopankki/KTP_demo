@@ -44,24 +44,6 @@ const ReportTemplate = ({
   //pts images
   const [ptsImages, setPtsImages] = useState([]);
 
-  useEffect(() => {
-    if (ptsImages.length > 0) {
-      console.log("Type of first element:", typeof ptsImages[0]);
-      console.log("First element value:", ptsImages[0]);
-    } else {
-      console.log("ptsImages array is empty");
-    }
-  }, [ptsImages]);
-
-    // Logging coverImage
-  useEffect(() => {
-    if (coverImage) {
-      console.log("Type of coverImage:", typeof coverImage);
-      console.log("Cover image value:", coverImage);
-    } else {
-      console.log("coverImage is null or empty");
-    }
-  }, [coverImage]);
 
 
 

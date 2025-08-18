@@ -335,29 +335,29 @@ if (intro) {
       content.push(...rows, { text: '', margin: [0, 10] });
     }
 
-    if (s.key === 'pts-ehdotukset' && Array.isArray(ptsImages) && ptsImages.length) {
-      const rows = [];
-      for (let i = 0; i < ptsImages.length; i += 2) {
-        const row = ptsImages.slice(i, i + 2).map((imgStr) => ({
-          stack: [
-            imgStr
-              ? {
-                  image: imgStr,
-                  width: 240,
-                  height: 160,
-                  preserveAspectRatio: false,
-                  alignment: 'center',
-                  margin: [0, 0, 0, 5],
-                }
-              : { text: 'Image not available', italics: true, alignment: 'center', margin: [0, 0, 0, 5] },
-            { text: '', fontSize: 9, alignment: 'center', italics: true, margin: [0, 2, 0, 0] },
-          ],
-          width: '50%',
-        }));
-        rows.push({ columns: row, columnGap: 10 });
-      }
-      content.push(...rows, { text: '', margin: [0, 10] });
-    }
+if (s.key === 'pts-ehdotukset' && Array.isArray(ptsImages) && ptsImages.length) {
+  const imageStack = ptsImages.map((imgStr) => ({
+    image: imgStr || undefined,
+    width: 480,
+    height: 620,
+    preserveAspectRatio: true,
+    margin: [0, 0, 0, 10],
+    alignment: 'center', // centers the individual image in the page
+  }));
+
+  // For images that are not available, add a placeholder
+  const imageStackWithPlaceholders = imageStack.map((img, i) =>
+    img.image
+      ? img
+      : { text: 'Image not available', italics: true, alignment: 'center', margin: [0, 0, 0, 10] }
+  );
+
+  content.push({
+    stack: imageStackWithPlaceholders,
+    alignment: 'center', // centers the whole stack horizontally
+  });
+}
+
 
     if (s.key === 'jarjestelma') {
       content.push(
