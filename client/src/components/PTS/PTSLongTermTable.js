@@ -82,6 +82,7 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
           { credentials: 'include'
         });
         const fullPTS = await fullRes.json();
+        console.log(fullPTS)
 
       
 

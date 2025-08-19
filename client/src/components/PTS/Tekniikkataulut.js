@@ -10,79 +10,40 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
 
   if (type === 'Sähkötekniikka') {
     initialData = [
-      { header: 'Aluesähköistys', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Kytkinlaitokset ja jakokeskukset', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Johdot ja niiden varusteet', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Valaisimet, lämmittimet, kojeet ja laitteet', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Tele- ja antennijärjestelmät', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Palo- ja turvajärjestelmät', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Siirtolaitteet', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Aluesähköistys', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Kytkinlaitokset ja jakokeskukset', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Johdot ja niiden varusteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Valaisimet, lämmittimet, kojeet ja laitteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Tele- ja antennijärjestelmät', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Palo- ja turvajärjestelmät', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Siirtolaitteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
     ];
   } else if (type === 'LVI-tekniikka') {
     initialData = [
-      { header: 'Lämmöntuotanto', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Lämmitysverkosto', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Vesijohtoverkosto', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Viemäriverkosto', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Ilmanvaihtojärjestelmä', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Jäähdytysjärjestelmät', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Rakennusautomaatio', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
-      { header: 'Muut järjestelmät', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Lämmöntuotanto', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Lämmitysverkosto', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Vesijohtoverkosto', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Viemäriverkosto', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Ilmanvaihtojärjestelmä', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Jäähdytysjärjestelmät', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Rakennusautomaatio', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Muut järjestelmät', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
     ];
   } else if (type === 'Rakennetekniikka') {
     initialData = [
-      {
-        header: 'Vierustat ja kuivatusosat',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Pihapäällysteet',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Aluevarusteet ja -rakenteet',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Perustukset ja sokkelit',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Alapohja',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Rakennusrunko',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Ulkoseinät',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Ikkunat',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Ulko-ovet',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Parvekkeet',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Kattorakenteet',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Sisätilat',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
-      {
-        header: 'Märkätilat',
-        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
-      },
+      { name: 'Vierustat ja kuivatusosat', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Pihapäällysteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Aluevarusteet ja -rakenteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Perustukset ja sokkelit', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Alapohja', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Rakennusrunko', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Ulkoseinät', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Ikkunat', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Ulko-ovet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Parvekkeet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Kattorakenteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Sisätilat', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { name: 'Märkätilat', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
     ];
   }
 
@@ -135,6 +96,21 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
     })
   ));
 
+  function getKLColor(kl) {
+    switch (kl) {
+      case 'KL1':
+      case 'KL2':
+        return '#ba3b46'; // red
+      case 'KL3':
+        return '#d0c407'; // yellow
+      case 'KL4':
+      case 'KL5':
+        return '#04aa00'; // green
+      default:
+        return 'black';
+    }
+  }
+
   useEffect(() => { if (onYhteensaChange) onYhteensaChange([...yhteensa]); }, [JSON.stringify(yhteensa)]);
 
   return (
@@ -183,7 +159,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
                   className="bg-light fw-semibold text-dark p-2"
                 >
                   <div className="justify-content-between align-items-center w-100">
-                    <span>{section.header}
+                    <span>{section.name}
                       {isEditing && (
                       <button
                         className="btn btn-sm btn-outline-secondary ms-4"
@@ -210,7 +186,9 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
                           onChange={e => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
                           className="form-control form-control-sm"
                         />
-                      ) : item.label}
+                      ) : <span className='ms-4'>
+                        {item.label}
+                      </span>}
                     </td>
 
                     <td style={{ minWidth: '90px' }} className="text-center">
@@ -224,7 +202,16 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
                             <option key={kl} value={kl}>{kl}</option>
                           ))}
                         </select>
-                      ) : item.kl}
+                      ) : (
+                        <span
+                          style={{
+                            fontWeight: 'bold',
+                            color: getKLColor(item.kl),
+                          }}
+                        >
+                          {item.kl}
+                        </span>
+                      )}
                     </td>
 
                     {item.values.map((val, yearIdx) => (
