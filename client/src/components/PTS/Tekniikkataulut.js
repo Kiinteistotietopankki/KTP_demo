@@ -186,9 +186,11 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
                           onChange={e => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
                           className="form-control form-control-sm"
                         />
-                      ) : <span className='ms-4'>
+                      ) : 
+                      <div className="ms-4" style={{ whiteSpace: 'pre-wrap' }}>
                         {item.label}
-                      </span>}
+                      </div>
+                      }
                     </td>
 
                     <td style={{ minWidth: '90px' }} className="text-center">
@@ -214,18 +216,18 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
                       )}
                     </td>
 
-                    {item.values.map((val, yearIdx) => (
-                      <td key={yearIdx} className="text-end px-2">
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            value={val}
-                            onChange={e => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
-                            className="form-control form-control-sm text-end"
-                          />
-                        ) : val}
-                      </td>
-                    ))}
+                      {item.values.map((val, yearIdx) => (
+                        <td key={yearIdx} className="text-end px-2">
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              value={val}
+                              onChange={e => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
+                              className="form-control form-control-sm text-end"
+                            />
+                          ) : val === 0 || val === '0' ? '' : val} {/* <-- render empty for 0 */}
+                        </td>
+                      ))}
 
                     {isEditing && (
                       <td>
