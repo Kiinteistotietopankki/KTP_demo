@@ -106,20 +106,23 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
                           ) : item.label}
                         </td>
 
-                        {item.values.map((val, yearIdx) => (
-                          <td key={yearIdx} className="text-end px-2">
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={val}
-                                onChange={(e) =>
-                                  handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)
-                                }
-                                className="form-control form-control-sm text-end"
-                              />
-                            ) : val}
-                          </td>
-                        ))}
+                          {item.values.map((val, yearIdx) => (
+                            <td key={yearIdx} className="text-end px-2">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={val}
+                                  onChange={(e) =>
+                                    handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)
+                                  }
+                                  className="form-control form-control-sm text-end"
+                                />
+                              ) : (
+                                // Show empty instead of 0
+                                parseFloat(val) === 0 ? '' : val
+                              )}
+                            </td>
+                          ))}
 
                         {isEditing && (
                           <td>
