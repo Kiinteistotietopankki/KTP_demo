@@ -37,7 +37,7 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
       category: 'Rakennetekniikka',
       subcategories: [
         {
-          name: 'Toimenpide-ehdotukset yhteensä',
+          name: 'Yhteenvetotaulukko',
           items: [
             { label: 'Lisätutkimukset', kl: 'KL3', values: Array(11).fill('') },
             { label: 'Rakennetekniikka', kl: '', values: Array(11).fill('') },
@@ -391,30 +391,30 @@ return (
               <div className="table-responsive" ref={mainTableRef}>
                 <table className="table table-sm table-borderless table-striped mb-0">
 
-                  {/* Vihreä headeri osio */}
+                  {/* Green header */}
                   <thead>
                     <tr>
                       <th colSpan={years.length + 2} className="bg-success text-white p-2">
                         <div className="d-flex justify-content-between">
-                          <span>Toimenpide-ehdotukset yhteensä</span>
-                          <span className="small">Kustannusarvio (x 1000€) Kustannustaso 2025 sis. Alv 25,5%</span>
+                          <div className="fw-bold">Toimenpide-ehdotukset yhteensä</div>
+                          <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso 2025 sis. Alv 25,5%</div>
                         </div>
                       </th>
                     </tr>
                   </thead>
 
+                  {/* Column headers */}
                   <thead>
                     <tr>
-                      <th className="bg-success text-white">Osa-alue</th>
-                      <th className="bg-success text-white">Yhteensä</th>
+                      <th className="bg-success text-white text-start">Osa-alue</th>
+                      <th className="bg-success text-white text-end">Yhteensä</th>
                       {years.map((year) => (
-                        <th key={year} className="bg-success text-white">
-                          {year}
-                        </th>
+                        <th key={year} className="bg-success text-white text-end px-2">{year}</th>
                       ))}
                     </tr>
                   </thead>
 
+                  {/* Table body */}
                   <tbody>
                     {sub.items
                       .filter((item) => item.label !== 'Yhteensä')
@@ -424,83 +424,77 @@ return (
                           return !isNaN(num) ? sum + num : sum;
                         }, 0);
 
+                        const valuesToShow =
+                          sub.name === 'Yhteenvetotaulukko'
+                            ? item.label === 'Rakennetekniikka'
+                              ? tekniikkaYhteensa
+                              : item.label === 'LVI Järjestelmät'
+                              ? lviYhteensa
+                              : item.label === 'Sähköjärjestelmät'
+                              ? sahkoYhteensa
+                              : item.label === 'Lisätutkimukset'
+                              ? tutkimusYhteensa
+                              : item.values
+                            : item.values;
+
                         return (
                           <tr key={itemIdx}>
-                            <td>{item.label}</td>
+                            <td className="text-start">{item.label}</td>
                             <td className="text-end font-monospace">{rowTotal}</td>
-
-                            {sub.name === 'Toimenpide-ehdotukset yhteensä'
-                              ? (
-                                  item.label === 'Rakennetekniikka'
-                                    ? tekniikkaYhteensa
-                                    : item.label === 'LVI Järjestelmät'
-                                    ? lviYhteensa
-                                    : item.label === 'Sähköjärjestelmät'
-                                    ? sahkoYhteensa
-                                    : item.label === 'Lisätutkimukset'
-                                    ? tutkimusYhteensa
-                                    : item.values
-                                ).map((val, yearIdx) => (
-                                  <td key={yearIdx} className="text-end">
-                                    {val}
-                                  </td>
-                                ))
-                              : item.values.map((val, yearIdx) => (
-                                  <td key={yearIdx}>
-                                    <input
-                                      type="text"
-                                      value={val}
-                                      onChange={(e) =>
-                                        handleValueChange(
-                                          catIdx,
-                                          subIdx,
-                                          itemIdx,
-                                          yearIdx,
-                                          e.target.value
-                                        )
-                                      }
-                                      className="form-control form-control-sm text-end"
-                                    />
-                                  </td>
-                                ))}
+                            {valuesToShow.map((val, yearIdx) => (
+                              <td key={yearIdx} className="text-end px-2">
+                                {sub.name === 'Yhteenvetotaulukko' ? (
+                                  val
+                                ) : (
+                                  <input
+                                    type="text"
+                                    value={val}
+                                    onChange={(e) =>
+                                      handleValueChange(catIdx, subIdx, itemIdx, yearIdx, e.target.value)
+                                    }
+                                    className="form-control form-control-sm text-end"
+                                  />
+                                )}
+                              </td>
+                            ))}
                           </tr>
                         );
                       })}
                   </tbody>
 
-                    <tfoot>
-                      <tr className="fw-bold">
-                        <td className="bg-success text-white text-start">YHTEENSÄ</td>
-                        <td className="bg-success text-white text-end font-monospace">
-                          {sub.items
-                            .filter((i) => i.label !== 'Yhteensä')
-                            .reduce(
-                              (acc, item) =>
-                                acc +
-                                item.values.reduce((sum, val) => {
-                                  const num = parseFloat(val);
-                                  return !isNaN(num) ? sum + num : sum;
-                                }, 0),
-                              0
-                            )}
-                        </td>
+                  {/* Footer totals */}
+                  <tfoot>
+                    <tr className="fw-bold">
+                      <td className="bg-success text-white text-start">YHTEENSÄ</td>
+                      <td className="bg-success text-white text-end font-monospace">
+                        {sub.items
+                          .filter((i) => i.label !== 'Yhteensä')
+                          .reduce(
+                            (acc, item) =>
+                              acc +
+                              item.values.reduce((sum, val) => {
+                                const num = parseFloat(val);
+                                return !isNaN(num) ? sum + num : sum;
+                              }, 0),
+                            0
+                          )}
+                      </td>
+                      {Array.from({ length: years.length }, (_, idx) => {
+                        const colSum = sub.items
+                          .filter((i) => i.label !== 'Yhteensä')
+                          .reduce((sum, item) => {
+                            const num = parseFloat(item.values[idx]);
+                            return !isNaN(num) ? sum + num : sum;
+                          }, 0);
 
-                        {Array.from({ length: 11 }, (_, idx) => {
-                          const colSum = sub.items
-                            .filter((i) => i.label !== 'Yhteensä')
-                            .reduce((sum, item) => {
-                              const num = parseFloat(item.values[idx]);
-                              return !isNaN(num) ? sum + num : sum;
-                            }, 0);
-
-                          return (
-                            <td key={idx} className="bg-success text-white text-end font-monospace">
-                              {colSum}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    </tfoot>
+                        return (
+                          <td key={idx} className="bg-success text-white text-end font-monospace px-2">
+                            {colSum}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
             </div>
