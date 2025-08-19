@@ -111,13 +111,11 @@ function Taloyhtiokortti() {
               <DokumentitTab kiinteisto={card}></DokumentitTab>
           )}
         {activeKey === 'pts' && (
-              <div className="p-3">
+              <div>
                 {hasPTSData === null ? (
                   <p className="text-muted">Tarkistetaan PTS-tietoja...</p>
                 ) : hasPTSData === true ? (
-                  <>
                     <PTSLongTermTable kiinteistotunnus={card?.kiinteistotunnus} />
-                  </>
                 ) : (
                   <>
                     <p>Ei vielä PTS-suunnitelmaa tälle kiinteistölle.</p>
