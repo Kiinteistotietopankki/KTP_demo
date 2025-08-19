@@ -93,17 +93,45 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
                       <tr key={itemIdx}>
                         <td className="text-start">
                           {isEditing ? (
-                            <input
-                              type="text"
-                              value={item.label}
-                              onChange={(e) => {
-                                const updated = [...tableData];
-                                updated[sectionIdx].items[itemIdx].label = e.target.value;
-                                setTableData(updated);
-                              }}
-                              className="form-control form-control-sm"
-                            />
-                          ) : item.label}
+                            <div style={{ display: 'inline-block', position: 'relative' }}>
+                              <input
+                                type="text"
+                                value={item.label}
+                                onChange={(e) => {
+                                  const updated = [...tableData];
+                                  updated[sectionIdx].items[itemIdx].label = e.target.value;
+                                  setTableData(updated);
+                                }}
+                                className="form-control form-control-sm"
+                                style={{ width: 'auto', minWidth: '50px' }}
+                                onFocus={(e) => {
+                                  const span = document.createElement('span');
+                                  span.style.visibility = 'hidden';
+                                  span.style.whiteSpace = 'pre';
+                                  span.style.font = window.getComputedStyle(e.target).font;
+                                  span.innerText = e.target.value || ' ';
+                                  document.body.appendChild(span);
+                                  e.target.style.width = `${span.offsetWidth + 30}px`;
+                                  document.body.removeChild(span);
+                                }}
+                                onInput={(e) => {
+                                  const span = document.createElement('span');
+                                  span.style.visibility = 'hidden';
+                                  span.style.whiteSpace = 'pre';
+                                  span.style.font = window.getComputedStyle(e.target).font;
+                                  span.innerText = e.target.value || ' ';
+                                  document.body.appendChild(span);
+                                  e.target.style.width = `${span.offsetWidth + 30}px`;
+                                  document.body.removeChild(span);
+                                }}
+                                onBlur={(e) => e.target.style.width = '150px'} // optional: shrink back
+                              />
+                            </div>
+                          ) : (
+                            <div className="" style={{ whiteSpace: 'pre-wrap' }}>
+                              {item.label}
+                            </div>
+                          )}
                         </td>
 
                           {item.values.map((val, yearIdx) => (

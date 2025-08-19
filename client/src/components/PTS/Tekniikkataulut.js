@@ -180,12 +180,36 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
                   <tr key={itemIdx}>
                     <td>
                       {isEditing ? (
-                        <input
-                          type="text"
-                          value={item.label}
-                          onChange={e => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
-                          className="form-control form-control-sm"
-                        />
+                        <div style={{ display: 'inline-block', position: 'relative' }}>
+                          <input
+                            type="text"
+                            value={item.label}
+                            onChange={e => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
+                            className="form-control form-control-sm"
+                            style={{ width: 'auto', minWidth: '50px' }} // start small
+                            onFocus={e => {
+                              const span = document.createElement('span');
+                              span.style.visibility = 'hidden';
+                              span.style.whiteSpace = 'pre';
+                              span.style.font = window.getComputedStyle(e.target).font;
+                              span.innerText = e.target.value || ' '; 
+                              document.body.appendChild(span);
+                              e.target.style.width = `${span.offsetWidth + 30}px`; // add small padding
+                              document.body.removeChild(span);
+                            }}
+                            onInput={e => {
+                              const span = document.createElement('span');
+                              span.style.visibility = 'hidden';
+                              span.style.whiteSpace = 'pre';
+                              span.style.font = window.getComputedStyle(e.target).font;
+                              span.innerText = e.target.value || ' ';
+                              document.body.appendChild(span);
+                              e.target.style.width = `${span.offsetWidth + 30}px`;
+                              document.body.removeChild(span);
+                            }}
+                            onBlur={e => e.target.style.width = '150px'} // optional: shrink back after editing
+                          />
+                        </div>
                       ) : 
                       <div className="ms-4" style={{ whiteSpace: 'pre-wrap' }}>
                         {item.label}
@@ -193,28 +217,29 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
                       }
                     </td>
 
-                    <td className="text-center px-1" style={{ width: '1%' }}>
-                      {isEditing ? (
-                        <select
-                          value={item.kl}
-                          onChange={e => handleKLChange(sectionIdx, itemIdx, e.target.value)}
-                          className="form-select form-select-sm text-center"
-                        >
-                          {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
-                            <option key={kl} value={kl}>{kl}</option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span
-                          style={{
-                            fontWeight: 'bold',
-                            color: getKLColor(item.kl),
-                          }}
-                        >
-                          {item.kl}
-                        </span>
-                      )}
-                    </td>
+                      <td className="text-center px-1" style={{ width: '1%' }}>
+                        {isEditing ? (
+                          <select
+                            value={item.kl}
+                            onChange={e => handleKLChange(sectionIdx, itemIdx, e.target.value)}
+                            className="form-select form-select-sm text-center"
+                            style={{ minWidth: '60px' }} // ensures the text is visible
+                          >
+                            {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
+                              <option key={kl} value={kl}>{kl}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span
+                            style={{
+                              fontWeight: 'bold',
+                              color: getKLColor(item.kl),
+                            }}
+                          >
+                            {item.kl}
+                          </span>
+                        )}
+                      </td>
 
                       {item.values.map((val, yearIdx) => (
                         <td key={yearIdx} className="text-end px-1 px-sm-2">
