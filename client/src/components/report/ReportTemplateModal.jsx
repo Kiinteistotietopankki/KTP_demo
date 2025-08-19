@@ -7,9 +7,9 @@ const ReportTemplateModal = ({
   onHide,
   rakennus,
   kiinteistotunnus,
-  initialTab,
-  rakennusData
-}) => {
+  rakennusData,
+  initialTab
+  }) => {
   const [activeTab, setActiveTab] = useState(initialTab || 'report');
 
   return (

@@ -16,6 +16,7 @@ import DokumentitTab from '../components/DokumentitTab';
 
 import PTSLongTermTable from '../components/PTS/PTSLongTermTable';
 import config from '../devprodConfig';
+import ReportTemplateModal from '../components/report/ReportTemplateModal.jsx';
 
 function Taloyhtiokortti() {
   const { id } = useParams();
@@ -130,7 +131,7 @@ function Taloyhtiokortti() {
                   </>
                 )}
 
-                <Modal
+                {/* <Modal
                   show={showPTSModal}
                   onHide={() => setShowPTSModal(false)}
                   size="xl"
@@ -147,8 +148,17 @@ function Taloyhtiokortti() {
                       initialTab="pts"
                     />
                   </Modal.Body>
-                </Modal>
-              </div>  
+                </Modal> */}
+
+                <ReportTemplateModal
+                  show={showPTSModal}
+                  onHide={() => setShowPTSModal(false)}
+                  rakennus={rakennus}
+                  kiinteistotunnus={card.kiinteistotunnus}
+                  rakennusData={card}
+                  initialTab="pts"
+                />
+              </div>
           )}
 
         {activeKey === 'kartta' && (

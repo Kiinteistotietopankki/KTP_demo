@@ -60,6 +60,7 @@ export default function DokumentitTab({ kiinteisto }) {
           rakennus={kiinteisto}
           kiinteistotunnus={kiinteisto.kiinteistotunnus}
           rakennusData={kiinteisto}
+          initialTab="report"
         />
     </div>
   )
