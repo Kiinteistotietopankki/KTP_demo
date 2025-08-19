@@ -79,7 +79,7 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
             <tr>
               <th className="bg-success text-white text-start">Tutkimustarpeet</th>
               {years.map((year) => (
-                <th key={year} className="bg-success text-white text-end px-2">{year}</th>
+                <th key={year} className="bg-success text-white text-center px-2">{year}</th>
               ))}
             </tr>
           </thead>
@@ -134,23 +134,18 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
                           )}
                         </td>
 
-                          {item.values.map((val, yearIdx) => (
-                            <td key={yearIdx} className="text-end px-2">
-                              {isEditing ? (
-                                <input
-                                  type="text"
-                                  value={val}
-                                  onChange={(e) =>
-                                    handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)
-                                  }
-                                  className="form-control form-control-sm text-end"
-                                />
-                              ) : (
-                                // Show empty instead of 0
-                                parseFloat(val) === 0 ? '' : val
-                              )}
-                            </td>
-                          ))}
+                        {item.values.map((val, yearIdx) => (
+                          <td key={yearIdx} className="text-center px-1 px-sm-2">
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={val}
+                                onChange={(e) => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
+                                className="form-control form-control-sm text-center"
+                              />
+                            ) : parseFloat(val) === 0 ? '' : val}
+                          </td>
+                        ))}
 
                         {isEditing && (
                           <td>

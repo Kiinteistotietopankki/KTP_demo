@@ -144,7 +144,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
               <th className="bg-success text-white text-start">{type}</th>
               <th className="bg-success text-white text-center">KL</th>
               {years.map(year => (
-                <th key={year} className="bg-success text-white text-end px-2">{year}</th>
+                <th key={year} className="bg-success text-white text-center px-2">{year}</th>
               ))}
               {isEditing && <th className="bg-success text-white"></th>}
             </tr>
@@ -242,13 +242,13 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
                       </td>
 
                       {item.values.map((val, yearIdx) => (
-                        <td key={yearIdx} className="text-end px-1 px-sm-2">
+                        <td key={yearIdx} className="text-center px-1 px-sm-2">
                           {isEditing ? (
                             <input
                               type="text"
                               value={val}
                               onChange={e => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
-                              className="form-control form-control-sm text-end"
+                              className="form-control form-control-sm text-center"
                             />
                           ) : val === 0 || val === '0' ? '' : val}
                         </td>
