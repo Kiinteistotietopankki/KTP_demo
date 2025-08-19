@@ -335,28 +335,28 @@ if (intro) {
       content.push(...rows, { text: '', margin: [0, 10] });
     }
 
-if (s.key === 'pts-ehdotukset' && Array.isArray(ptsImages) && ptsImages.length) {
-  const imageStack = ptsImages.map((imgStr) => ({
-    image: imgStr || undefined,
-    width: 480,
-    height: 620,
-    preserveAspectRatio: true,
-    margin: [0, 0, 0, 10],
-    alignment: 'center', // centers the individual image in the page
-  }));
+    if (s.key === 'pts-ehdotukset' && Array.isArray(ptsImages) && ptsImages.length) {
+      const imageStack = ptsImages.map((imgStr) => ({
+        image: imgStr || undefined,
+        width: 480,
+        height: 620,
+        preserveAspectRatio: true,
+        margin: [0, 0, 0, 10],
+        alignment: 'center', // centers the individual image in the page
+      }));
 
-  // For images that are not available, add a placeholder
-  const imageStackWithPlaceholders = imageStack.map((img, i) =>
-    img.image
-      ? img
-      : { text: 'Image not available', italics: true, alignment: 'center', margin: [0, 0, 0, 10] }
-  );
+      // For images that are not available, add a placeholder
+      const imageStackWithPlaceholders = imageStack.map((img, i) =>
+        img.image
+          ? img
+          : { text: 'Image not available', italics: true, alignment: 'center', margin: [0, 0, 0, 10] }
+      );
 
-  content.push({
-    stack: imageStackWithPlaceholders,
-    alignment: 'center', // centers the whole stack horizontally
-  });
-}
+      content.push({
+        stack: imageStackWithPlaceholders,
+        alignment: 'center', // centers the whole stack horizontally
+      });
+    }
 
 
     if (s.key === 'jarjestelma') {

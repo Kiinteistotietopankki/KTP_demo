@@ -390,12 +390,25 @@ return (
 
               <div className="table-responsive" ref={mainTableRef}>
                 <table className="table table-sm table-borderless table-striped mb-0">
-                  <thead className="table-light">
+
+                  {/* Vihreä headeri osio */}
+                  <thead>
                     <tr>
-                      <th className="text-start">Osa-alue</th>
-                      <th className="text-end font-monospace">Yhteensä</th>
+                      <th colSpan={years.length + 2} className="bg-success text-white p-2">
+                        <div className="d-flex justify-content-between">
+                          <span>Toimenpide-ehdotukset yhteensä</span>
+                          <span className="small">Kustannusarvio (x 1000€) Kustannustaso 2025 sis. Alv 25,5%</span>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <thead>
+                    <tr>
+                      <th className="bg-success text-white">Osa-alue</th>
+                      <th className="bg-success text-white">Yhteensä</th>
                       {years.map((year) => (
-                        <th key={year} className="text-end font-monospace">
+                        <th key={year} className="bg-success text-white">
                           {year}
                         </th>
                       ))}
@@ -455,39 +468,39 @@ return (
                       })}
                   </tbody>
 
-                  <tfoot>
-                    <tr className="table-success fw-bold">
-                      <td className="text-start">YHTEENSÄ</td>
-                      <td className="text-end font-monospace">
-                        {sub.items
-                          .filter((i) => i.label !== 'Yhteensä')
-                          .reduce(
-                            (acc, item) =>
-                              acc +
-                              item.values.reduce((sum, val) => {
-                                const num = parseFloat(val);
-                                return !isNaN(num) ? sum + num : sum;
-                              }, 0),
-                            0
-                          )}
-                      </td>
+                    <tfoot>
+                      <tr className="fw-bold">
+                        <td className="bg-success text-white text-start">YHTEENSÄ</td>
+                        <td className="bg-success text-white text-end font-monospace">
+                          {sub.items
+                            .filter((i) => i.label !== 'Yhteensä')
+                            .reduce(
+                              (acc, item) =>
+                                acc +
+                                item.values.reduce((sum, val) => {
+                                  const num = parseFloat(val);
+                                  return !isNaN(num) ? sum + num : sum;
+                                }, 0),
+                              0
+                            )}
+                        </td>
 
-                      {Array.from({ length: 11 }, (_, idx) => {
-                        const colSum = sub.items
-                          .filter((i) => i.label !== 'Yhteensä')
-                          .reduce((sum, item) => {
-                            const num = parseFloat(item.values[idx]);
-                            return !isNaN(num) ? sum + num : sum;
-                          }, 0);
+                        {Array.from({ length: 11 }, (_, idx) => {
+                          const colSum = sub.items
+                            .filter((i) => i.label !== 'Yhteensä')
+                            .reduce((sum, item) => {
+                              const num = parseFloat(item.values[idx]);
+                              return !isNaN(num) ? sum + num : sum;
+                            }, 0);
 
-                        return (
-                          <td key={idx} className="text-end font-monospace">
-                            {colSum}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  </tfoot>
+                          return (
+                            <td key={idx} className="bg-success text-white text-end font-monospace">
+                              {colSum}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    </tfoot>
                 </table>
               </div>
             </div>
