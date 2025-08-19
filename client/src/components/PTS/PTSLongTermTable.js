@@ -515,18 +515,21 @@ return (
       data={tekniikkaData}
       setData={setTekniikkaData}
       onYhteensaChange={setTekniikkaYhteensa}
+      type={'Rakennetekniikka'}
     />
 
-    <LVITable
+    <Tekniikkataulut
       data={lviData}
       setData={setLviData}
       onYhteensaChange={setLviYhteensa}
+      type={'LVI-tekniikka'}
     />
 
-    <SahkotekniikkaTable
+    <Tekniikkataulut
       data={sahkoData}
       setData={setSahkoData}
       onYhteensaChange={setSahkoYhteensa}
+      type={'Sähkötekniikka'}
     />
 
     <div className="text-end p-4">

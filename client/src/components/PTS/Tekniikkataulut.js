@@ -1,41 +1,90 @@
 import React, { useState, useEffect } from 'react';
 
-export default function Tekniikkataulut({ data, setData, onYhteensaChange, type=null}) {
+export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
   const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
-  const initialData = [
-    {
-      header: 'Aluesähköistys',
-      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-    },
-    {
-      header: 'Kutkinlaitokset ja jakokeskukset',
-      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-    },
-    {
-      header: 'Johdot ja niiden varusteet',
-      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-    },
-    {
-      header: 'Valaisimet, lämmittimet, kojeet ja laitteet',
-      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-    },
-    {
-      header: 'Tele- ja antennijärjestelmät',
-      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-    },
-    {
-      header: 'Palo- ja turvajärjestelmät',
-      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-    },
-    {
-      header: 'Siirtolaitteet',
-      items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-    },
-  ];
+  let initialData;
+
+  if (type === 'Sähkötekniikka') {
+    initialData = [
+      { header: 'Aluesähköistys', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Kytkinlaitokset ja jakokeskukset', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Johdot ja niiden varusteet', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Valaisimet, lämmittimet, kojeet ja laitteet', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Tele- ja antennijärjestelmät', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Palo- ja turvajärjestelmät', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Siirtolaitteet', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+    ];
+  } else if (type === 'LVI-tekniikka') {
+    initialData = [
+      { header: 'Lämmöntuotanto', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Lämmitysverkosto', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Vesijohtoverkosto', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Viemäriverkosto', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Ilmanvaihtojärjestelmä', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Jäähdytysjärjestelmät', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Rakennusautomaatio', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+      { header: 'Muut järjestelmät', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+    ];
+  } else if (type === 'Rakennetekniikka') {
+    initialData = [
+      {
+        header: 'Vierustat ja kuivatusosat',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Pihapäällysteet',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Aluevarusteet ja -rakenteet',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Perustukset ja sokkelit',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Alapohja',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Rakennusrunko',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Ulkoseinät',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Ikkunat',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Ulko-ovet',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Parvekkeet',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Kattorakenteet',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Sisätilat',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+      {
+        header: 'Märkätilat',
+        items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }]
+      },
+    ];
+  }
 
   const [tableData, setTableData] = useState(() => (Array.isArray(data) && data.length > 0 ? data : initialData));
   const [isEditing, setIsEditing] = useState(false);
@@ -116,7 +165,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type=
 
           <thead>
             <tr>
-              <th className="bg-success text-white text-start">Osa-alue</th>
+              <th className="bg-success text-white text-start">{type}</th>
               <th className="bg-success text-white text-center">KL</th>
               {years.map(year => (
                 <th key={year} className="bg-success text-white text-end px-2">{year}</th>
@@ -133,16 +182,19 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type=
                   colSpan={years.length + 2 + (isEditing ? 1 : 0)}
                   className="bg-light fw-semibold text-dark p-2"
                 >
-                  <div className="d-flex justify-content-between align-items-center w-100">
-                    <span>{section.header}</span>
-                    {isEditing && (
+                  <div className="justify-content-between align-items-center w-100">
+                    <span>{section.header}
+                      {isEditing && (
                       <button
-                        className="btn btn-sm btn-outline-secondary"
+                        className="btn btn-sm btn-outline-secondary ms-4"
                         onClick={() => handleAddRow(sectionIdx)}
                       >
                         +
                       </button>
                     )}
+
+                    </span>
+
 
                   </div>
                 </td>
@@ -161,12 +213,12 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type=
                       ) : item.label}
                     </td>
 
-                    <td style={{ minWidth: '90px' }}>
+                    <td style={{ minWidth: '90px' }} className="text-center">
                       {isEditing ? (
                         <select
                           value={item.kl}
                           onChange={e => handleKLChange(sectionIdx, itemIdx, e.target.value)}
-                          className="form-select form-select-sm"
+                          className="form-select form-select-sm text-center"
                         >
                           {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
                             <option key={kl} value={kl}>{kl}</option>
