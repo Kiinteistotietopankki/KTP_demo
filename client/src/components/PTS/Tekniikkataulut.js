@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 
-export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}) {
+const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type }, ref) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -126,7 +126,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
         </button>
       </div>
 
-      <div className="table-responsive">
+      <div className="table-responsive" ref={ref}>
         <table className="table table-sm table-borderless mb-0">
           <thead>
             <tr>
@@ -284,4 +284,7 @@ export default function Tekniikkataulut({ data, setData, onYhteensaChange, type}
       </div>
     </div>
   );
-}
+});
+
+
+export default Tekniikkataulut;
