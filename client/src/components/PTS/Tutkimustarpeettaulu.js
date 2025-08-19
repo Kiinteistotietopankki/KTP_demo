@@ -7,7 +7,7 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
   const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
   const initialData = [
-    { header: 'Tutkimustarpeet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+    { header: 'Tutkimustarpeet', items: [{ label: '', values: Array(11).fill('') }] },
   ];
 
   const [tableData, setTableData] = useState(() => (Array.isArray(data) && data.length > 0 ? data : initialData));
@@ -21,7 +21,7 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
 
   const handleAddRow = (sectionIdx) => {
     const updated = [...tableData];
-    updated[sectionIdx].items.push({ label: '', kl: 'KL3', values: Array(11).fill('') });
+    updated[sectionIdx].items.push({ label: '', values: Array(11).fill('') });
     setTableData(updated);
   };
 
@@ -38,7 +38,7 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
   };
 
   const yhteensa = Array(11).fill(0);
-  tableData.forEach(section => section.items.forEach(item => 
+  tableData.forEach(section => section.items.forEach(item =>
     item.values.forEach((val, idx) => {
       const num = parseFloat(val);
       if (!isNaN(num)) yhteensa[idx] += num;
@@ -49,20 +49,23 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
 
   return (
     <div className="my-4">
-      {/* Muokkaa / Tallenna button */}
-      <button
-        className="btn btn-sm btn-success mb-2"
-        onClick={() => setIsEditing(!isEditing)}
-      >
-        {isEditing ? 'Tallenna' : 'Muokkaa'}
-      </button>
+
+      <div className="text-center">
+        <button
+          className="btn btn-sm btn-success mb-2"
+          onClick={() => setIsEditing(!isEditing)}
+        >
+          {isEditing ? 'Tallenna' : 'Muokkaa'}
+        </button>
+      </div>
+
 
       <div className="table-responsive">
         <table className="table table-sm table-borderless table-striped mb-0">
           {/* Green header */}
           <thead>
             <tr>
-              <th colSpan={years.length + 2} className="bg-success text-white p-2">
+              <th colSpan={years.length + 1} className="bg-success text-white p-2">
                 <div className="d-flex justify-content-between">
                   <div className="fw-bold"></div>
                   {!isEditing && <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso 2025 sis. Alv 25,5%</div>}
@@ -75,7 +78,6 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
           <thead>
             <tr>
               <th className="bg-success text-white text-start">Tutkimustarpeet</th>
-              <th className="bg-success text-white text-end">KL / Yhteensä</th>
               {years.map((year) => (
                 <th key={year} className="bg-success text-white text-end px-2">{year}</th>
               ))}
@@ -85,66 +87,67 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
           <tbody>
             {tableData.map((section, sectionIdx) => (
               <React.Fragment key={sectionIdx}>
-                {section.items.map((item, itemIdx) => {
-                  const rowTotal = item.values.reduce((sum, val) => {
-                    const num = parseFloat(val); 
-                    return !isNaN(num) ? sum + num : sum;
-                  }, 0);
-
-                  return (
-                    <tr key={itemIdx}>
-                      <td className="text-start">
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            value={item.label}
-                            onChange={(e) => {
-                              const updated = [...tableData];
-                              updated[sectionIdx].items[itemIdx].label = e.target.value;
-                              setTableData(updated);
-                            }}
-                            className="form-control form-control-sm"
-                          />
-                        ) : (
-                          item.label
-                        )}
-                      </td>
-
-                      <td className="text-end">
-                        {isEditing ? (
-                          <select
-                            value={item.kl}
-                            onChange={(e) => {
-                              const updated = [...tableData];
-                              updated[sectionIdx].items[itemIdx].kl = e.target.value;
-                              setTableData(updated);
-                            }}
-                            className="form-select form-select-sm"
-                          >
-                            {['KL1','KL2','KL3','KL4','KL5'].map(kl => (
-                              <option key={kl} value={kl}>{kl}</option>
-                            ))}
-                          </select>
-                        ) : rowTotal}
-                      </td>
-
-                      {item.values.map((val, yearIdx) => (
-                        <td key={yearIdx} className="text-end px-2">
+                {section.items.map((item, itemIdx) => (
+                  (() => {
+                    return (
+                      <tr key={itemIdx}>
+                        <td className="text-start">
                           {isEditing ? (
                             <input
                               type="text"
-                              value={val}
-                              onChange={(e) =>
-                                handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)
-                              }
-                              className="form-control form-control-sm text-end"
+                              value={item.label}
+                              onChange={(e) => {
+                                const updated = [...tableData];
+                                updated[sectionIdx].items[itemIdx].label = e.target.value;
+                                setTableData(updated);
+                              }}
+                              className="form-control form-control-sm"
                             />
-                          ) : val}
+                          ) : item.label}
                         </td>
-                      ))}
-                    </tr>
-                  );
-                })}
+
+                        {item.values.map((val, yearIdx) => (
+                          <td key={yearIdx} className="text-end px-2">
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={val}
+                                onChange={(e) =>
+                                  handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)
+                                }
+                                className="form-control form-control-sm text-end"
+                              />
+                            ) : val}
+                          </td>
+                        ))}
+
+                        {isEditing && (
+                          <td>
+                            <button
+                              className="btn btn-sm btn-outline-danger"
+                              onClick={() => handleRemoveRow(sectionIdx, itemIdx)}
+                            >
+                              ×
+                            </button>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })()
+                ))}
+
+                {isEditing && (
+                  <tr key="add-row">
+                    <td colSpan={years.length + 1} className="text-start">
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => handleAddRow(sectionIdx)}
+                      >
+                        Lisää rivi
+                      </button>
+                    </td>
+                  </tr>
+                )}
               </React.Fragment>
             ))}
           </tbody>
@@ -152,11 +155,9 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
           <tfoot>
             <tr className="fw-bold">
               <td className="bg-success text-white text-start">YHTEENSÄ</td>
-              <td className="bg-success text-white text-end font-monospace"></td>
               {yhteensa.map((sum, idx) => (
                 <td key={idx} className="bg-success text-white text-end font-monospace px-2">{sum}</td>
               ))}
-              
             </tr>
           </tfoot>
         </table>
