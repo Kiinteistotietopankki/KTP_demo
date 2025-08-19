@@ -117,9 +117,6 @@ function Taloyhtiokortti() {
                 ) : hasPTSData === true ? (
                   <>
                     <PTSLongTermTable kiinteistotunnus={card?.kiinteistotunnus} />
-                    <div className="mt-3 text-end">
-                    
-                    </div>
                   </>
                 ) : (
                   <>
@@ -130,25 +127,6 @@ function Taloyhtiokortti() {
                     </button>
                   </>
                 )}
-
-                {/* <Modal
-                  show={showPTSModal}
-                  onHide={() => setShowPTSModal(false)}
-                  size="xl"
-                  backdrop="static"
-                >
-                  <Modal.Header closeButton>
-                    <Modal.Title>{hasPTSData ? 'Muokkaa PTS-raporttia' : 'Luo uusi PTS'}</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <PropertyDetailsForm
-                      rakennus={rakennus}
-                      kiinteistotunnus={card.kiinteistotunnus}
-                      rakennusData={card}
-                      initialTab="pts"
-                    />
-                  </Modal.Body>
-                </Modal> */}
 
                 <ReportTemplateModal
                   show={showPTSModal}

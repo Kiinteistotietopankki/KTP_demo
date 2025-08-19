@@ -59,14 +59,25 @@
   white-space: nowrap;
 }
 
-@media (max-width: 576px) {
-  .table-responsive-text table {
-    font-size: 0.8rem; /* smaller font on mobile */
+@media (max-width: 768px) {
+  .table-responsive table {
+    font-size: 0.45rem; /* very small text */
   }
 
-  .table-responsive-text td,
-  .table-responsive-text th {
-    padding: 0.25rem 0.4rem; /* less padding for tighter rows */
+  .table-responsive th,
+  .table-responsive td {
+    padding: 0.1rem 0.15rem; /* minimal cell padding */
+  }
+
+  .btn-sm {
+    font-size: 0.45rem;
+    padding: 0.15rem 0.3rem; /* smaller buttons */
+  }
+
+  input.form-control-sm,
+  select.form-select-sm {
+    font-size: 0.45rem;
+    padding: 0.1rem 0.15rem; /* smaller inputs */
   }
 }
 
