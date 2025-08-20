@@ -348,13 +348,13 @@ function addHeadingsWithImages(content, ptsHeadings, ptsImages, sectionCounter, 
 
       content.push({
         stack: [
-{
-  text: `${sectionCounter}.${currentSub + 1} ${heading.toUpperCase()}`,
-  style: 'subHeading',
-  margin: [0, 12, 0, 6],
-  tocItem: true,        // ✅ tells pdfmake to include in TOC
-  id: `${sectionCounter}_${currentSub + 1}` // ✅ unique anchor for linking
-},
+        {
+          text: `${sectionCounter}.${currentSub + 1} ${heading.toUpperCase()}`,
+          style: 'subHeading',
+          margin: [0, 12, 0, 6],
+          tocItem: true,        // ✅ tells pdfmake to include in TOC
+          id: `${sectionCounter}_${currentSub + 1}` // ✅ unique anchor for linking
+        },
           imgStr
             ? { 
                 image: imgStr, 
