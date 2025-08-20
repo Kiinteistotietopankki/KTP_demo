@@ -5,14 +5,14 @@ const BackgroundPTS = ({ kiinteistotunnus, setPtsImages }) => {
   const [show, setShow] = useState(true);
 
     useEffect(() => {
-    setShow(true); // reset to true whenever kiinteistotunnus changes
+    setShow(true); 
 
     const timer = setTimeout(() => {
         setShow(false);
     }, 10000);
 
     return () => clearTimeout(timer);
-    }, [kiinteistotunnus]); // dependency on kiinteistotunnus
+    }, [kiinteistotunnus]); 
 
   if (!show) return null;
 

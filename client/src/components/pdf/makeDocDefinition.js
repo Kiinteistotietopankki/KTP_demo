@@ -337,12 +337,11 @@ if (intro) {
 
     if (s.key === 'pts-ehdotukset' && Array.isArray(ptsImages) && ptsImages.length) {
       const imageStack = ptsImages.map((imgStr) => ({
-        image: imgStr || undefined,
-        width: 480,
-        height: 620,
+        image: imgStr,
+        width: 595 - (2 * 30),               // ~A4 content width (595pt page - margins)
         preserveAspectRatio: true,
         margin: [0, 0, 0, 10],
-        alignment: 'center', // centers the individual image in the page
+        alignment: 'center',
       }));
 
       // For images that are not available, add a placeholder

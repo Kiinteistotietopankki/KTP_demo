@@ -291,6 +291,8 @@ const handleSavePTS = async () => {
   useEffect(() => {
     if (!onBackground) return;
 
+    console.log("Capture uef activated...")
+
     let resizeObserver;
     let captureTimeout;
 
@@ -304,7 +306,7 @@ const handleSavePTS = async () => {
           const canvas = await html2canvas(ref.current, { scale: 2, useCORS: true });
           images.push(canvas.toDataURL("image/png"));
         }
-        if (setPtsImages) setPtsImages(images);
+        if (setPtsImages) setPtsImages(prev => [...prev, ...images]);
         console.log("Captured all refs as images!");
       } catch (err) {
         console.error("Error capturing elements:", err);
@@ -316,12 +318,15 @@ const handleSavePTS = async () => {
       captureTimeout = setTimeout(captureElements, 6000);
     };
 
+
+    console.log("Before resize observer")
     // Observe only the first ref for resize, or you can loop all
     if (yhteensaRef.current) {
       scheduleCapture();
       resizeObserver = new ResizeObserver(scheduleCapture);
       resizeObserver.observe(yhteensaRef.current);
     }
+    console.log("After resize observer")
 
     return () => {
       if (resizeObserver && yhteensaRef.current) resizeObserver.unobserve(yhteensaRef.current);
