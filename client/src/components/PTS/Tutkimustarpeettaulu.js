@@ -1,6 +1,6 @@
 import React, { useState, useEffect, forwardRef } from 'react';
 
-const TutkimustarpeetTaulu = forwardRef(({ data, onYhteensaChange, setData }, ref) => {
+const TutkimustarpeetTaulu = forwardRef(({ data, onYhteensaChange, setData, savepts }, ref) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -50,14 +50,20 @@ const TutkimustarpeetTaulu = forwardRef(({ data, onYhteensaChange, setData }, re
   return (
     <div className="my-4 ptstaulut">
 
-      <div className="text-center">
+      <div className="text-center mb-2">
         <button
-          className="btn btn-sm btn-success mb-2"
-          onClick={() => setIsEditing(!isEditing)}
+          className="btn btn-sm btn-success"
+          onClick={() => {
+            if (isEditing && typeof savepts === 'function') {
+              savepts(tableData); // call the save function
+            }
+            setIsEditing(!isEditing);
+          }}
         >
           {isEditing ? 'Tallenna' : 'Muokkaa'}
         </button>
       </div>
+
 
 
       <div className="table-responsive" ref={ref}>

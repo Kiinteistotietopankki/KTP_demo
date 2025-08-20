@@ -1,6 +1,6 @@
 import React, { useState, useEffect, forwardRef } from 'react';
 
-const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type }, ref) => {
+const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type, savepts}, ref) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -120,7 +120,12 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type }, r
       <div className="text-center mb-2">
         <button
           className="btn btn-sm btn-success"
-          onClick={() => setIsEditing(!isEditing)}
+          onClick={() => {
+            if (isEditing && typeof savepts === 'function') {
+              savepts(tableData); // call the save function
+            }
+            setIsEditing(!isEditing);
+          }}
         >
           {isEditing ? 'Tallenna' : 'Muokkaa'}
         </button>

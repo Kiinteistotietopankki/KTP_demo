@@ -15,6 +15,7 @@ import TutkimustarpeetTaulu from './Tutkimustarpeettaulu';
 import config from '../../devprodConfig';
 import PiechartPTS from './PiechartPTS';
 import html2canvas from 'html2canvas';
+import ToastMessage from '../ToastMessage';
 
 export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPtsImages=null, onBackground=false}) {
   const currentYear = new Date().getFullYear();
@@ -206,79 +207,79 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
   });
 
   
-const handleSavePTS = async () => {
-  if (!kiinteistotunnus) return;
+  const [toast, setToast] = useState({ show: false, message: '', bg: 'success' });
 
-  // Flatten helper function
-  const flattenForPTS = (sections, category) =>
-    sections.flatMap(section =>
-      (section.items || [])
-        .filter(item => {
-          const hasLabel = item.label?.trim();
-          const hasKL = item.kl?.trim();
-          const hasValues = (item.values || []).some(v => parseFloat(v) > 0);
-          return hasLabel || hasKL || hasValues;
-        })
-        .map(item => ({
-          id: item.id || undefined, 
-          category,
-          section: section.name || section.header || '',
-          label: item.label || '',
-          kl_rating: item.kl || '',
-          values_by_year: (item.values || []).reduce((acc, val, idx) => {
-            acc[`y${idx + 1}`] = parseFloat(val) || 0;
-            return acc;
-          }, {}),
-          metadata: {}
-        }))
-    );
+  const handleSavePTS = async () => {
+    if (!kiinteistotunnus) return;
 
-  // Build payload
-  const allData = [
-    ...flattenForPTS(tekniikkaData, 'Rakennetekniikka'),
-    ...flattenForPTS(lviData, 'LVI Järjestelmät'),
-    ...flattenForPTS(sahkoData, 'Sähköjärjestelmät'),
-    ...flattenForPTS(tutkimusData, 'Lisätutkimukset')
-  ];
+    const flattenForPTS = (sections, category) =>
+      sections.flatMap(section =>
+        (section.items || [])
+          .filter(item => {
+            const hasLabel = item.label?.trim();
+            const hasKL = item.kl?.trim();
+            const hasValues = (item.values || []).some(v => parseFloat(v) > 0);
+            return hasLabel || hasKL || hasValues;
+          })
+          .map(item => ({
+            id: item.id || undefined, 
+            category,
+            section: section.name || section.header || '',
+            label: item.label || '',
+            kl_rating: item.kl || '',
+            values_by_year: (item.values || []).reduce((acc, val, idx) => {
+              acc[`y${idx + 1}`] = parseFloat(val) || 0;
+              return acc;
+            }, {}),
+            metadata: {}
+          }))
+      );
 
-  const payload = {
-    kiinteistotunnus,
-    title: 'PTS Raportti',
-    created_by: 'UI',
-    entries: allData
-  };
+    const allData = [
+      ...flattenForPTS(tekniikkaData, 'Rakennetekniikka'),
+      ...flattenForPTS(lviData, 'LVI Järjestelmät'),
+      ...flattenForPTS(sahkoData, 'Sähköjärjestelmät'),
+      ...flattenForPTS(tutkimusData, 'Lisätutkimukset')
+    ];
 
-  try {
-    // Check if a PTS already exists
-    const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`,{ credentials: 'include'
-});
-    const ptsList = await listRes.json();
+    const payload = {
+      kiinteistotunnus,
+      title: 'PTS Raportti',
+      created_by: 'UI',
+      entries: allData
+    };
 
-    const existingPTS = ptsList?.[0]; 
-    const method = existingPTS ? 'PUT' : 'POST';
-    const url = existingPTS
-      ? `${config.apiBaseUrl}/api/pts/${existingPTS.id}`
-      : `${config.apiBaseUrl}/api/pts`;
+    try {
+      const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`, {
+        credentials: 'include'
+      });
+      const ptsList = await listRes.json();
 
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      credentials: 'include'
-    });
+      const existingPTS = ptsList?.[0]; 
+      const method = existingPTS ? 'PUT' : 'POST';
+      const url = existingPTS
+        ? `${config.apiBaseUrl}/api/pts/${existingPTS.id}`
+        : `${config.apiBaseUrl}/api/pts`;
 
-    const result = await res.json();
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        credentials: 'include'
+      });
 
-    if (result.success) {
-      alert('✅ PTS tallennettu onnistuneesti!');
-    } else {
-      throw new Error('❌ Virhe tallennuksessa');
+      const result = await res.json();
+
+      if (result.success) {
+        setToast({ show: true, message: '✅ PTS tallennettu onnistuneesti!', bg: 'success' });
+      } else {
+        throw new Error('❌ Virhe tallennuksessa');
+      }
+    } catch (err) {
+      console.error(err);
+      setToast({ show: true, message: '❌ Tallennus epäonnistui', bg: 'danger' });
     }
-  } catch (err) {
-    console.error(err);
-    alert('❌ Tallennus epäonnistui');
-  }
-};
+  };
 
 
   const yhteensaRef = useRef(null);
@@ -339,6 +340,12 @@ const handleSavePTS = async () => {
   return (
   <div className="container-fluid mb-4">
     <div className="mx-auto w-100 w-md-100" style={{ maxWidth: '960px' }}>
+        <ToastMessage
+          show={toast.show}
+          message={toast.message}
+          bg={toast.bg}
+          onClose={() => setToast({ ...toast, show: false })}
+        />
         <div className="accordion my-4" id="ptsAccordion">
           {data.map((cat, catIdx) => (
             <React.Fragment key={catIdx}>
@@ -520,6 +527,7 @@ const handleSavePTS = async () => {
             data={tutkimusData}
             setData={setTutkimusData}
             onYhteensaChange={setTutkimusYhteensa}
+            savepts={handleSavePTS}
             ref={lisatutkimuksetRef}
           />
 
@@ -528,6 +536,7 @@ const handleSavePTS = async () => {
             setData={setTekniikkaData}
             onYhteensaChange={setTekniikkaYhteensa}
             type={'Rakennetekniikka'}
+            savepts={handleSavePTS}
             ref={rakennetekniikkaRef}
           />
 
@@ -536,6 +545,7 @@ const handleSavePTS = async () => {
             setData={setLviData}
             onYhteensaChange={setLviYhteensa}
             type={'LVI-tekniikka'}
+            savepts={handleSavePTS}
             ref={lvitekniikkaRef}
           />
 
@@ -544,14 +554,10 @@ const handleSavePTS = async () => {
             setData={setSahkoData}
             onYhteensaChange={setSahkoYhteensa}
             type={'Sähkötekniikka'}
+            savepts={handleSavePTS}
             ref={sahkotekniikkaRef}
           />
 
-          <div className="text-end p-4">
-            <button className="btn btn-success" onClick={handleSavePTS}>
-              💾 Tallenna PTS
-            </button>
-          </div>
         </div>
       </div>
     </div>
