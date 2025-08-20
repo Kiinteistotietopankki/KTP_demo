@@ -45,7 +45,7 @@ export const reportTemplates = Object.freeze({
       { key: 'johdanto',     label: 'Johdanto ',content: JohdantoText.Option1, include: true, images: [] },
       { key: 'jarjestelma',   label: 'Järjestelmäkuvaukset ja Riskiluokitus', content: Jarjestelmakuvaus.option1, include: true, images: [] },
       { key: 'yhteenveto',       label: 'Yhteenveto',     content: '', include: true, images: [] },
-      { key: 'toimenpide',   label: 'PTS-ehdotukset', content: '', include: true, images: [], children: []},
+      { key: 'pts-ehdotukset',   label: 'PTS-ehdotukset', content: '', include: true, images: [], children: []},
       { key: 'lahtotiedot',label: 'Lähtötiedot',      content: '', include: true, images: [],children: [] },
       { key: 'havainnot',label: 'Havainnot nykytilanteesta',      content: '', include: true, images: [],children: [] },
       { key: 'turvallisuus',label: 'Turvallisuus - ja ympäristöriskit',      content: '', include: true, images: [] },

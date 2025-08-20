@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-export default function SahkotekniikkaTable({data, onYhteensaChange, setData }) {
+export default function SahkotekniikkaTable({data, onYhteensaChange, setData, imports }) {
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth(); // 0 = Tammikuu ja  6 = heinäkuu
 const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -74,7 +73,7 @@ useEffect(() => {
   const updated = [...tableData];
   updated[sectionIdx].items.push({
     label: '',
-    kl: '', // 👈 add this line
+    kl: '', 
     values: Array(11).fill('')
   });
   setTableData(updated);
@@ -130,6 +129,10 @@ useEffect(() => {
           aria-labelledby="headingSahko"
           data-bs-parent="#sahkotekniikkaAccordion"
         >
+          
+            <div className="p-2">
+              
+            </div>
           <div className="responsive-table-container">
                   <table className="table table-sm mb-0">
               <thead className="table-light">

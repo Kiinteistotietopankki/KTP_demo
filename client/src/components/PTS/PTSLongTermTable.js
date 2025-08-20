@@ -12,7 +12,7 @@ import SahkotekniikkaTable from './Sähkötekniikkataulu';
 import TutkimustarpeetTaulu from './Tutkimustarpeettaulu';
 import config from '../../devprodConfig';
 
-export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
+export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded, imports, onSectionsChange }) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -45,7 +45,44 @@ export default function PTSLongTermTable({ kiinteistotunnus,onDataLoaded }) {
       ],
     },
   ]);
+useEffect(() => {
+  if (!imports || imports.length === 0) return;
 
+  const mergeImports = (prevSections = [], cat) => {
+    const catImports = imports.filter(x => x.category === cat);
+    if (catImports.length === 0) return prevSections;
+
+    const next = prevSections.map(s => ({ ...s, items: [...(s.items || [])] }));
+
+    catImports.forEach(imp => {
+      const secName = (imp.section || '').trim() || 'Muu';
+      const label = (imp.label || '').trim();
+      if (!label) return;
+
+      let idx = next.findIndex(s => (s.name || s.header) === secName);
+      if (idx === -1) {
+        next.push({ name: secName, items: [] });
+        idx = next.length - 1;
+      }
+
+      const exists = next[idx].items?.some(it => (it.label || '').trim() === label);
+      if (!exists) {
+        (next[idx].items ||= []).push({
+          label,
+          kl: imp.kl || 'KL3',
+          values: Array(11).fill(''),
+        });
+      }
+   });
+
+   return next;
+ };
+  setTekniikkaData(prev => mergeImports(prev, 'Rakennetekniikka'));
+  setLviData(prev => mergeImports(prev, 'LVI Järjestelmät'));
+  setSahkoData(prev => mergeImports(prev, 'Sähköjärjestelmät'));
+setTutkimusData(prev => mergeImports(prev, 'Lisätutkimukset'));
+
+}, [JSON.stringify(imports)]);
   const handleValueChange = (catIdx, subIdx, itemIdx, yearIdx, value) => {
     const updated = [...data];
     updated[catIdx].subcategories[subIdx].items[itemIdx].values[yearIdx] = value;
@@ -197,7 +234,14 @@ console.log("values array for:", entry.label, values);
     });
     return row;
   });
-
+ useEffect(() => {   if (!onSectionsChange) return;
+   const pick = (arr = []) => arr.map(s => s.name || s.header).filter(Boolean);
+   onSectionsChange({
+     'Rakennetekniikka': pick(tekniikkaData),
+     'LVI Järjestelmät': pick(lviData),
+     'Sähköjärjestelmät': pick(sahkoData),
+     'Lisätutkimukset': pick(tutkimusData),
+   });  }, [tekniikkaData, lviData, sahkoData, tutkimusData, onSectionsChange]);
   
 const handleSavePTS = async () => {
   if (!kiinteistotunnus) return;
@@ -234,13 +278,14 @@ const handleSavePTS = async () => {
     ...flattenForPTS(tutkimusData, 'Lisätutkimukset')
   ];
 
+
   const payload = {
     kiinteistotunnus,
     title: 'PTS Raportti',
     created_by: 'UI',
     entries: allData
   };
-
+ 
   try {
     // Check if a PTS already exists
     const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`,{ credentials: 'include'
@@ -416,6 +461,7 @@ const handleSavePTS = async () => {
   data={sahkoData}
   setData={setSahkoData}
   onYhteensaChange={setSahkoYhteensa}
+  imports={(imports || []).filter(x => x.category === 'Sähköjärjestelmät')}
 />
 
 <div className="accordion-item">

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState,useMemo } from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 import pdfMake from 'pdfmake/build/pdfmake';
 import 'handsontable/dist/handsontable.full.min.css';
@@ -23,7 +23,7 @@ import '../../fonts/Lato-fonts.js';
 const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: initialRakennusData }) => {
   const [savedData, setSavedData] = useLocalStorage('reportFormData', {});
   const [activeTab, setActiveTab] = useState(initialTab || 'report');
-
+const [availablePTSSections, setAvailablePTSSections] = useState(null);
   const [rakennusData, setRakennusData] = useState(initialRakennusData || null);
   const [selectedTemplate, setSelectedTemplate] = useState(savedData.selectedTemplate || 'wpts');
   const [sections, setSections] = useState(savedData.sections || reportTemplates[selectedTemplate].defaultSections);
@@ -55,7 +55,33 @@ const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: 
     });
     
   }, [title, dateIso, propertyName, coverImage, riskidata, sections, selectedTemplate]);
+const ptsImports = useMemo(() => {
+  const acc = [];
 
+  const pullFrom = (owner, ownerLabel) => {
+    const items = owner?.actionItems || [];
+    items.forEach(raw => {
+      const it = typeof raw === 'string'
+        ? { text: raw, includeInPTS: false, ptsCategory: 'Rakennetekniikka', kl: 'KL3' }
+        : raw || {};
+      if (!it.includeInPTS || !it.text?.trim()) return;
+
+      acc.push({
+        label: it.text.trim(),
+        kl: it.kl || 'KL3',
+        category: it.ptsCategory || 'Rakennetekniikka',
+        section: (it.ptsSection || '').trim() || ownerLabel || 'Raportin toimenpiteet',
+      });
+    });
+  };
+
+  sections.forEach(sec => {
+    pullFrom(sec, sec.label);
+    (sec.subsections || []).forEach(sub => pullFrom(sub, `${sec.label} / ${sub.label}`));
+  });
+
+  return acc;
+}, [sections]);
   // preview generation
   useEffect(() => {
     if (activeTab !== 'preview') return;
@@ -78,7 +104,7 @@ const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: 
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
-  }, [activeTab, title, propertyName, dateIso, coverImage, logoBase64, sections, riskidata, rakennusData]); // eslint-disable-line
+  }, [activeTab, title, propertyName, dateIso, coverImage, logoBase64, sections, riskidata, rakennusData]); 
 
   const handleExportPdf = () => {
     const docDefinition = makeDocDefinition({
@@ -154,6 +180,7 @@ const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: 
             setSections={setSections}
             riskidata={riskidata}
             setRiskidata={setRiskidata}
+            availablePTSSections={availablePTSSections}
           />
 
           <div className="flex flex-row justify-end mt-6 gap-4">
@@ -188,7 +215,10 @@ const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: 
       <Tab eventKey="pts" title="PTS (Pitkän tähtäimen suunnitelma)">
         <div className="p-4">
           <h3 className="text-xl font-semibold mb-4">📊 PTS (Pitkän tähtäimen suunnitelma)</h3>
-       <PTSLongTermTable kiinteistotunnus={kiinteistotunnus} />
+       <PTSLongTermTable kiinteistotunnus={kiinteistotunnus} 
+       imports={ptsImports}
+       onSectionsChange={setAvailablePTSSections}
+       />
         </div>
       </Tab>
 
