@@ -13,7 +13,13 @@ export default function makeDocDefinition({
 }) {
   const content = [];
 
-  const CONTENT_WIDTH = 515;
+  // const CONTENT_WIDTH = 515;
+
+  const PAGE_WIDTH = 595.28; // A4 in points at 72dpi
+  const MARGIN_LEFT = 30;
+  const MARGIN_RIGHT = 30;
+
+  const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
 
   
   let sectionCounter = 0;
@@ -335,27 +341,57 @@ if (intro) {
       content.push(...rows, { text: '', margin: [0, 10] });
     }
 
-    if (s.key === 'pts-ehdotukset' && Array.isArray(ptsImages) && ptsImages.length) {
-      const imageStack = ptsImages.map((imgStr) => ({
-        image: imgStr,
-        width: 595 - (2 * 30),               // ~A4 content width (595pt page - margins)
-        preserveAspectRatio: true,
-        margin: [0, 0, 0, 10],
-        alignment: 'center',
-      }));
-
-      // For images that are not available, add a placeholder
-      const imageStackWithPlaceholders = imageStack.map((img, i) =>
-        img.image
-          ? img
-          : { text: 'Image not available', italics: true, alignment: 'center', margin: [0, 0, 0, 10] }
-      );
+function addHeadingsWithImages(content, ptsHeadings, ptsImages, sectionCounter, currentSub) {
+  if (Array.isArray(ptsImages) && ptsImages.length) {
+    ptsHeadings.forEach((heading, i) => {
+      const imgStr = ptsImages[i];
 
       content.push({
-        stack: imageStackWithPlaceholders,
-        alignment: 'center', // centers the whole stack horizontally
+        stack: [
+{
+  text: `${sectionCounter}.${currentSub + 1} ${heading.toUpperCase()}`,
+  style: 'subHeading',
+  margin: [0, 12, 0, 6],
+  tocItem: true,        // ✅ tells pdfmake to include in TOC
+  id: `${sectionCounter}_${currentSub + 1}` // ✅ unique anchor for linking
+},
+          imgStr
+            ? { 
+                image: imgStr, 
+                width: CONTENT_WIDTH-5, // ✅ same usable width as header
+                preserveAspectRatio: true, 
+                margin: [0, 0, 0, 10], 
+                alignment: 'center' 
+              }
+            : { 
+                text: 'Image not available', 
+                italics: true, 
+                alignment: 'center', 
+                margin: [0, 0, 0, 10] 
+              }
+        ],
+        unbreakable: true, // ensures heading + image stick together
       });
-    }
+
+      currentSub++;
+    });
+  }
+
+  return currentSub; // return updated counter
+}
+
+  if (s.key === 'pts-ehdotukset') {
+    const ptsHeadings = [
+      'Yhteenvetotaulukko',
+      'Lisätutkimukset',
+      'Rakennetekniikan PTS',
+      'LVI-Tekniikan PTS',
+      'Sähköjärjestelmien PTS'
+    ];
+
+    // call the reusable function instead of inlining the loop
+    currentSub = addHeadingsWithImages(content, ptsHeadings, ptsImages, sectionCounter, currentSub);
+  }
 
 
     if (s.key === 'jarjestelma') {
