@@ -222,8 +222,7 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type }, r
                           <select
                             value={item.kl}
                             onChange={e => handleKLChange(sectionIdx, itemIdx, e.target.value)}
-                            className="form-select form-select-sm text-center"
-                            style={{ minWidth: '60px' }} // ensures the text is visible
+                            className="form-select form-select-sm text-center kl-select"
                           >
                             {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
                               <option key={kl} value={kl}>{kl}</option>
