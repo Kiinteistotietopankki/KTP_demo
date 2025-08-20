@@ -282,11 +282,12 @@ const handleSavePTS = async () => {
 
 
   const yhteensaRef = useRef(null);
+  const lisatutkimuksetRef = useRef(null)
   const rakennetekniikkaRef = useRef(null)
   const lvitekniikkaRef = useRef(null)
   const sahkotekniikkaRef = useRef(null)
 
-  const refs = [yhteensaRef, rakennetekniikkaRef, lvitekniikkaRef, sahkotekniikkaRef];
+  const refs = [yhteensaRef, lisatutkimuksetRef, rakennetekniikkaRef, lvitekniikkaRef, sahkotekniikkaRef];
 
   useEffect(() => {
     if (!onBackground) return;
@@ -398,7 +399,7 @@ const handleSavePTS = async () => {
                     <p>No data available for the pie chart.</p>
                   )}
 
-                    <div className="table-responsive">
+                    <div className="table-responsive ptstaulut">
                       <table className="table table-sm table-borderless table-striped mb-0">
 
                         {/* Green header */}
@@ -519,6 +520,7 @@ const handleSavePTS = async () => {
             data={tutkimusData}
             setData={setTutkimusData}
             onYhteensaChange={setTutkimusYhteensa}
+            ref={lisatutkimuksetRef}
           />
 
           <Tekniikkataulut

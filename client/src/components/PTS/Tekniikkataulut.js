@@ -114,7 +114,7 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type }, r
   useEffect(() => { if (onYhteensaChange) onYhteensaChange([...yhteensa]); }, [JSON.stringify(yhteensa)]);
 
   return (
-    <div className="my-4">
+    <div className="my-4 ptstaulut">
 
       {/* Edit button */}
       <div className="text-center mb-2">

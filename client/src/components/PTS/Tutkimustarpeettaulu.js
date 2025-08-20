@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 
-export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }) {
+const TutkimustarpeetTaulu = forwardRef(({ data, onYhteensaChange, setData }, ref) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
@@ -48,7 +48,7 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
   useEffect(() => { if (onYhteensaChange) onYhteensaChange([...yhteensa]); }, [JSON.stringify(yhteensa)]);
 
   return (
-    <div className="my-4">
+    <div className="my-4 ptstaulut">
 
       <div className="text-center">
         <button
@@ -60,7 +60,7 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
       </div>
 
 
-      <div className="table-responsive">
+      <div className="table-responsive" ref={ref}>
         <table className="table table-sm table-borderless table-striped mb-0">
           {/* Green header */}
           <thead>
@@ -190,4 +190,6 @@ export default function TutkimustarpeetTaulu({ data, onYhteensaChange, setData }
       </div>
     </div>
   );
-}
+})
+
+export default TutkimustarpeetTaulu;

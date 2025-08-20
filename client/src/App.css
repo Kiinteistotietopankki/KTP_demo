@@ -85,6 +85,30 @@
   color: #000 !important; /* force black text */
 }
 
+/* @font-face {
+  font-family: 'Josefin Sans';
+  src: url('./fonts/josefin-fonts.js') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+} */
+
+body {
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+.ptstaulut {
+  font-family: 'Josefin Sans', sans-serif !important;
+}
+
+.ptstaulut table,
+.ptstaulut th,
+.ptstaulut td,
+.ptstaulut input,
+.ptstaulut select,
+.ptstaulut button {
+  font-family: 'Josefin Sans', sans-serif !important;
+}
+
 .layout{
   display: flex;
   flex-direction: row;
