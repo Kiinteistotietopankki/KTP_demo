@@ -317,7 +317,7 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
 
     const scheduleCapture = () => {
       if (captureTimeout) clearTimeout(captureTimeout);
-      captureTimeout = setTimeout(captureElements, 6000);
+      captureTimeout = setTimeout(captureElements, 8000);
     };
 
 
