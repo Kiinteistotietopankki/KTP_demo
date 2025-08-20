@@ -25,28 +25,29 @@ export default function makeDocDefinition({
   let sectionCounter = 0;
   let currentSub = 0;
 
-  const pushNumberedSection = (arr, { title, pageBreak = 'before', tocItem = true, id }) => {
-    sectionCounter += 1;
-    currentSub = 0; 
-    arr.push({
-      stack: [
-        { text: `${sectionCounter} ${title.toUpperCase()}`, style: 'sectionHeading', pageBreak, tocItem, id },
-        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: CONTENT_WIDTH, y2: 0, lineWidth: 1.5, lineColor: '#000' }] },
-      ],
-      margin: [0, 10, 0, 18],
-    });
-  };
+const pushNumberedSection = (arr, { title, pageBreak = 'before', tocItem = true, id }) => {
+  sectionCounter += 1;
+  currentSub = 0; 
+  arr.push({
+    stack: [
+      { text: `${sectionCounter} ${title.toUpperCase()}`, style: 'sectionHeading', pageBreak, tocItem: true, id },
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: CONTENT_WIDTH, y2: 0, lineWidth: 1.5, lineColor: '#000' }] },
+    ],
+    margin: [0, 10, 0, 18],
+  });
+};
 
-  const pushSubsection = (arr, { title, tocItem = true, id }) => {
-    currentSub += 1;
-    arr.push({
-      text: `${sectionCounter}.${currentSub} ${title.toUpperCase()}`,
-      style: 'subHeading',
-      margin: [0, 12, 0, 6],
-      tocItem,
-      id,
-    });
-  };
+const pushSubsection = (arr, { title, tocItem = true, id }) => {
+  currentSub += 1;
+  arr.push({
+    text: `${sectionCounter}.${currentSub} ${title.toUpperCase()}`,
+    style: 'subHeading',
+    margin: [0, 12, 0, 6],
+    tocItem: true,
+    id,
+  });
+};
+
 // Turn a big blob of text into nicely spaced paragraphs
 function pushCleanParagraphs(arr, rawText) {
   if (!rawText) return;
@@ -295,16 +296,17 @@ if (intro) {
   }
 
   // --- SISÄLLYSLUETTELO ---
-  content.push({ text: 'SISÄLLYSLUETTELO', style: 'heading', pageBreak: 'before', margin: [0, 20, 0, 10] });
   content.push({
-    toc: {
-      title: { text: '' },
-      numberStyle: 'tocNumber',
-      textMargin: [0, 2, 0, 2],
-      dotLeader: true,
-    },
-    style: 'paragraph',
+  toc: {
+    title: { text: 'SISÄLLYSLUETTELO', style: 'heading' },
+    numberStyle: 'tocNumber',
+    textMargin: [0, 10, 0, 2],
+    dotLeader: true,
+  },
+    pageBreak: 'before' 
   });
+
+
 
  
   for (const s of sections) {
@@ -348,29 +350,18 @@ function addHeadingsWithImages(content, ptsHeadings, ptsImages, sectionCounter, 
 
       content.push({
         stack: [
-        {
-          text: `${sectionCounter}.${currentSub + 1} ${heading.toUpperCase()}`,
-          style: 'subHeading',
-          margin: [0, 12, 0, 6],
-          tocItem: true,        // ✅ tells pdfmake to include in TOC
-          id: `${sectionCounter}_${currentSub + 1}` // ✅ unique anchor for linking
-        },
+          {
+            text: `${sectionCounter}.${currentSub + 1} ${heading.toUpperCase()}`,
+            style: 'subHeading',
+            margin: [0, 12, 0, 6],
+            id: `${sectionCounter}_${currentSub + 1}`,
+            tocItem : true
+          },
           imgStr
-            ? { 
-                image: imgStr, 
-                width: CONTENT_WIDTH-5, // ✅ same usable width as header
-                preserveAspectRatio: true, 
-                margin: [0, 0, 0, 10], 
-                alignment: 'center' 
-              }
-            : { 
-                text: 'Image not available', 
-                italics: true, 
-                alignment: 'center', 
-                margin: [0, 0, 0, 10] 
-              }
+            ? { image: imgStr, width: CONTENT_WIDTH-5, preserveAspectRatio: true, margin: [0, 0, 0, 10], alignment: 'center' }
+            : { text: 'Image not available', italics: true, alignment: 'center', margin: [0, 0, 0, 10] }
         ],
-        unbreakable: true, // ensures heading + image stick together
+        unbreakable: true,
       });
 
       currentSub++;
@@ -453,11 +444,13 @@ return {
   pageMargins: [30, 60, 30, 40],
   defaultStyle: { font: 'Lato', fontSize: 12 },
   styles: {
-    title: { font: 'JosefinSans', fontSize: 36, semibold: true },
-    heading: { font: 'JosefinSans', fontSize: 18, semibold: true },
-    sectionHeading: { font: 'JosefinSans', fontSize: 16, semibold: true },
-    subHeading: { font: 'JosefinSans', fontSize: 13, semibold: true }, 
+    title: { font: 'JosefinSans', fontSize: 36, bold: true },
+    heading: { font: 'JosefinSans', fontSize: 18, bold: true },
+    sectionHeading: { font: 'JosefinSans', fontSize: 16, bold: true },
+    subHeading: { font: 'JosefinSans', fontSize: 13, bold: true },
     paragraph: { font: 'Lato', fontSize: 11, alignment: 'justify', lineHeight: 1.35, characterSpacing: 0.1 },
+    tocHeading: { font: 'JosefinSans', fontSize: 12, bold: true, margin: [0, 2, 0, 2] },
+    tocSubHeading: { font: 'JosefinSans', fontSize: 6, margin: [30, 0, 0, 0] } // indent
   },
     header: (currentPage) => {
       if (currentPage === 1) return null;
