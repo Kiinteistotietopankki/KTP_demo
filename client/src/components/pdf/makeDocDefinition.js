@@ -414,33 +414,51 @@ if (intro) {
 
 
 
-  return {
-    content,
-    pageMargins: [30, 50, 30, 40],
-    defaultStyle: { font: 'Lato', fontSize: 12 },
-    styles: {
-      title: { font: 'JosefinSans', fontSize: 36, semibold: true },
-      heading: { font: 'JosefinSans', fontSize: 18, semibold: true },
-      sectionHeading: { font: 'JosefinSans', fontSize: 16, semibold: true },
-      subHeading: { font: 'JosefinSans', fontSize: 13, semibold: true }, 
-      paragraph: { font: 'Lato', fontSize: 11, alignment: 'justify', lineHeight: 1.35, characterSpacing: 0.1 },
-    },
+return {
+  content,
+  pageMargins: [30, 60, 30, 40],
+  defaultStyle: { font: 'Lato', fontSize: 12 },
+  styles: {
+    title: { font: 'JosefinSans', fontSize: 36, semibold: true },
+    heading: { font: 'JosefinSans', fontSize: 18, semibold: true },
+    sectionHeading: { font: 'JosefinSans', fontSize: 16, semibold: true },
+    subHeading: { font: 'JosefinSans', fontSize: 13, semibold: true }, 
+    paragraph: { font: 'Lato', fontSize: 11, alignment: 'justify', lineHeight: 1.35, characterSpacing: 0.1 },
+  },
     header: (currentPage) => {
       if (currentPage === 1) return null;
-      const sidePadding = 30;
-      const bannerWidth = 595 - 2 * sidePadding;
+
+      const dateText = new Date().toLocaleDateString('fi-FI');
+      const propertyText = propertyName || 'ASUNTO OY MALLILA';
+
       return {
-        margin: [0, 0, 0, 10],
-        stack: [
-          { canvas: [{ type: 'rect', x: sidePadding, y: 0, w: bannerWidth, h: 20, color: '#008000' }] },
-          {
-            text: `${new Date().toLocaleDateString('fi-FI')}  |  ${propertyName || 'ASUNTO OY MALLILIA'}`,
-            fontSize: 9,
-            color: 'white',
-            absolutePosition: { x: sidePadding + 5, y: 5 },
-          },
-        ],
+        margin: [30, 10],
+        table: {
+          widths: ['auto', '*'], // left = date, right = remaining space
+          body: [[
+            { 
+              text: dateText, 
+              color: 'white', 
+              bold: true,
+              margin: [5, 0, 0, 0] // extra 5px padding on the left
+            },
+            { 
+              text: propertyText, 
+              color: 'white', 
+              bold: true, 
+              alignment: 'right', 
+              margin: [0, 0, 5, 0] // extra 15px padding on the right
+            }
+          ]]
+        },
+        layout: {
+          fillColor: '#04aa00',
+          hLineWidth: () => 0,
+          vLineWidth: () => 0,
+          paddingTop: () => 7,
+          paddingBottom: () => 7
+        }
       };
-    },
+    }
   };
 }
