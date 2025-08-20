@@ -16,6 +16,7 @@ import DokumentitTab from '../components/DokumentitTab';
 
 import PTSLongTermTable from '../components/PTS/PTSLongTermTable';
 import config from '../devprodConfig';
+import ReportTemplateModal from '../components/report/ReportTemplateModal.jsx';
 
 function Taloyhtiokortti() {
   const { id } = useParams();
@@ -110,17 +111,11 @@ function Taloyhtiokortti() {
               <DokumentitTab kiinteisto={card}></DokumentitTab>
           )}
         {activeKey === 'pts' && (
-              <div className="p-3">
+              <div>
                 {hasPTSData === null ? (
                   <p className="text-muted">Tarkistetaan PTS-tietoja...</p>
                 ) : hasPTSData === true ? (
-                  <>
-                    <h5 className="mb-3 fw-bold text-success">📋 PTS-suunnitelma </h5>
                     <PTSLongTermTable kiinteistotunnus={card?.kiinteistotunnus} />
-                    <div className="mt-3 text-end">
-                    
-                    </div>
-                  </>
                 ) : (
                   <>
                     <p>Ei vielä PTS-suunnitelmaa tälle kiinteistölle.</p>
@@ -131,25 +126,15 @@ function Taloyhtiokortti() {
                   </>
                 )}
 
-                <Modal
+                <ReportTemplateModal
                   show={showPTSModal}
                   onHide={() => setShowPTSModal(false)}
-                  size="xl"
-                  backdrop="static"
-                >
-                  <Modal.Header closeButton>
-                    <Modal.Title>{hasPTSData ? 'Muokkaa PTS-raporttia' : 'Luo uusi PTS'}</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <PropertyDetailsForm
-                      rakennus={rakennus}
-                      kiinteistotunnus={card.kiinteistotunnus}
-                      rakennusData={card}
-                      initialTab="pts"
-                    />
-                  </Modal.Body>
-                </Modal>
-              </div>  
+                  rakennus={rakennus}
+                  kiinteistotunnus={card.kiinteistotunnus}
+                  rakennusData={card}
+                  initialTab="pts"
+                />
+              </div>
           )}
 
         {activeKey === 'kartta' && (

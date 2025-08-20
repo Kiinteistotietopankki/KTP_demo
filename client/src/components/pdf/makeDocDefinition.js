@@ -9,6 +9,7 @@ export default function makeDocDefinition({
   sections,
   riskidata,
   rakennusData,
+  ptsImages
 }) {
   const content = [];
 
@@ -445,6 +446,11 @@ function pushActionsBlock(arr, items) {
       }
     }
   }
+
+
+
+
+
 
   return {
     content,

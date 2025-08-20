@@ -2,6 +2,8 @@ import React from 'react';
 import JohdantoText from '../../Static/johdando';
 import Jarjestelmakuvaus from '../../Static/Jarjestelmariskikuvaus';
 import ImageUploadCategorizer from '../ImageUpload';
+import { RiskMatrixEditor } from './RiskMatrixEditor';
+import PTSLongTermTable from '../PTS/PTSLongTermTable';
 
 function normalizeItem(raw) {
   if (typeof raw === 'string') {
@@ -306,6 +308,7 @@ export default function SectionsAccordion({
   riskidata,
   setRiskidata,
   availablePTSSections, 
+  ptsImagesPrew
 }) {
   const addSubsection = (sectionIndex) => {
     const updated = [...sections];
@@ -686,6 +689,41 @@ export default function SectionsAccordion({
               )}
                {section.key === 'pts-ehdotukset' && (
                 <div> pts sisältävät ehdotukset</div>
+              )}
+              {section.key === 'pts-ehdotukset' && (
+                <div className="my-3 text-center">
+                  {ptsImagesPrew && ptsImagesPrew.length > 0 ? (
+                    ptsImagesPrew[0].startsWith('data:image') ? (
+                      ptsImagesPrew.map((imgSrc, index) => (
+                        <img
+                          key={index}
+                          src={imgSrc}
+                          alt={`PTS Image ${index + 1}`}
+                          style={{
+                            maxWidth: '100%',
+                            height: 'auto',
+                            borderRadius: 6,
+                            marginBottom: 8,
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <div className="d-flex flex-column align-items-center gap-2">
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <span>Luodaan kuvia PTS-tauluista...</span>
+                      </div>
+                    )
+                  ) : (
+                    <div className="d-flex flex-column align-items-center gap-2">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                      <span>Luodaan kuvia PTS-tauluista...</span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
             

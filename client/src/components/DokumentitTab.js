@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Tab, Tabs, Button, Modal } from 'react-bootstrap'
 import TulosteetTab from './TulosteetTab'
 import PropertyDetailsForm from './report/ReportTemplate'
+import ReportTemplateModal from './report/ReportTemplateModal'
 
 export default function DokumentitTab({ kiinteisto }) {
   const [dokumentitActiveKey, setDokumentitActiveKey] = useState('Omat_dokumentit')
@@ -53,25 +54,14 @@ export default function DokumentitTab({ kiinteisto }) {
         </div>
       </div>
 
-      <Modal
-        show={showReportModal}
-        onHide={handleCloseModal}
-        size="xl"
-        centered
-        scrollable
-        dialogClassName="fullscreen-modal-sm"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>📄 Luo uusi raportti</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <PropertyDetailsForm
-            kiinteistotunnus={kiinteisto.kiinteistotunnus}
-            rakennus={kiinteisto}
-            rakennusData={kiinteisto}
-          />
-        </Modal.Body>
-      </Modal>
+        <ReportTemplateModal
+          show={showReportModal}
+          onHide={handleCloseModal}
+          rakennus={kiinteisto}
+          kiinteistotunnus={kiinteisto.kiinteistotunnus}
+          rakennusData={kiinteisto}
+          initialTab="report"
+        />
     </div>
   )
 }

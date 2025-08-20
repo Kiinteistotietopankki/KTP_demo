@@ -19,8 +19,15 @@ import { Riskidataa } from '../../assets/Riskidata';
 
 import '../../fonts/josefin-fonts.js';
 import '../../fonts/Lato-fonts.js';
+import BackgroundPTS from '../PTS/BackgroundPTS.jsx';
 
-const ReportTemplate = ({ rakennus, kiinteistotunnus, initialTab, rakennusData: initialRakennusData }) => {
+const ReportTemplate = ({
+  rakennus,
+  kiinteistotunnus,
+  rakennusData: initialRakennusData,
+  activeTab,
+  setActiveTab
+}) => {
   const [savedData, setSavedData] = useLocalStorage('reportFormData', {});
   const [activeTab, setActiveTab] = useState(initialTab || 'report');
 const [availablePTSSections, setAvailablePTSSections] = useState(null);
@@ -37,11 +44,16 @@ const [availablePTSSections, setAvailablePTSSections] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const logoBase64 = useBase64Image(logo);
 
+  //pts images
+  const [ptsImages, setPtsImages] = useState([]);
+
+
+
+
   useEffect(() => {
     if (initialRakennusData) setRakennusData(initialRakennusData);
   }, [initialRakennusData]);
 
- 
   useEffect(() => {
     setSavedData({
       ...savedData,
@@ -54,7 +66,7 @@ const [availablePTSSections, setAvailablePTSSections] = useState(null);
       selectedTemplate,
     });
     
-  }, [title, dateIso, propertyName, coverImage, riskidata, sections, selectedTemplate]);
+  }, [title, dateIso, propertyName, coverImage, riskidata, sections, selectedTemplate,ptsImages]);
 const ptsImports = useMemo(() => {
   const acc = [];
 
@@ -94,6 +106,7 @@ const ptsImports = useMemo(() => {
       sections,
       riskidata,
       rakennusData,
+      ptsImages
     });
     const pdfDoc = pdfMake.createPdf(docDefinition);
     pdfDoc.getBlob((blob) => {
@@ -104,7 +117,7 @@ const ptsImports = useMemo(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
-  }, [activeTab, title, propertyName, dateIso, coverImage, logoBase64, sections, riskidata, rakennusData]); 
+  }, [activeTab, title, propertyName, dateIso, coverImage, logoBase64, sections, riskidata, rakennusData, ptsImages]); // eslint-disable-line
 
   const handleExportPdf = () => {
     const docDefinition = makeDocDefinition({
@@ -116,6 +129,7 @@ const ptsImports = useMemo(() => {
       sections,
       riskidata,
       rakennusData,
+      ptsImages
     });
     const pdfDoc = pdfMake.createPdf(docDefinition);
     pdfDoc.getBlob((blob) => {
@@ -150,9 +164,9 @@ const ptsImports = useMemo(() => {
   };
 
   return (
-    <Tabs activeKey={activeTab} onSelect={setActiveTab} id="report-tabs" className="mb-3">
-      <Tab eventKey="report" title="Raportti">
-        <div className="p-4 space-y-6">
+    <>
+      {activeTab === 'report' && (
+        <div className="p-1 space-y-6">
           <CoverPageForm
             title={title}
             setTitle={setTitle}
@@ -181,6 +195,7 @@ const ptsImports = useMemo(() => {
             riskidata={riskidata}
             setRiskidata={setRiskidata}
             availablePTSSections={availablePTSSections}
+            ptsImagesPrew={ptsImages}
           />
 
           <div className="flex flex-row justify-end mt-6 gap-4">
@@ -210,22 +225,32 @@ const ptsImports = useMemo(() => {
             </button>
           </div>
         </div>
-      </Tab>
+      )}
 
-      <Tab eventKey="pts" title="PTS (Pitkän tähtäimen suunnitelma)">
-        <div className="p-4">
+      {activeTab === 'pts' && (
+        <div className="p-1">
           <h3 className="text-xl font-semibold mb-4">📊 PTS (Pitkän tähtäimen suunnitelma)</h3>
-       <PTSLongTermTable kiinteistotunnus={kiinteistotunnus} 
-       imports={ptsImports}
-       onSectionsChange={setAvailablePTSSections}
-       />
-        </div>
-      </Tab>
+          {setPtsImages && (
+            <PTSLongTermTable
+              kiinteistotunnus={kiinteistotunnus}
+              setPtsImages={setPtsImages}
+              imports={ptsImports}
+              onSectionsChange={setAvailablePTSSections}
+            />
+          )}
 
-      <Tab eventKey="preview" title=" Raportin esikatselu">
+        </div>
+      )}
+
+      <BackgroundPTS
+        kiinteistotunnus={kiinteistotunnus}
+        setPtsImages={setPtsImages}
+      />
+
+      {activeTab === 'preview' && (
         <PreviewPane previewUrl={previewUrl} onDownload={handleExportPdf} />
-      </Tab>
-    </Tabs>
+      )}
+    </>
   );
 };
 

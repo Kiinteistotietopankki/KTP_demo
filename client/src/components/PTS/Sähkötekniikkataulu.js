@@ -6,51 +6,21 @@ const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
 const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
   const initialData = [
-  {
-    name: 'Aluesähköistys',
-    kl: 'KL3',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-  {
-    name: 'Kutkinlaitokset ja jakokeskukset',
-    kl: 'KL3',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-  {
-    name: 'Johdot ja niiden varusteet',
-    kl: 'KL3',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-  {
-    name: 'Valaisimet, lämmittimet, kojeet ja laitteet',
-    kl: 'KL3',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-  {
-    name: 'Tele- ja antennijärjestelmät',
-    kl: 'KL3',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-  {
-    name: 'Palo- ja turvajärjestelmät',
-    kl: 'KL3',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-  {
-    name: 'Siirtolaitteet',
-    kl: 'KL3',
-    items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }],
-  },
-];
+    { name: 'Aluesähköistys', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+    { name: 'Kutkinlaitokset ja jakokeskukset', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+    { name: 'Johdot ja niiden varusteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+    { name: 'Valaisimet, lämmittimet, kojeet ja laitteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+    { name: 'Tele- ja antennijärjestelmät', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+    { name: 'Palo- ja turvajärjestelmät', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+    { name: 'Siirtolaitteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
+  ];
 
-const [tableData, setTableData] = useState(() =>
-  Array.isArray(data) && data.length > 0 ? data : initialData
-);
-useEffect(() => {
-  if (Array.isArray(data) && data.length > 0) {
-    setTableData(data);
-  }
-}, [data]);
+  const [tableData, setTableData] = useState(() => (Array.isArray(data) && data.length > 0 ? data : initialData));
+
+  useEffect(() => {
+    if (Array.isArray(data) && data.length > 0) setTableData(data);
+  }, [data]);
+
   const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
     const updated = [...tableData];
     updated[sectionIdx].items[itemIdx].values[yearIdx] = value;
@@ -63,21 +33,11 @@ useEffect(() => {
     setTableData(updated);
   };
 
-  const handleKlChange = (sectionIdx, value) => {
+  const handleAddRow = (sectionIdx) => {
     const updated = [...tableData];
-    updated[sectionIdx].kl = value;
+    updated[sectionIdx].items.push({ label: '', kl: 'KL3', values: Array(11).fill('') });
     setTableData(updated);
   };
-
-  const handleAddRow = (sectionIdx) => {
-  const updated = [...tableData];
-  updated[sectionIdx].items.push({
-    label: '',
-    kl: '', 
-    values: Array(11).fill('')
-  });
-  setTableData(updated);
-};
 
   const handleRemoveRow = (sectionIdx, itemIdx) => {
     const updated = [...tableData];
@@ -85,7 +45,6 @@ useEffect(() => {
     setTableData(updated);
   };
 
-  
   const yhteensa = Array(11).fill(0);
   tableData.forEach(section => {
     section.items.forEach(item => {
@@ -95,17 +54,16 @@ useEffect(() => {
       });
     });
   });
-useEffect(() => {
-  if (onYhteensaChange) {
-    onYhteensaChange([...yhteensa]); 
-  }
+
+  const memoYhteensa = useMemo(() => [...yhteensa], [yhteensa.join(',')]);
   
-}, [JSON.stringify(yhteensa)]);
-useEffect(() => {
-  if (typeof setData === 'function') {
-    setData(tableData);
-  }
-}, [tableData, setData]);
+  useEffect(() => {
+    if (onYhteensaChange) onYhteensaChange(memoYhteensa);
+  }, [memoYhteensa]);
+
+  useEffect(() => {
+    if (typeof setData === 'function') setData(tableData);
+  }, [tableData, setData]);
 
   return (
     <div className="accordion my-4" id="sahkotekniikkaAccordion">
@@ -122,7 +80,6 @@ useEffect(() => {
             Sähkötekniikka
           </button>
         </h2>
-
         <div
           id="collapseSahko"
           className="accordion-collapse collapse"
@@ -134,12 +91,12 @@ useEffect(() => {
               
             </div>
           <div className="responsive-table-container">
-                  <table className="table table-sm mb-0">
+            <table className="table table-sm mb-0">
               <thead className="table-light">
                 <tr>
                   <th>Osa-alue</th>
                   <th>KL</th>
-                  {years.map((year) => (
+                  {years.map(year => (
                     <th key={year} className="text-center">{year}</th>
                   ))}
                   <th></th>
@@ -148,21 +105,18 @@ useEffect(() => {
               <tbody>
                 {tableData.map((section, sectionIdx) => (
                   <React.Fragment key={sectionIdx}>
-                    
                     <tr className="bg-secondary text-white">
                       <td colSpan={years.length + 3} className="fw-semibold d-flex justify-content-between align-items-center">
                         {section.name}
                         <button
                           onClick={() => handleAddRow(sectionIdx)}
                           className="btn btn-sm btn-light text-dark border"
-
                           title="Lisää rivi"
                         >
                           +
                         </button>
                       </td>
                     </tr>
-
                     {section.items.map((item, itemIdx) => (
                       <tr key={itemIdx}>
                         <td>
@@ -170,13 +124,13 @@ useEffect(() => {
                             type="text"
                             className="form-control form-control-sm"
                             value={item.label}
-                            onChange={(e) => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
+                            onChange={e => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
                           />
                         </td>
                         <td style={{ minWidth: '90px' }}>
                           <select
                             value={item.kl}
-                            onChange={(e) => {
+                            onChange={e => {
                               const updated = [...tableData];
                               updated[sectionIdx].items[itemIdx].kl = e.target.value;
                               setTableData(updated);
@@ -194,9 +148,7 @@ useEffect(() => {
                               type="text"
                               className="form-control form-control-sm text-end"
                               value={val}
-                              onChange={(e) =>
-                                handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)
-                              }
+                              onChange={e => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
                             />
                           </td>
                         ))}
@@ -212,8 +164,6 @@ useEffect(() => {
                     ))}
                   </React.Fragment>
                 ))}
-
-                
                 <tr className="table-success fw-bold">
                   <td>YHTEENSÄ</td>
                   <td></td>
