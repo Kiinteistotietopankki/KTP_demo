@@ -8,6 +8,7 @@ export const reportTemplates = Object.freeze({
     defaultSections: [
       { key: 'johdanto',       label: ' Johdanto', content: JohdantoText.Option1,       include: true,  images: [] },
       { key: 'jarjestelma',    label: ' Järjestelmäkuvaukset ja Riskiluokitus', content: Jarjestelmakuvaus.option1, include: true,  images: [] },
+      { key: 'pts-ehdotukset',   label: 'PTS-ehdotukset', content: '', include: true, images: [], children: []},
       { key: 'rakennetekniikka', label: 'Rakennetekniikkan Kuvat',content: '',include: true,  images: [] },
       { key: 'lvi',            label: 'LVI-Tekniikan Kuvat',content: '', include: true,  images: [] },
       { key: 'sahko',          label: ' Sähköjärjestelmien Kuvat', content: '',                          include: true,  images: [] },
@@ -23,6 +24,7 @@ export const reportTemplates = Object.freeze({
       { key: 'johdanto',     label: 'Yleiskuvaus',           content: '', include: true, images: [] },
       { key: 'kuntoarvio',   label: 'Kuntoarviointi',        content: '', include: true, images: [] },
       { key: 'riskit',       label: 'Riskit ja Huomiot',     content: '', include: true, images: [] },
+      { key: 'pts-ehdotukset',   label: 'PTS-ehdotukset', content: '', include: true, images: [], children: []},
       { key: 'toimenpide',   label: 'Suositellut Toimenpiteet', content: '', include: true, images: [] },
       { key: 'allekirjoitus',label: 'Allekirjoitukset',      content: Allekirjoitus.Option1, include: true, images: [] },
     ],
