@@ -7,8 +7,14 @@ export default function MapModalWrapper({ coords }) {
 
   return (
     <>
-      <Button variant="success" onClick={() => setShowMapModal(true)}>
-        Näytä kartalla
+      <Button
+        variant="outline-success"
+        size="sm"
+        className="rounded-pill fw-semibold shadow-sm mx-2 my-2 text-nowrap"
+        onClick={() => setShowMapModal(true)}
+      >
+        <i className="bi bi-geo-alt-fill me-2"></i>
+        Kartta
       </Button>
 
       <Modal

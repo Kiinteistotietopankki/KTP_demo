@@ -22,6 +22,7 @@
     "file-saver": "^2.0.5",
     "handsontable": "^15.2.0",
     "html-to-pdfmake": "^2.5.23",
+    "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.3",
     "hyperformula": "^3.0.0",
     "jspdf": "^3.0.1",
