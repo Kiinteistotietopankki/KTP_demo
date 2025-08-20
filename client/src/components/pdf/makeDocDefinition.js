@@ -42,6 +42,7 @@ const pushSubsection = (arr, { title, tocItem = true, id }) => {
   arr.push({
     text: `${sectionCounter}.${currentSub} ${title.toUpperCase()}`,
     style: 'subHeading',
+    tocMargin: [20,12, 0, 0],
     margin: [0, 12, 0, 6],
     tocItem: true,
     id,
@@ -354,6 +355,7 @@ function addHeadingsWithImages(content, ptsHeadings, ptsImages, sectionCounter, 
             text: `${sectionCounter}.${currentSub + 1} ${heading.toUpperCase()}`,
             style: 'subHeading',
             margin: [0, 12, 0, 6],
+            tocMargin: [20, 0, 0, 0],
             id: `${sectionCounter}_${currentSub + 1}`,
             tocItem : true
           },
