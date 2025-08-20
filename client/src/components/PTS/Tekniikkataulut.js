@@ -144,7 +144,7 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type }, r
               <th className="bg-success text-white text-start">{type}</th>
               <th className="bg-success text-white text-center">KL</th>
               {years.map(year => (
-                <th key={year} className="bg-success text-white text-center px-2">{year}</th>
+                <th key={year} className="bg-success text-white text-center px-2 fw-normal">{year}</th>
               ))}
               {isEditing && <th className="bg-success text-white"></th>}
             </tr>

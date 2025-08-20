@@ -420,7 +420,7 @@ const handleSavePTS = async () => {
                             <th className="bg-success text-white text-start">Osa-alue</th>
                             <th className="bg-success text-white text-center">Yhteensä</th>
                             {years.map((year) => (
-                              <th key={year} className="bg-success text-white text-center px-2">{year}</th>
+                              <th key={year} className="bg-success text-white text-center px-2 fw-normal">{year}</th>
                             ))}
                           </tr>
                         </thead>

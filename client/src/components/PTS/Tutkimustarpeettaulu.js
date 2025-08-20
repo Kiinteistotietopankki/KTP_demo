@@ -79,7 +79,7 @@ const TutkimustarpeetTaulu = forwardRef(({ data, onYhteensaChange, setData }, re
             <tr>
               <th className="bg-success text-white text-start">Tutkimustarpeet</th>
               {years.map((year) => (
-                <th key={year} className="bg-success text-white text-center px-2">{year}</th>
+                <th key={year} className="bg-success text-white text-center px-2 fw-normal">{year}</th>
               ))}
             </tr>
           </thead>
