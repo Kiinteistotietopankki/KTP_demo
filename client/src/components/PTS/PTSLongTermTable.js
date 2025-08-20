@@ -418,9 +418,9 @@ const handleSavePTS = async () => {
                         <thead>
                           <tr>
                             <th className="bg-success text-white text-start">Osa-alue</th>
-                            <th className="bg-success text-white text-end">Yhteensä</th>
+                            <th className="bg-success text-white text-center">Yhteensä</th>
                             {years.map((year) => (
-                              <th key={year} className="bg-success text-white text-end px-2">{year}</th>
+                              <th key={year} className="bg-success text-white text-center px-2">{year}</th>
                             ))}
                           </tr>
                         </thead>
@@ -451,9 +451,9 @@ const handleSavePTS = async () => {
                               return (
                                 <tr key={itemIdx}>
                                   <td className="text-start">{item.label}</td>
-                                  <td className="text-end font-monospace">{rowTotal}</td>
+                                  <td className="text-center font-monospace">{rowTotal}</td>
                                   {valuesToShow.map((val, yearIdx) => (
-                                    <td key={yearIdx} className="text-end px-2">
+                                    <td key={yearIdx} className="text-center px-2">
                                       {sub.name === 'Yhteenvetotaulukko' ? (
                                         val
                                       ) : (
@@ -463,7 +463,7 @@ const handleSavePTS = async () => {
                                           onChange={(e) =>
                                             handleValueChange(catIdx, subIdx, itemIdx, yearIdx, e.target.value)
                                           }
-                                          className="form-control form-control-sm text-end"
+                                          className="form-control form-control-sm text-center"
                                         />
                                       )}
                                     </td>
@@ -477,7 +477,7 @@ const handleSavePTS = async () => {
                         <tfoot>
                           <tr className="fw-bold">
                             <td className="bg-success text-white text-start">YHTEENSÄ</td>
-                            <td className="bg-success text-white text-end font-monospace">
+                            <td className="bg-success text-white text-center font-monospace">
                               {sub.items
                                 .filter((i) => i.label !== 'Yhteensä')
                                 .reduce(
@@ -499,7 +499,7 @@ const handleSavePTS = async () => {
                                 }, 0);
 
                               return (
-                                <td key={idx} className="bg-success text-white text-end font-monospace px-2">
+                                <td key={idx} className="bg-success text-white text-center font-monospace px-2">
                                   {colSum}
                                 </td>
                               );

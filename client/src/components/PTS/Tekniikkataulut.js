@@ -275,7 +275,7 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type }, r
               <td className="bg-success text-white text-start">YHTEENSÄ</td>
               <td className="bg-success text-white"></td>
               {yhteensa.map((sum, idx) => (
-                <td key={idx} className="bg-success text-white text-end font-monospace px-2">{sum}</td>
+                <td key={idx} className="bg-success text-white text-center font-monospace px-2">{sum}</td>
               ))}
               {isEditing && <td className="bg-success text-white"></td>}
             </tr>

@@ -182,7 +182,7 @@ const TutkimustarpeetTaulu = forwardRef(({ data, onYhteensaChange, setData }, re
             <tr className="fw-bold">
               <td className="bg-success text-white text-start">YHTEENSÄ</td>
               {yhteensa.map((sum, idx) => (
-                <td key={idx} className="bg-success text-white text-end font-monospace px-2">{sum}</td>
+                <td key={idx} className="bg-success text-white text-center font-monospace px-2">{sum}</td>
               ))}
             </tr>
           </tfoot>
