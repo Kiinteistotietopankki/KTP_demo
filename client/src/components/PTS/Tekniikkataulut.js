@@ -146,196 +146,179 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type, sav
   useEffect(() => { if (onYhteensaChange) onYhteensaChange([...yhteensa]); }, [JSON.stringify(yhteensa)]);
 
 
-  return (
-    <div className="my-4 ptstaulut">
+return (
+  <div className="my-4 ptstaulut">
 
-      {/* Edit button */}
-      <div className="text-center mb-2">
-        <button
-          className="btn btn-sm btn-success"
-          onClick={() => {
-            if (isEditing && typeof savepts === 'function') {
-              savepts(tableData); // call the save function
-            }
-            setIsEditing(!isEditing);
-          }}
-        >
-          {isEditing ? 'Tallenna' : 'Muokkaa'}
-        </button>
-      </div>
+    {/* Edit button */}
+    <div className="text-center mb-2">
+      <button
+        className="btn btn-sm btn-success"
+        onClick={() => {
+          if (isEditing && typeof savepts === 'function') {
+            savepts(tableData);
+          }
+          setIsEditing(!isEditing);
+        }}
+      >
+        {isEditing ? 'Tallenna' : 'Muokkaa'}
+      </button>
+    </div>
 
-      <div className="table-responsive" ref={ref}>
-        <table className="table table-sm table-borderless mb-0">
-          <thead>
-            <tr>
-              <th colSpan={years.length + 2 + (isEditing ? 1 : 0)} className="bg-success text-white p-2">
-                <div className="d-flex justify-content-between">
-                  <div className="fw-bold"></div>
-                  {!isEditing && <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso 2025 sis. Alv 25,5%</div>}
-                </div>
-              </th>
-            </tr>
-          </thead>
+    <div className="table-responsive" ref={ref}>
+      <table className="table table-sm table-borderless mb-0">
+        <thead>
+          <tr>
+            <th colSpan={years.length + 2 + (isEditing ? 1 : 0)} className="bg-success text-white p-2">
+              <div className="d-flex justify-content-between">
+                <div className="fw-bold"></div>
+                {!isEditing && <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso 2025 sis. Alv 25,5%</div>}
+              </div>
+            </th>
+          </tr>
+        </thead>
 
-          <thead>
-            <tr>
-              <th className="bg-success text-white text-start">{type}</th>
-              <th className="bg-success text-white text-center">KL</th>
-              {years.map(year => (
-                <th key={year} className="bg-success text-white text-center px-2 fw-normal">{year}</th>
-              ))}
-              {isEditing && <th className="bg-success text-white"></th>}
-            </tr>
-          </thead>
+        <thead>
+          <tr>
+            <th className="bg-success text-white text-start">{type}</th>
+            <th className="bg-success text-white text-center">KL</th>
+            {years.map(year => (
+              <th key={year} className="bg-success text-white text-center px-2 fw-normal">{year}</th>
+            ))}
+            {isEditing && <th className="bg-success text-white"></th>}
+          </tr>
+        </thead>
 
-          <tbody>
-            {tableData.map((section, sectionIdx) => (
-              <React.Fragment key={sectionIdx}>
+        <tbody>
+          {tableData.map((section, sectionIdx) => (
+            <React.Fragment key={sectionIdx}>
               <tr>
                 <td
                   colSpan={years.length + 2 + (isEditing ? 1 : 0)}
                   className="bg-light fw-semibold text-dark p-2"
                 >
-                  <div className="justify-content-between align-items-center w-100">
-                    <span>{section.name}
-                      {isEditing && (
+                  <div className="d-flex align-items-center w-100">
+                    {isEditing && (
                       <button
-                        className="btn btn-sm btn-outline-secondary ms-4"
+                        className="btn btn-sm btn-outline-secondary me-2"
                         onClick={() => handleAddRow(sectionIdx)}
                       >
                         +
                       </button>
                     )}
-
-                    </span>
-
-
+                    <span>{section.name}</span>
                   </div>
                 </td>
               </tr>
 
-                {/* {(labelsBySection[section.name] || []).map((label, labelIdx) => (
-                  <tr key={labelIdx}>
-                    <td>{label}</td>
-                  </tr>
-                ))} */}
+              {section.items.map((item, itemIdx) => (
+                <tr key={itemIdx}>
+                  <td>
+                  {isEditing ? (
+                    <div style={{ display: 'inline-block', position: 'relative' }}>
+                      <input
+                        type="text"
+                        list={`labels-${sectionIdx}-${itemIdx}`}
+                        value={item.label || ""}
+                        onChange={e => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
+                        className="form-control form-control-sm"
+                        placeholder="Freewrite or select..."
+                        style={{
+                          width: '150px',                // default width
+                          transition: 'width 0.2s ease', // smooth expansion
+                        }}
+                        onFocus={e => e.target.style.width = `${Math.max((item.label || "").length + 1, 15)}ch`}
+                        onBlur={e => e.target.style.width = '150px'}
+                      />
+                      <datalist id={`labels-${sectionIdx}-${itemIdx}`}>
+                        {(labelsBySection[section.name] || []).map((labelOption, idx) => (
+                          <option key={idx} value={labelOption} />
+                        ))}
+                      </datalist>
+                    </div>
+                  ) : (
+                    <div className="ms-4" style={{ whiteSpace: 'pre-wrap' }}>
+                      {item.label}
+                    </div>
+                  )}
+                  </td>
 
-                {section.items.map((item, itemIdx) => (
-                  <tr key={itemIdx}>
-                    <td>
-                      {isEditing ? (
-                        <div style={{ display: 'inline-block', minWidth: '150px', position: 'relative' }}>
-                          <input
-                            type="text"
-                            list={`labels-${sectionIdx}-${itemIdx}`}
-                            value={item.label || ""}
-                            onChange={e => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
-                            className="form-control form-control-sm"
-                            placeholder="Freewrite or select..."
-                            style={{ width: '150px', transition: 'width 0.2s' }}
-                            onFocus={e => {
-                              // Expand to fit current text
-                              const span = document.createElement('span');
-                              span.style.visibility = 'hidden';
-                              span.style.whiteSpace = 'pre';
-                              span.style.font = window.getComputedStyle(e.target).font;
-                              span.innerText = e.target.value || ' ';
-                              document.body.appendChild(span);
-                              e.target.style.width = `${span.offsetWidth + 30}px`;
-                              document.body.removeChild(span);
-                            }}
-                            onInput={e => {
-                              // Adjust width as user types
-                              const span = document.createElement('span');
-                              span.style.visibility = 'hidden';
-                              span.style.whiteSpace = 'pre';
-                              span.style.font = window.getComputedStyle(e.target).font;
-                              span.innerText = e.target.value || ' ';
-                              document.body.appendChild(span);
-                              e.target.style.width = `${span.offsetWidth + 30}px`;
-                              document.body.removeChild(span);
-                            }}
-                            onBlur={e => e.target.style.width = '150px'} // shrink back on blur
-                          />
-                          <datalist id={`labels-${sectionIdx}-${itemIdx}`}>
-                            {(labelsBySection[section.name] || []).map((labelOption, idx) => (
-                              <option key={idx} value={labelOption} />
-                            ))}
-                          </datalist>
-                        </div>
-                      ) : (
-                        <div className="ms-4" style={{ whiteSpace: 'pre-wrap' }}>
-                          {item.label}
-                        </div>
-                      )}
-                    </td>
-
-                      <td className="text-center px-1" style={{ width: '1%' }}>
-                        {isEditing ? (
-                          <select
-                            value={item.kl}
-                            onChange={e => handleKLChange(sectionIdx, itemIdx, e.target.value)}
-                            className="form-select form-select-sm text-center kl-select"
-                          >
-                            {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
-                              <option key={kl} value={kl}>{kl}</option>
-                            ))}
-                          </select>
-                        ) : (
-                          <span
-                            style={{
-                              fontWeight: 'bold',
-                              color: getKLColor(item.kl),
-                            }}
-                          >
-                            {item.kl}
-                          </span>
-                        )}
-                      </td>
-
-                      {item.values.map((val, yearIdx) => (
-                        <td key={yearIdx} className="text-center px-1 px-sm-2">
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              value={val}
-                              onChange={e => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
-                              className="form-control form-control-sm text-center"
-                            />
-                          ) : val === 0 || val === '0' ? '' : val}
-                        </td>
-                      ))}
-
-                    {isEditing && (
-                      <td>
-                        <button
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() => handleRemoveRow(sectionIdx, itemIdx)}
-                        >
-                          ×
-                        </button>
-                      </td>
+                  <td className="text-center px-1" style={{ width: '1%' }}>
+                    {isEditing ? (
+                      <select
+                        value={item.kl}
+                        onChange={e => handleKLChange(sectionIdx, itemIdx, e.target.value)}
+                        className="form-select form-select-sm text-center kl-select"
+                      >
+                        {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map(kl => (
+                          <option key={kl} value={kl}>{kl}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span
+                        style={{
+                          fontWeight: 'bold',
+                          color: getKLColor(item.kl),
+                        }}
+                      >
+                        {item.kl}
+                      </span>
                     )}
-                  </tr>
-                ))}
-              </React.Fragment>
-            ))}
-          </tbody>
+                  </td>
 
-          <tfoot>
-            <tr className="fw-bold">
-              <td className="bg-success text-white text-start">YHTEENSÄ</td>
-              <td className="bg-success text-white"></td>
-              {yhteensa.map((sum, idx) => (
-                <td key={idx} className="bg-success text-white text-center font-monospace px-2">{sum}</td>
+                  {item.values.map((val, yearIdx) => (
+                    <td key={yearIdx} className="text-center px-1 px-sm-2">
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={val}
+                          onChange={e => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
+                          className={`form-control form-control-sm text-center ${val !== 0 && val !== '0' ? 'bg-success text-white fw-bold' : ''}`}
+                        />
+                      ) : val === 0 || val === '0' ? '' : val}
+                    </td>
+                  ))}
+                  {isEditing && (
+                    <td>
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => handleRemoveRow(sectionIdx, itemIdx)}
+                      >
+                        ×
+                      </button>
+                    </td>
+                  )}
+                </tr>
               ))}
-              {isEditing && <td className="bg-success text-white"></td>}
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+
+              {/* Repeat year headers only in editing mode */}
+              {isEditing && (
+                <tr>
+                  <td className="bg-light text-start fw-semibold" colSpan={2}></td>
+                  {years.map(year => (
+                    <td key={year} className="bg-light text-center text-muted px-2">{year}</td>
+                  ))}
+                  <td className="bg-light"></td>
+                </tr>
+              )}
+            </React.Fragment>
+          ))}
+        </tbody>
+
+        <tfoot>
+          <tr className="fw-bold">
+            <td className="bg-success text-white text-start">YHTEENSÄ</td>
+            <td className="bg-success text-white"></td>
+            {yhteensa.map((sum, idx) => (
+              <td key={idx} className="bg-success text-white text-center font-monospace px-2">{sum}</td>
+            ))}
+            {isEditing && <td className="bg-success text-white"></td>}
+          </tr>
+        </tfoot>
+      </table>
     </div>
-  );
+  </div>
+);
+
 });
 
 
