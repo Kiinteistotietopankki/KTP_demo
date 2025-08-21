@@ -1,4 +1,5 @@
 import React, { useState, useEffect, forwardRef } from 'react';
+import { getLabelsByCategoryAndSection } from '../../api/api.js'
 
 const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type, savepts}, ref) => {
   const currentYear = new Date().getFullYear();
