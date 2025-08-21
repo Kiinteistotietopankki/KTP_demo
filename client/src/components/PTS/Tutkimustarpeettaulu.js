@@ -22,7 +22,7 @@ const TutkimustarpeetTaulu = forwardRef(({ data, onYhteensaChange, setData, save
 
   const handleAddRow = (sectionIdx) => {
     const updated = [...tableData];
-    updated[sectionIdx].items.push({ label: '', values: Array(11).fill('') });
+    updated[sectionIdx].items.push({ label: '', values: Array(11).fill('0') });
     setTableData(updated);
   };
 
@@ -172,18 +172,20 @@ const TutkimustarpeetTaulu = forwardRef(({ data, onYhteensaChange, setData, save
                           )}
                         </td>
 
-                        {item.values.map((val, yearIdx) => (
-                          <td key={yearIdx} className="text-center px-1 px-sm-2">
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={val}
-                                onChange={(e) => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
-                                className="form-control form-control-sm text-center"
-                              />
-                            ) : parseFloat(val) === 0 ? '' : val}
-                          </td>
-                        ))}
+                        
+
+                    {item.values.map((val, yearIdx) => (
+                      <td key={yearIdx} className="text-center px-1 px-sm-2">
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={val}
+                            onChange={e => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
+                            className={`form-control form-control-sm text-center ${val && Number(val) > 0 ? 'bg-success text-white' : ''}`}
+                          />
+                        ) : val === 0 || val === '0' ? '' : val}
+                      </td>
+                    ))}
 
                         {isEditing && (
                           <td>

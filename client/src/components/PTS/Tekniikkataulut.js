@@ -272,7 +272,7 @@ return (
                           type="text"
                           value={val}
                           onChange={e => handleValueChange(sectionIdx, itemIdx, yearIdx, e.target.value)}
-                          className={`form-control form-control-sm text-center ${val !== 0 && val !== '0' ? 'bg-success text-white fw-bold' : ''}`}
+                          className={`form-control form-control-sm text-center ${val !== 0 && val !== '0' ? 'bg-success text-white' : ''}`}
                         />
                       ) : val === 0 || val === '0' ? '' : val}
                     </td>
