@@ -85,10 +85,18 @@ export const getIndicatorValueByKuntaName = (indicatorId, kuntaName, years) => {
 //PTS labelien haku
 
 export const getLabelsByCategoryAndSection = (category = '', section = '') => {
+  //Normalization table to match database categories
+  const categoryMap = {
+    "Sähkötekniikka": "Sähköjärjestelmät",
+    "LVI-tekniikka": "LVI Järjestelmät",
+  };
+
+  const normalizedCategory = categoryMap[category] || category;
+
   return axios.get(`${API_URL}/api/pts/by/get-labels-by-category-and-section`, {
     withCredentials: true,
     params: {
-      category: category || undefined,
+      category: normalizedCategory || undefined,
       section: section || undefined,
     },
   });

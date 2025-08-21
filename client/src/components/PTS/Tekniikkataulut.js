@@ -112,7 +112,39 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type, sav
     }
   }
 
+  const [labelsBySection, setLabelsBySection] = useState({});
+
+  useEffect(() => {
+    if (!isEditing || !type || tableData.length === 0) return;
+
+    let isMounted = true;
+
+    const fetchLabels = async () => {
+      try {
+        const results = await Promise.all(
+          tableData.map(section => getLabelsByCategoryAndSection(type, section.name))
+        );
+
+        if (!isMounted) return;
+
+        const labelsMap = {};
+        tableData.forEach((section, idx) => {
+          labelsMap[section.name] = results[idx].data.labels;
+        });
+
+        setLabelsBySection(labelsMap);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchLabels();
+
+    return () => { isMounted = false };
+  }, [isEditing, type, tableData.map(s => s.name).join(',')]);
+
   useEffect(() => { if (onYhteensaChange) onYhteensaChange([...yhteensa]); }, [JSON.stringify(yhteensa)]);
+
 
   return (
     <div className="my-4 ptstaulut">
@@ -182,28 +214,27 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type, sav
                 </td>
               </tr>
 
+                {/* {(labelsBySection[section.name] || []).map((label, labelIdx) => (
+                  <tr key={labelIdx}>
+                    <td>{label}</td>
+                  </tr>
+                ))} */}
+
                 {section.items.map((item, itemIdx) => (
                   <tr key={itemIdx}>
                     <td>
                       {isEditing ? (
-                        <div style={{ display: 'inline-block', position: 'relative' }}>
+                        <div style={{ display: 'inline-block', minWidth: '150px', position: 'relative' }}>
                           <input
                             type="text"
-                            value={item.label}
+                            list={`labels-${sectionIdx}-${itemIdx}`}
+                            value={item.label || ""}
                             onChange={e => handleLabelChange(sectionIdx, itemIdx, e.target.value)}
                             className="form-control form-control-sm"
-                            style={{ width: 'auto', minWidth: '50px' }} // start small
+                            placeholder="Freewrite or select..."
+                            style={{ width: '150px', transition: 'width 0.2s' }}
                             onFocus={e => {
-                              const span = document.createElement('span');
-                              span.style.visibility = 'hidden';
-                              span.style.whiteSpace = 'pre';
-                              span.style.font = window.getComputedStyle(e.target).font;
-                              span.innerText = e.target.value || ' '; 
-                              document.body.appendChild(span);
-                              e.target.style.width = `${span.offsetWidth + 30}px`; // add small padding
-                              document.body.removeChild(span);
-                            }}
-                            onInput={e => {
+                              // Expand to fit current text
                               const span = document.createElement('span');
                               span.style.visibility = 'hidden';
                               span.style.whiteSpace = 'pre';
@@ -213,14 +244,30 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type, sav
                               e.target.style.width = `${span.offsetWidth + 30}px`;
                               document.body.removeChild(span);
                             }}
-                            onBlur={e => e.target.style.width = '150px'} // optional: shrink back after editing
+                            onInput={e => {
+                              // Adjust width as user types
+                              const span = document.createElement('span');
+                              span.style.visibility = 'hidden';
+                              span.style.whiteSpace = 'pre';
+                              span.style.font = window.getComputedStyle(e.target).font;
+                              span.innerText = e.target.value || ' ';
+                              document.body.appendChild(span);
+                              e.target.style.width = `${span.offsetWidth + 30}px`;
+                              document.body.removeChild(span);
+                            }}
+                            onBlur={e => e.target.style.width = '150px'} // shrink back on blur
                           />
+                          <datalist id={`labels-${sectionIdx}-${itemIdx}`}>
+                            {(labelsBySection[section.name] || []).map((labelOption, idx) => (
+                              <option key={idx} value={labelOption} />
+                            ))}
+                          </datalist>
                         </div>
-                      ) : 
-                      <div className="ms-4" style={{ whiteSpace: 'pre-wrap' }}>
-                        {item.label}
-                      </div>
-                      }
+                      ) : (
+                        <div className="ms-4" style={{ whiteSpace: 'pre-wrap' }}>
+                          {item.label}
+                        </div>
+                      )}
                     </td>
 
                       <td className="text-center px-1" style={{ width: '1%' }}>
