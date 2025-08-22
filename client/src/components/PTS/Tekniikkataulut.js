@@ -144,7 +144,15 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type, sav
   }, [isEditing, type, tableData.map(s => s.name).join(',')]);
 
   useEffect(() => { if (onYhteensaChange) onYhteensaChange([...yhteensa]); }, [JSON.stringify(yhteensa)]);
+  
+  function klToNumber(kl) {
+    return parseInt(kl.replace("KL", ""), 10);
+  }
 
+  function numberToKl(num) {
+    if (isNaN(num)) return "";
+    return "KL" + Math.round(num);
+  }
 
 return (
   <div className="my-4 ptstaulut">
@@ -192,10 +200,7 @@ return (
           {tableData.map((section, sectionIdx) => (
             <React.Fragment key={sectionIdx}>
               <tr>
-                <td
-                  colSpan={years.length + 2 + (isEditing ? 1 : 0)}
-                  className="bg-light fw-semibold text-dark p-2"
-                >
+                <td className="bg-light fw-semibold text-dark p-2" colSpan={1}>
                   <div className="d-flex align-items-center w-100">
                     {isEditing && (
                       <button
@@ -208,7 +213,24 @@ return (
                     <span>{section.name}</span>
                   </div>
                 </td>
+
+                {/* KL average cell */}
+                <td className="bg-light text-center fw-semibold align-middle" style={{ color: getKLColor(numberToKl(
+                  section.items.length > 0
+                    ? section.items.reduce((sum, item) => sum + klToNumber(item.kl), 0) / section.items.length
+                    : NaN
+                ))}}>
+                  {numberToKl(
+                    section.items.length > 0
+                      ? section.items.reduce((sum, item) => sum + klToNumber(item.kl), 0) / section.items.length
+                      : NaN
+                  )}
+                </td>
+
+                {/* Empty year columns so row spans full width */}
+                <td colSpan={years.length + (isEditing ? 1 : 0)} className="bg-light"></td>
               </tr>
+
 
               {section.items.map((item, itemIdx) => (
                 <tr key={itemIdx}>
@@ -254,14 +276,8 @@ return (
                         ))}
                       </select>
                     ) : (
-                      <span
-                        style={{
-                          fontWeight: 'bold',
-                          color: getKLColor(item.kl),
-                        }}
-                      >
-                        {item.kl}
-                      </span>
+                      // Empty cell in non-edit mode
+                      null
                     )}
                   </td>
 
