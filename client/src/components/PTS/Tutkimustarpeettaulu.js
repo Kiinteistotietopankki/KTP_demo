@@ -22,7 +22,7 @@ const TutkimustarpeetTaulu = forwardRef(({ data, onYhteensaChange, setData, save
 
   const handleAddRow = (sectionIdx) => {
     const updated = [...tableData];
-    updated[sectionIdx].items.push({ label: '', values: Array(11).fill('0') });
+    updated[sectionIdx].items.push({ label: '', values: Array(11).fill('') });
     setTableData(updated);
   };
 
