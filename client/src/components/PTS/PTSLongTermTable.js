@@ -529,11 +529,6 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
             </React.Fragment>
           ))}
 
-          {years && (
-            <Taloustaulu years={years} totalValues={footerTotals} currentYear={currentYear}></Taloustaulu>
-
-          )}
-          
 
           <TutkimustarpeetTaulu
             data={tutkimusData}
@@ -569,6 +564,12 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
             savepts={handleSavePTS}
             ref={sahkotekniikkaRef}
           />
+
+          {years && (
+            <Taloustaulu years={years} totalValues={footerTotals} currentYear={currentYear}></Taloustaulu>
+
+          )}
+          
 
         </div>
       </div>
