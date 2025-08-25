@@ -9,7 +9,7 @@ const BackgroundPTS = ({ kiinteistotunnus, setPtsImages }) => {
 
     const timer = setTimeout(() => {
         setShow(false);
-    }, 10000);
+    }, 12000);
 
     return () => clearTimeout(timer);
     }, [kiinteistotunnus]); 

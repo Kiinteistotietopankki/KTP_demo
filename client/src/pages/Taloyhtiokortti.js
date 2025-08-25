@@ -1,15 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import Badge from 'react-bootstrap/Badge';
 import { useParams } from 'react-router-dom';
-import MapVisual from '../components/MapVisual';
-import { Card, CardHeader, Col, Row, Tab, Table, Tabs } from 'react-bootstrap';
+import { Tab, Tabs } from 'react-bootstrap';
 import { getKiinteistoWhole } from '../api/api';
-import PerustiedotAccordion from '../components/PerustiedotAccordion';
-import { Button, Modal } from 'react-bootstrap';
-import PropertyDetailsForm from '../components/report/ReportTemplate.js';
-import TilastoTable from '../components/TilastoTable';
-import TulosteetTab from '../components/TulosteetTab';
-import MMLTabFetcher from '../components/MMLTabFetcher';
 import PerustiedotTab from '../components/PerustiedotTab';
 import MapVisualMultiple from '../components/MapVisualMultiple';
 import DokumentitTab from '../components/DokumentitTab';

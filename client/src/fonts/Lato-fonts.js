@@ -18,6 +18,7 @@ pdfMake.fonts = {
   JosefinSans: {
     normal: 'JosefinSans-Regular.ttf',
     semibold: 'JosefinSans-Bold.ttf',
+    bold: 'JosefinSans-Bold.ttf',
     italics: 'JosefinSans-Italic.ttf',
     bolditalics: 'JosefinSans-BoldItalic.ttf'
   },

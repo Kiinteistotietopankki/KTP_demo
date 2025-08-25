@@ -25,8 +25,8 @@ export const getKiinteistotWithRakennukset = (
   limit = 6,
   orderBy = 'id_kiinteisto',
   orderDir = 'ASC',
-  searchTerm = '' // new param with default empty string
-) =>
+  searchTerm = '' 
+  ) =>
   axios.get(`${API_URL}/api/kiinteistot/with-rakennukset`, {
     withCredentials: true,
     params: {
@@ -34,7 +34,7 @@ export const getKiinteistotWithRakennukset = (
       limit,
       orderBy,
       orderDir,
-      searchTerm: searchTerm,  // add search param here
+      searchTerm: searchTerm, 
     },
   });
 
@@ -79,5 +79,25 @@ export const getIndicatorValueByKuntaName = (indicatorId, kuntaName, years) => {
       kuntaName,
       years: years.join(','),
     }
+  });
+};
+
+//PTS labelien haku
+
+export const getLabelsByCategoryAndSection = (category = '', section = '') => {
+  //Normalization table to match database categories
+  const categoryMap = {
+    "Sähkötekniikka": "Sähköjärjestelmät",
+    "LVI-tekniikka": "LVI Järjestelmät",
+  };
+
+  const normalizedCategory = categoryMap[category] || category;
+
+  return axios.get(`${API_URL}/api/pts/by/get-labels-by-category-and-section`, {
+    withCredentials: true,
+    params: {
+      category: normalizedCategory || undefined,
+      section: section || undefined,
+    },
   });
 };

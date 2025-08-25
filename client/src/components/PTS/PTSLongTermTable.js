@@ -1,20 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   BarChart, Bar,
-  PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer
 } from 'recharts';
 
-
-
-import { Tabs, Tab } from 'react-bootstrap';
 import Tekniikkataulut from './Tekniikkataulut';
-import LVITable from './LVItaulu';
-import SahkotekniikkaTable from './Sähkötekniikkataulu';
 import TutkimustarpeetTaulu from './Tutkimustarpeettaulu';
 import config from '../../devprodConfig';
 import PiechartPTS from './PiechartPTS';
 import html2canvas from 'html2canvas';
+import ToastMessage from '../ToastMessage';
+import Taloustaulu from './Taloustaulu';
 
 export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPtsImages=null, onBackground=false}) {
   const currentYear = new Date().getFullYear();
@@ -206,79 +202,79 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
   });
 
   
-const handleSavePTS = async () => {
-  if (!kiinteistotunnus) return;
+  const [toast, setToast] = useState({ show: false, message: '', bg: 'success' });
 
-  // Flatten helper function
-  const flattenForPTS = (sections, category) =>
-    sections.flatMap(section =>
-      (section.items || [])
-        .filter(item => {
-          const hasLabel = item.label?.trim();
-          const hasKL = item.kl?.trim();
-          const hasValues = (item.values || []).some(v => parseFloat(v) > 0);
-          return hasLabel || hasKL || hasValues;
-        })
-        .map(item => ({
-          id: item.id || undefined, 
-          category,
-          section: section.name || section.header || '',
-          label: item.label || '',
-          kl_rating: item.kl || '',
-          values_by_year: (item.values || []).reduce((acc, val, idx) => {
-            acc[`y${idx + 1}`] = parseFloat(val) || 0;
-            return acc;
-          }, {}),
-          metadata: {}
-        }))
-    );
+  const handleSavePTS = async () => {
+    if (!kiinteistotunnus) return;
 
-  // Build payload
-  const allData = [
-    ...flattenForPTS(tekniikkaData, 'Rakennetekniikka'),
-    ...flattenForPTS(lviData, 'LVI Järjestelmät'),
-    ...flattenForPTS(sahkoData, 'Sähköjärjestelmät'),
-    ...flattenForPTS(tutkimusData, 'Lisätutkimukset')
-  ];
+    const flattenForPTS = (sections, category) =>
+      sections.flatMap(section =>
+        (section.items || [])
+          .filter(item => {
+            const hasLabel = item.label?.trim();
+            const hasKL = item.kl?.trim();
+            const hasValues = (item.values || []).some(v => parseFloat(v) > 0);
+            return hasLabel || hasKL || hasValues;
+          })
+          .map(item => ({
+            id: item.id || undefined, 
+            category,
+            section: section.name || section.header || '',
+            label: item.label || '',
+            kl_rating: item.kl || '',
+            values_by_year: (item.values || []).reduce((acc, val, idx) => {
+              acc[`y${idx + 1}`] = parseFloat(val) || 0;
+              return acc;
+            }, {}),
+            metadata: {}
+          }))
+      );
 
-  const payload = {
-    kiinteistotunnus,
-    title: 'PTS Raportti',
-    created_by: 'UI',
-    entries: allData
-  };
+    const allData = [
+      ...flattenForPTS(tekniikkaData, 'Rakennetekniikka'),
+      ...flattenForPTS(lviData, 'LVI Järjestelmät'),
+      ...flattenForPTS(sahkoData, 'Sähköjärjestelmät'),
+      ...flattenForPTS(tutkimusData, 'Lisätutkimukset')
+    ];
 
-  try {
-    // Check if a PTS already exists
-    const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`,{ credentials: 'include'
-});
-    const ptsList = await listRes.json();
+    const payload = {
+      kiinteistotunnus,
+      title: 'PTS Raportti',
+      created_by: 'UI',
+      entries: allData
+    };
 
-    const existingPTS = ptsList?.[0]; 
-    const method = existingPTS ? 'PUT' : 'POST';
-    const url = existingPTS
-      ? `${config.apiBaseUrl}/api/pts/${existingPTS.id}`
-      : `${config.apiBaseUrl}/api/pts`;
+    try {
+      const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`, {
+        credentials: 'include'
+      });
+      const ptsList = await listRes.json();
 
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      credentials: 'include'
-    });
+      const existingPTS = ptsList?.[0]; 
+      const method = existingPTS ? 'PUT' : 'POST';
+      const url = existingPTS
+        ? `${config.apiBaseUrl}/api/pts/${existingPTS.id}`
+        : `${config.apiBaseUrl}/api/pts`;
 
-    const result = await res.json();
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        credentials: 'include'
+      });
 
-    if (result.success) {
-      alert('✅ PTS tallennettu onnistuneesti!');
-    } else {
-      throw new Error('❌ Virhe tallennuksessa');
+      const result = await res.json();
+
+      if (result.success) {
+        setToast({ show: true, message: '✅ PTS tallennettu onnistuneesti!', bg: 'success' });
+      } else {
+        throw new Error('❌ Virhe tallennuksessa');
+      }
+    } catch (err) {
+      console.error(err);
+      setToast({ show: true, message: '❌ Tallennus epäonnistui', bg: 'danger' });
     }
-  } catch (err) {
-    console.error(err);
-    alert('❌ Tallennus epäonnistui');
-  }
-};
+  };
 
 
   const yhteensaRef = useRef(null);
@@ -287,6 +283,7 @@ const handleSavePTS = async () => {
   const lvitekniikkaRef = useRef(null)
   const sahkotekniikkaRef = useRef(null)
 
+  // Kuvaajien ja taulujen "kuvaus" raporttia varten:
   const refs = [yhteensaRef, lisatutkimuksetRef, rakennetekniikkaRef, lvitekniikkaRef, sahkotekniikkaRef];
 
   useEffect(() => {
@@ -316,7 +313,7 @@ const handleSavePTS = async () => {
 
     const scheduleCapture = () => {
       if (captureTimeout) clearTimeout(captureTimeout);
-      captureTimeout = setTimeout(captureElements, 6000);
+      captureTimeout = setTimeout(captureElements, 8000);
     };
 
 
@@ -335,10 +332,43 @@ const handleSavePTS = async () => {
     };
   }, [kiinteistotunnus]);
 
+  // Yhteensä-lukujen tallennus, muihin komponentteihin viemiseksi: 
+
+  const [footerTotals, setFooterTotals] = useState([]);
+
+    const getColumnTotals = (subcategory) => {
+    if (!subcategory || !subcategory.items) return [];
+    const numYears = subcategory.items[0]?.values?.length || 0;
+
+    return Array.from({ length: numYears }, (_, yearIdx) => {
+      return subcategory.items
+        .filter(i => i.label !== 'Yhteensä')
+        .reduce((sum, item) => {
+          const num = parseFloat(item.values[yearIdx]);
+          return !isNaN(num) ? sum + num : sum;
+        }, 0);
+    });
+  };
+
+  useEffect(() => {
+    if (!data.length || !data[0].subcategories?.length) return;
+
+    const sub = data[0].subcategories[0];
+    const totals = getColumnTotals(sub);
+    setFooterTotals(totals);
+  }, [data]);
+  
+
 
   return (
   <div className="container-fluid mb-4">
     <div className="mx-auto w-100 w-md-100" style={{ maxWidth: '960px' }}>
+        <ToastMessage
+          show={toast.show}
+          message={toast.message}
+          bg={toast.bg}
+          onClose={() => setToast({ ...toast, show: false })}
+        />
         <div className="accordion my-4" id="ptsAccordion">
           {data.map((cat, catIdx) => (
             <React.Fragment key={catIdx}>
@@ -408,7 +438,7 @@ const handleSavePTS = async () => {
                             <th colSpan={years.length + 2} className="bg-success text-white p-2">
                               <div className="d-flex justify-content-between">
                                 <div className="fw-bold">Toimenpide-ehdotukset yhteensä</div>
-                                <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso 2025 sis. Alv 25,5%</div>
+                                <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso {currentYear} sis. Alv 25,5%</div>
                               </div>
                             </th>
                           </tr>
@@ -477,33 +507,16 @@ const handleSavePTS = async () => {
                         <tfoot>
                           <tr className="fw-bold">
                             <td className="bg-success text-white text-start">YHTEENSÄ</td>
+                            {/* Total of all years combined */}
                             <td className="bg-success text-white text-center font-monospace">
-                              {sub.items
-                                .filter((i) => i.label !== 'Yhteensä')
-                                .reduce(
-                                  (acc, item) =>
-                                    acc +
-                                    item.values.reduce((sum, val) => {
-                                      const num = parseFloat(val);
-                                      return !isNaN(num) ? sum + num : sum;
-                                    }, 0),
-                                  0
-                                )}
+                              {getColumnTotals(sub).reduce((a, b) => a + b, 0)}
                             </td>
-                            {Array.from({ length: years.length }, (_, idx) => {
-                              const colSum = sub.items
-                                .filter((i) => i.label !== 'Yhteensä')
-                                .reduce((sum, item) => {
-                                  const num = parseFloat(item.values[idx]);
-                                  return !isNaN(num) ? sum + num : sum;
-                                }, 0);
-
-                              return (
-                                <td key={idx} className="bg-success text-white text-center font-monospace px-2">
-                                  {colSum}
-                                </td>
-                              );
-                            })}
+                            {/* Column totals per year */}
+                            {getColumnTotals(sub).map((colSum, idx) => (
+                              <td key={idx} className="bg-success text-white text-center font-monospace px-2">
+                                {colSum}
+                              </td>
+                            ))}
                           </tr>
                         </tfoot>
                       </table>
@@ -516,10 +529,12 @@ const handleSavePTS = async () => {
             </React.Fragment>
           ))}
 
+
           <TutkimustarpeetTaulu
             data={tutkimusData}
             setData={setTutkimusData}
             onYhteensaChange={setTutkimusYhteensa}
+            savepts={handleSavePTS}
             ref={lisatutkimuksetRef}
           />
 
@@ -528,6 +543,7 @@ const handleSavePTS = async () => {
             setData={setTekniikkaData}
             onYhteensaChange={setTekniikkaYhteensa}
             type={'Rakennetekniikka'}
+            savepts={handleSavePTS}
             ref={rakennetekniikkaRef}
           />
 
@@ -536,6 +552,7 @@ const handleSavePTS = async () => {
             setData={setLviData}
             onYhteensaChange={setLviYhteensa}
             type={'LVI-tekniikka'}
+            savepts={handleSavePTS}
             ref={lvitekniikkaRef}
           />
 
@@ -544,14 +561,16 @@ const handleSavePTS = async () => {
             setData={setSahkoData}
             onYhteensaChange={setSahkoYhteensa}
             type={'Sähkötekniikka'}
+            savepts={handleSavePTS}
             ref={sahkotekniikkaRef}
           />
 
-          <div className="text-end p-4">
-            <button className="btn btn-success" onClick={handleSavePTS}>
-              💾 Tallenna PTS
-            </button>
-          </div>
+          {years && (
+            <Taloustaulu years={years} totalValues={footerTotals} currentYear={currentYear}></Taloustaulu>
+
+          )}
+          
+
         </div>
       </div>
     </div>

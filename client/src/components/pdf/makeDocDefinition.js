@@ -13,34 +13,42 @@ export default function makeDocDefinition({
 }) {
   const content = [];
 
-  const CONTENT_WIDTH = 515;
+  // const CONTENT_WIDTH = 515;
+
+  const PAGE_WIDTH = 595.28; // A4 in points at 72dpi
+  const MARGIN_LEFT = 30;
+  const MARGIN_RIGHT = 30;
+
+  const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
 
   
   let sectionCounter = 0;
   let currentSub = 0;
 
-  const pushNumberedSection = (arr, { title, pageBreak = 'before', tocItem = true, id }) => {
-    sectionCounter += 1;
-    currentSub = 0; 
-    arr.push({
-      stack: [
-        { text: `${sectionCounter} ${title.toUpperCase()}`, style: 'sectionHeading', pageBreak, tocItem, id },
-        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: CONTENT_WIDTH, y2: 0, lineWidth: 1.5, lineColor: '#000' }] },
-      ],
-      margin: [0, 10, 0, 18],
-    });
-  };
+const pushNumberedSection = (arr, { title, pageBreak = 'before', tocItem = true, id }) => {
+  sectionCounter += 1;
+  currentSub = 0; 
+  arr.push({
+    stack: [
+      { text: `${sectionCounter} ${title.toUpperCase()}`, style: 'sectionHeading', pageBreak, tocItem: true, id },
+      { canvas: [{ type: 'line', x1: 0, y1: 0, x2: CONTENT_WIDTH, y2: 0, lineWidth: 1.5, lineColor: '#000' }] },
+    ],
+    margin: [0, 10, 0, 18],
+  });
+};
 
-  const pushSubsection = (arr, { title, tocItem = true, id }) => {
-    currentSub += 1;
-    arr.push({
-      text: `${sectionCounter}.${currentSub} ${title.toUpperCase()}`,
-      style: 'subHeading',
-      margin: [0, 12, 0, 6],
-      tocItem,
-      id,
-    });
-  };
+const pushSubsection = (arr, { title, tocItem = true, id }) => {
+  currentSub += 1;
+  arr.push({
+    text: `${sectionCounter}.${currentSub} ${title.toUpperCase()}`,
+    style: 'subHeading',
+    tocMargin: [20,12, 0, 0],
+    margin: [0, 12, 0, 6],
+    tocItem: true,
+    id,
+  });
+};
+
 // Turn a big blob of text into nicely spaced paragraphs
 function pushCleanParagraphs(arr, rawText) {
   if (!rawText) return;
@@ -289,16 +297,17 @@ if (intro) {
   }
 
   // --- SISÄLLYSLUETTELO ---
-  content.push({ text: 'SISÄLLYSLUETTELO', style: 'heading', pageBreak: 'before', margin: [0, 20, 0, 10] });
   content.push({
-    toc: {
-      title: { text: '' },
-      numberStyle: 'tocNumber',
-      textMargin: [0, 2, 0, 2],
-      dotLeader: true,
-    },
-    style: 'paragraph',
+  toc: {
+    title: { text: 'SISÄLLYSLUETTELO', style: 'heading' },
+    numberStyle: 'tocNumber',
+    textMargin: [0, 10, 0, 2],
+    dotLeader: true,
+  },
+    pageBreak: 'before' 
   });
+
+
 
  
   for (const s of sections) {
@@ -335,27 +344,47 @@ if (intro) {
       content.push(...rows, { text: '', margin: [0, 10] });
     }
 
-    if (s.key === 'pts-ehdotukset' && Array.isArray(ptsImages) && ptsImages.length) {
-      const imageStack = ptsImages.map((imgStr) => ({
-        image: imgStr,
-        width: 595 - (2 * 30),               // ~A4 content width (595pt page - margins)
-        preserveAspectRatio: true,
-        margin: [0, 0, 0, 10],
-        alignment: 'center',
-      }));
-
-      // For images that are not available, add a placeholder
-      const imageStackWithPlaceholders = imageStack.map((img, i) =>
-        img.image
-          ? img
-          : { text: 'Image not available', italics: true, alignment: 'center', margin: [0, 0, 0, 10] }
-      );
+function addHeadingsWithImages(content, ptsHeadings, ptsImages, sectionCounter, currentSub) {
+  if (Array.isArray(ptsImages) && ptsImages.length) {
+    ptsHeadings.forEach((heading, i) => {
+      const imgStr = ptsImages[i];
 
       content.push({
-        stack: imageStackWithPlaceholders,
-        alignment: 'center', // centers the whole stack horizontally
+        stack: [
+          {
+            text: `${sectionCounter}.${currentSub + 1} ${heading.toUpperCase()}`,
+            style: 'subHeading',
+            margin: [0, 12, 0, 6],
+            tocMargin: [20, 0, 0, 0],
+            id: `${sectionCounter}_${currentSub + 1}`,
+            tocItem : true
+          },
+          imgStr
+            ? { image: imgStr, width: CONTENT_WIDTH-5, preserveAspectRatio: true, margin: [0, 0, 0, 10], alignment: 'center' }
+            : { text: 'Image not available', italics: true, alignment: 'center', margin: [0, 0, 0, 10] }
+        ],
+        unbreakable: true,
       });
-    }
+
+      currentSub++;
+    });
+  }
+
+  return currentSub; // return updated counter
+}
+
+  if (s.key === 'pts-ehdotukset') {
+    const ptsHeadings = [
+      'Yhteenvetotaulukko',
+      'Lisätutkimukset',
+      'Rakennetekniikan PTS',
+      'LVI-Tekniikan PTS',
+      'Sähköjärjestelmien PTS'
+    ];
+
+    // call the reusable function instead of inlining the loop
+    currentSub = addHeadingsWithImages(content, ptsHeadings, ptsImages, sectionCounter, currentSub);
+  }
 
 
     if (s.key === 'jarjestelma') {
@@ -412,35 +441,53 @@ if (intro) {
 
 
 
-
-
-  return {
-    content,
-    pageMargins: [30, 50, 30, 40],
-    defaultStyle: { font: 'Lato', fontSize: 12 },
-    styles: {
-      title: { font: 'JosefinSans', fontSize: 36, semibold: true },
-      heading: { font: 'JosefinSans', fontSize: 18, semibold: true },
-      sectionHeading: { font: 'JosefinSans', fontSize: 16, semibold: true },
-      subHeading: { font: 'JosefinSans', fontSize: 13, semibold: true }, 
-      paragraph: { font: 'Lato', fontSize: 11, alignment: 'justify', lineHeight: 1.35, characterSpacing: 0.1 },
-    },
+return {
+  content,
+  pageMargins: [30, 60, 30, 40],
+  defaultStyle: { font: 'Lato', fontSize: 12 },
+  styles: {
+    title: { font: 'JosefinSans', fontSize: 36, bold: true },
+    heading: { font: 'JosefinSans', fontSize: 18, bold: true },
+    sectionHeading: { font: 'JosefinSans', fontSize: 16, bold: true },
+    subHeading: { font: 'JosefinSans', fontSize: 13, bold: true },
+    paragraph: { font: 'Lato', fontSize: 11, alignment: 'justify', lineHeight: 1.35, characterSpacing: 0.1 },
+    tocHeading: { font: 'JosefinSans', fontSize: 12, bold: true, margin: [0, 2, 0, 2] },
+    tocSubHeading: { font: 'JosefinSans', fontSize: 6, margin: [30, 0, 0, 0] } // indent
+  },
     header: (currentPage) => {
       if (currentPage === 1) return null;
-      const sidePadding = 30;
-      const bannerWidth = 595 - 2 * sidePadding;
+
+      const dateText = new Date().toLocaleDateString('fi-FI');
+      const propertyText = propertyName || 'ASUNTO OY MALLILA';
+
       return {
-        margin: [0, 0, 0, 10],
-        stack: [
-          { canvas: [{ type: 'rect', x: sidePadding, y: 0, w: bannerWidth, h: 20, color: '#008000' }] },
-          {
-            text: `${new Date().toLocaleDateString('fi-FI')}  |  ${propertyName || 'ASUNTO OY MALLILIA'}`,
-            fontSize: 9,
-            color: 'white',
-            absolutePosition: { x: sidePadding + 5, y: 5 },
-          },
-        ],
+        margin: [30, 10],
+        table: {
+          widths: ['auto', '*'], // left = date, right = remaining space
+          body: [[
+            { 
+              text: dateText, 
+              color: 'white', 
+              bold: true,
+              margin: [5, 0, 0, 0] // extra 5px padding on the left
+            },
+            { 
+              text: propertyText, 
+              color: 'white', 
+              bold: true, 
+              alignment: 'right', 
+              margin: [0, 0, 5, 0] // extra 15px padding on the right
+            }
+          ]]
+        },
+        layout: {
+          fillColor: '#04aa00',
+          hLineWidth: () => 0,
+          vLineWidth: () => 0,
+          paddingTop: () => 7,
+          paddingBottom: () => 7
+        }
       };
-    },
+    }
   };
 }
