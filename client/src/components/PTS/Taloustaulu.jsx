@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
-const Taloustaulu = ({ years, totalValuess=null, currentYear }) => {
+const Taloustaulu = ({ years, totalValues, currentYear }) => {
 
     const huoneistoNeliot = 1200;
 
-    const totalValues = [7, 45, 67, 30, 50, 5, 18, 160, 42, 2, 140];
+    // const totalValues = [7, 45, 67, 30, 50, 5, 18, 160, 42, 2, 140];
 
     // Helper function to safely format numbers
     const formatVal2 = (val) => (val != null ? val.toFixed(2) : "-");
@@ -31,7 +31,7 @@ const Taloustaulu = ({ years, totalValuess=null, currentYear }) => {
     };
 
     // Calculates the yearly multiplier for cumulative calculation
-    const calculateYearlyMultiplier = (interestRate, loanYears) => {
+    const caclulateMonthlyAnnuityFactor = (interestRate, loanYears) => {
         const monthlyRate = interestRate / 12;      // kuukausikorko
         const months = loanYears * 12;                    // maksujen määrä
         const factor = (monthlyRate * Math.pow(1 + monthlyRate, months)) /
@@ -40,8 +40,8 @@ const Taloustaulu = ({ years, totalValuess=null, currentYear }) => {
     };
 
     // Usage example:
-    const yearlyMultiplier10 = calculateYearlyMultiplier(0.04, 10);  // ~0.01
-    const yearlyMultiplier25 = calculateYearlyMultiplier(0.04, 25);  // ~0.0052
+    const yearlyMultiplier10 = caclulateMonthlyAnnuityFactor(0.04, 10);  // ~0.01
+    const yearlyMultiplier25 = caclulateMonthlyAnnuityFactor(0.04, 25);  // ~0.0052
 
     console.log("10y yearly multiplier:", yearlyMultiplier10);
     console.log("25y yearly multiplier:", yearlyMultiplier25);
@@ -104,15 +104,7 @@ const Taloustaulu = ({ years, totalValuess=null, currentYear }) => {
                             ))}
                         </tr>
 
-                        <tr><td colSpan={years.length + 1}>&nbsp;</td></tr>
 
-                        {/* Total over 10 years */}
-                        <tr>
-                            <td className="text-start">Kustannukset yhteensä 10 vuoden jaksolla</td>
-                            <td colSpan={years.length + 1} className="font-monospace px-2">
-                                {(totalValues.reduce((acc, val) => acc + (val || 0), 0) * 1000).toLocaleString('fi-FI')} €
-                            </td>
-                        </tr>
 
                         <tr><td colSpan={years.length + 1}>&nbsp;</td></tr>
 
@@ -133,6 +125,16 @@ const Taloustaulu = ({ years, totalValuess=null, currentYear }) => {
 
                         <tr><td colSpan={years.length + 1}>&nbsp;</td></tr>
 
+                        {/* Total over 10 years */}
+                        <tr>
+                            <td className="text-start">Kustannukset yhteensä 10 vuoden jaksolla</td>
+                            <td colSpan={years.length + 1} className="font-monospace px-2">
+                                {(totalValues.reduce((acc, val) => acc + (val || 0), 0) * 1000).toLocaleString('fi-FI')} €
+                            </td>
+                        </tr>
+
+                        <tr><td colSpan={years.length + 1}>&nbsp;</td></tr>
+
                         {/* Huoneistoala */}
                         <tr>
                             <td className="text-start">Kohteen huoneistoala</td>
@@ -145,6 +147,9 @@ const Taloustaulu = ({ years, totalValuess=null, currentYear }) => {
                                 {formatVal0((totalValues.reduce((acc, val) => acc + (val || 0), 0) * 1000) / huoneistoNeliot).toLocaleString('fi-FI')} € /m²
                             </td>
                         </tr>
+
+
+
                     </tbody>
 
                     {/* Footer */}
