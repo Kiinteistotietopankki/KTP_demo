@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState,useMemo } from 'react';
+import { Tab, Tabs } from 'react-bootstrap';
 import pdfMake from 'pdfmake/build/pdfmake';
 import 'handsontable/dist/handsontable.full.min.css';
 
@@ -24,10 +25,16 @@ const ReportTemplate = ({
   rakennus,
   kiinteistotunnus,
   rakennusData: initialRakennusData,
-  activeTab,
-  setActiveTab
+  initialTab,
+   activeTab: controlledActiveTab,
+  setActiveTab: controlledSetActiveTab,
+  
 }) => {
   const [savedData, setSavedData] = useLocalStorage('reportFormData', {});
+ const [internalActiveTab, setInternalActiveTab] = useState(initialTab || 'report');
+  const activeTab = controlledActiveTab ?? internalActiveTab;
+  const setActiveTab = controlledSetActiveTab ?? setInternalActiveTab;
+  const [availablePTSSections, setAvailablePTSSections] = useState(null);
   const [rakennusData, setRakennusData] = useState(initialRakennusData || null);
   const [selectedTemplate, setSelectedTemplate] = useState(savedData.selectedTemplate || 'wpts');
   const [sections, setSections] = useState(savedData.sections || reportTemplates[selectedTemplate].defaultSections);
@@ -45,8 +52,6 @@ const ReportTemplate = ({
   const [ptsImages, setPtsImages] = useState([]);
 
 
-
-
   useEffect(() => {
     if (initialRakennusData) setRakennusData(initialRakennusData);
   }, [initialRakennusData]);
@@ -62,8 +67,35 @@ const ReportTemplate = ({
       sections,
       selectedTemplate,
     });
-  }, [title, dateIso, propertyName, coverImage, riskidata, sections, selectedTemplate, ptsImages]);
+    
+  }, [title, dateIso, propertyName, coverImage, riskidata, sections, selectedTemplate,ptsImages]);
+const ptsImports = useMemo(() => {
+  const acc = [];
 
+  const pullFrom = (owner) => {
+    (owner?.actionItems || []).forEach(raw => {
+      const it = typeof raw === 'string'
+        ? { text: raw, includeInPTS: false, ptsCategory: 'Rakennetekniikka', kl: 'KL3' }
+        : (raw || {});
+      if (!it.includeInPTS || !it.text?.trim()) return;
+
+      const section = (it.ptsSection || '').trim();
+      if (!section) return;
+      acc.push({
+        label: it.text.trim(),
+        kl: it.kl || 'KL3',
+        category: it.ptsCategory || 'Rakennetekniikka',
+        section, 
+      });
+    });
+  };
+
+  sections.forEach(sec => {
+    pullFrom(sec);
+    (sec.subsections || []).forEach(sub => pullFrom(sub));
+  });
+  return acc;
+}, [sections]);
   // preview generation
   useEffect(() => {
     if (activeTab !== 'preview') return;
@@ -133,92 +165,126 @@ const ReportTemplate = ({
     localStorage.removeItem('reportFormData');
   };
 
-  return (
-    <>
-      {activeTab === 'report' && (
-        <div className="p-1 space-y-6">
-          <CoverPageForm
-            title={title}
-            setTitle={setTitle}
-            coverImage={coverImage}
-            setCoverImage={setCoverImage}
-            propertyName={propertyName}
-            setPropertyName={setPropertyName}
-            dateIso={dateIso}
-            setDateIso={setDateIso}
-            selectedTemplate={selectedTemplate}
-            setSelectedTemplate={(key) => {
-              setSelectedTemplate(key);
-              setSections(reportTemplates[key].defaultSections);
-              setTitle(reportTemplates[key].name);
-            }}
-            templates={reportTemplates}
-          />
+return (
+  <>
+    {activeTab === 'report' && (
+      <div className="p-1 space-y-6">
+        <CoverPageForm
+          title={title}
+          setTitle={setTitle}
+          coverImage={coverImage}
+          setCoverImage={setCoverImage}
+          propertyName={propertyName}
+          setPropertyName={setPropertyName}
+          dateIso={dateIso}
+          setDateIso={setDateIso}
+          selectedTemplate={selectedTemplate}
+          setSelectedTemplate={(key) => {
+            setSelectedTemplate(key);
+            setSections(reportTemplates[key].defaultSections);
+            setTitle(reportTemplates[key].name);
+          }}
+          templates={reportTemplates}
+        />
 
-          <PropertyInfoAccordion card={rakennusData} />
+        <PropertyInfoAccordion card={rakennusData} />
 
-          <ImageBlocks sections={sections} setSections={setSections} />
+        <ImageBlocks sections={sections} setSections={setSections} />
 
-          <SectionsAccordion
-            sections={sections}
-            setSections={setSections}
-            riskidata={riskidata}
-            setRiskidata={setRiskidata}
-            ptsImagesPrew={ptsImages}
-          />
+        <SectionsAccordion
+          sections={sections}
+          setSections={setSections}
+          riskidata={riskidata}
+          setRiskidata={setRiskidata}
+          availablePTSSections={availablePTSSections}
+          ptsImagesPrew={ptsImages}
+        />
 
-          <div className="flex flex-row justify-end mt-6 gap-4">
-            <button className="btn btn-outline-success" onClick={() => {
+        <div className="flex flex-row justify-end mt-6 gap-4">
+          <button
+            className="btn btn-outline-success"
+            onClick={() => {
               const header = prompt('Anna uuden osion otsikko:');
               if (!header) return;
-              const newSection = { key: `custom-${Date.now()}`, label: header, content: '', include: true, images: [] };
+              const newSection = {
+                key: `custom-${Date.now()}`,
+                label: header,
+                content: '',
+                include: true,
+                images: [],
+              };
               setSections((prev) => {
-                const i = prev.findIndex(s =>
-                  ['rakennetekniikka','Kohteenkuvatkuvat','lvi','sahko','lähtötiedot','havainnot'].includes(s.key)
+                const i = prev.findIndex((s) =>
+                  [
+                    'rakennetekniikka',
+                    'Kohteenkuvatkuvat',
+                    'lvi',
+                    'sahko',
+                    'lähtötiedot',
+                    'havainnot',
+                  ].includes(s.key)
                 );
                 if (i === -1) return [...prev, newSection];
                 const updated = [...prev];
                 updated.splice(i, 0, newSection);
                 return updated;
               });
-            }}>
-              ➕ Lisää uusi osio
-            </button>
+            }}
+          >
+            ➕ Lisää uusi osio
+          </button>
 
-            <button className="btn btn-outline-success" onClick={handleExportPdf}>📥 Lataa Raportti</button>
+          <button
+            className="btn btn-outline-success"
+            onClick={handleExportPdf}
+          >
+            📥 Lataa Raportti
+          </button>
 
-            <button className="btn btn-outline-danger" onClick={() => {
-              if (window.confirm('Haluatko varmasti tyhjentää raportin? Tämä poistaa kaikki tiedot.')) resetForm();
-            }}>
-              ♻️ Tyhjennä kentät
-            </button>
-          </div>
+          <button
+            className="btn btn-outline-danger"
+            onClick={() => {
+              if (
+                window.confirm(
+                  'Haluatko varmasti tyhjentää raportin? Tämä poistaa kaikki tiedot.'
+                )
+              )
+                resetForm();
+            }}
+          >
+            ♻️ Tyhjennä kentät
+          </button>
         </div>
-      )}
+      </div>
+    )}
 
-      {activeTab === 'pts' && (
-        <div className="p-1">
-          <h3 className="text-xl font-semibold mb-4">📊 PTS (Pitkän tähtäimen suunnitelma)</h3>
-          {setPtsImages && (
-            <PTSLongTermTable
-              kiinteistotunnus={kiinteistotunnus}
-              setPtsImages={setPtsImages}
-            />
-          )}
-
-        </div>
-      )}
-
-      <BackgroundPTS
+    {/* 👇 Always mounted, visibility controlled by CSS */}
+    <div
+      className="p-1"
+      style={{ display: activeTab === 'pts' ? 'block' : 'none' }}
+    >
+      <h3 className="text-xl font-semibold mb-4">
+        📊 PTS (Pitkän tähtäimen suunnitelma)
+      </h3>
+      <PTSLongTermTable
         kiinteistotunnus={kiinteistotunnus}
         setPtsImages={setPtsImages}
+        imports={ptsImports}
+        onSectionsChange={setAvailablePTSSections}
       />
+    </div>
 
-      {activeTab === 'preview' && (
-        <PreviewPane previewUrl={previewUrl} onDownload={handleExportPdf} />
-      )}
-    </>
-  );
+    <BackgroundPTS
+      kiinteistotunnus={kiinteistotunnus}
+      setPtsImages={setPtsImages}
+    />
+
+    {activeTab === 'preview' && (
+      <PreviewPane previewUrl={previewUrl} onDownload={handleExportPdf} />
+    )}
+  </>
+);
+
 };
 
 export default ReportTemplate;

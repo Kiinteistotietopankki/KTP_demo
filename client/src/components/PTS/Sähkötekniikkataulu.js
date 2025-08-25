@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
-
-export default function SahkotekniikkaTable({ data, onYhteensaChange, setData }) {
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth(); // 0 = January
-  const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
-  const years = Array.from({ length: 11 }, (_, i) => startYear + i);
+import React, { useState, useEffect,useMemo } from 'react';
+export default function SahkotekniikkaTable({data, onYhteensaChange, setData, imports }) {
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth(); // 0 = Tammikuu ja  6 = heinäkuu
+const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
+const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
   const initialData = [
     { name: 'Aluesähköistys', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
@@ -15,12 +14,15 @@ export default function SahkotekniikkaTable({ data, onYhteensaChange, setData })
     { name: 'Palo- ja turvajärjestelmät', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
     { name: 'Siirtolaitteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
   ];
+const [tableData, setTableData] = useState(
+  () => (Array.isArray(data) && data.length > 0 ? data : initialData)
+);
 
-  const [tableData, setTableData] = useState(() => (Array.isArray(data) && data.length > 0 ? data : initialData));
-
-  useEffect(() => {
-    if (Array.isArray(data) && data.length > 0) setTableData(data);
-  }, [data]);
+useEffect(() => {
+  if (Array.isArray(data) && data.length > 0) {
+    setTableData(data);
+  }
+}, [data]);
 
   const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
     const updated = [...tableData];
@@ -87,6 +89,10 @@ export default function SahkotekniikkaTable({ data, onYhteensaChange, setData })
           aria-labelledby="headingSahko"
           data-bs-parent="#sahkotekniikkaAccordion"
         >
+          
+            <div className="p-2">
+              
+            </div>
           <div className="responsive-table-container">
             <table className="table table-sm mb-0">
               <thead className="table-light">

@@ -9,7 +9,7 @@ export default function makeDocDefinition({
   sections,
   riskidata,
   rakennusData,
-  ptsImages
+  ptsImages, 
 }) {
   const content = [];
 
@@ -21,7 +21,7 @@ export default function makeDocDefinition({
 
   const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
 
-  
+  // --- numbering state ---
   let sectionCounter = 0;
   let currentSub = 0;
 
@@ -58,18 +58,94 @@ function pushCleanParagraphs(arr, rawText) {
     .replace(/\n{3,}/g, '\n\n')      // collapse 3+ newlines to 2
     .split(/\n\s*\n/);               // split on blank line
 
-  parts.forEach((p, i) => {
-    const t = p.trim();
-    if (!t) return;
-    arr.push({
-      text: t,
-      style: 'paragraph',
-      alignment: 'justify',
-      lineHeight: 1.35,
-      margin: [0, 0, 0, i === parts.length - 1 ? 10 : 6], // paragraph spacing
+  // Turn a big blob of text into nicely spaced paragraphs
+
+
+    parts.forEach((p, i) => {
+      const t = p.trim();
+      if (!t) return;
+      arr.push({
+        text: t,
+        style: 'paragraph',
+        alignment: 'justify',
+        lineHeight: 1.35,
+        margin: [0, 0, 0, i === parts.length - 1 ? 10 : 6], // paragraph spacing
+      });
     });
-  });
-}
+  }
+
+  // --- Toimenpiteet block (with PTS meta line when includeInPTS is true) ---
+  function pushActionsBlock(arr, items) {
+    if (!Array.isArray(items) || items.length === 0) return;
+
+    // Normalize both strings and objects coming from the editor
+    const normalized = items
+      .map(it => {
+        if (typeof it === 'string') {
+          return { text: it.trim(), includeInPTS: false, ptsCategory: '', ptsSection: '', kl: '' };
+        }
+        return {
+          text: (it?.text || '').trim(),
+          includeInPTS: !!it?.includeInPTS,
+          ptsCategory: it?.ptsCategory || '',
+          ptsSection: it?.ptsSection || '',
+          kl: it?.kl || '',
+        };
+      })
+      .filter(it => it.text);
+
+    if (!normalized.length) return;
+
+    // Build bullet list items with optional PTS meta line
+    const SHOW_PTS_META_IN_PDF = false;
+
+const listItems = normalized.map(it => {
+  if (!SHOW_PTS_META_IN_PDF) {
+    return { text: it.text, fontSize: 11 };
+  }
+
+  // current behavior if flag true
+  let meta = '';
+  if (it.includeInPTS) {
+    const dest = [it.ptsCategory, it.ptsSection].filter(Boolean).join(' / ');
+    const parts = [];
+    if (dest) parts.push(`PTS: ${dest}`);
+    if (it.kl) parts.push(it.kl);
+    if (parts.length) meta = `\n→ ${parts.join('  •  ')}`;
+  }
+
+  return {
+    text: [
+      { text: it.text, fontSize: 11 },
+      meta ? { text: meta, fontSize: 9, color: '#6c757d' } : undefined,
+    ].filter(Boolean),
+  };
+});
+
+    arr.push({
+      table: {
+        widths: ['*'],
+        body: [[
+          {
+            stack: [
+              { text: 'Toimenpide-ehdotukset:', bold: true, margin: [0, 0, 0, 4] },
+              { ul: listItems },
+            ],
+          },
+        ]],
+      },
+      layout: {
+        hLineWidth: () => 0,
+        vLineWidth: () => 0,
+        paddingLeft: () => 8,
+        paddingRight: () => 8,
+        paddingTop: () => 6,
+        paddingBottom: () => 6,
+        fillColor: () => '#f7fbf7',
+      },
+      margin: [0, 4, 0, 10],
+    });
+  }
 
   // --- Cover page ---
   content.push({
@@ -117,97 +193,103 @@ function pushCleanParagraphs(arr, rawText) {
     ],
     margin: [30, 60, 30, 0],
   });
-function fillJohdantoTemplate(template, fields = {}) {
-  return template
-    .replace('{{toimeksiantaja}}', fields.toimeksiantaja || '')
-    .replace('{{koordinaattori}}', fields.koordinaattori || '')
-    .replace('{{koordinaattori_title}}', fields.koordinaattori_title || '')
-    .replace('{{rakennustekniikka}}', fields.rakennustekniikka || '')
-    .replace('{{rakennustekniikka_title}}', fields.rakennustekniikka_title || '')
-    .replace('{{lvia}}', fields.lvia || '')
-    .replace('{{lvia_title}}', fields.lvia_title || '')
-    .replace('{{sahko}}', fields.sahko || '')
-    .replace('{{sahko_title}}', fields.sahko_title || '');
-}
 
-const intro = sections.find((s) => s.key === 'johdanto' && s.include);
-if (intro) {
-  pushNumberedSection(content, { title: intro.label, pageBreak: 'before', tocItem: true });
+  function fillJohdantoTemplate(template, fields = {}) {
+    return template
+      .replace('{{toimeksiantaja}}', fields.toimeksiantaja || '')
+      .replace('{{koordinaattori}}', fields.koordinaattori || '')
+      .replace('{{koordinaattori_title}}', fields.koordinaattori_title || '')
+      .replace('{{rakennustekniikka}}', fields.rakennustekniikka || '')
+      .replace('{{rakennustekniikka_title}}', fields.rakennustekniikka_title || '')
+      .replace('{{lvia}}', fields.lvia || '')
+      .replace('{{lvia_title}}', fields.lvia_title || '')
+      .replace('{{sahko}}', fields.sahko || '')
+      .replace('{{sahko_title}}', fields.sahko_title || '');
+  }
 
-  // Build the aligned table
-  const henkilötTable = {
-    table: {
-      widths: [130, 'auto', '*'],
-      body: [
-        ['Koordinaattori:', intro.fields?.koordinaattori || '', intro.fields?.koordinaattori_title || ''],
-        ['Rakennustekniikka:', intro.fields?.rakennustekniikka || '', intro.fields?.rakennustekniikka_title || ''],
-        ['LVIA-järjestelmät:', intro.fields?.lvia || '', intro.fields?.lvia_title || ''],
-        ['Sähköjärjestelmät:', intro.fields?.sahko || '', intro.fields?.sahko_title || ''],
-      ]
-    },
-     layout: {
-    hLineWidth: () => 0,
-    vLineWidth: () => 0,
-    paddingLeft: () => 0,
-    paddingRight: () => 20, 
-    paddingTop: () => 2,
-    paddingBottom: () => 2
-  },
-  fontSize: 11,
-  margin: [0, 5, 0, 10]
-};
+  // --- Johdanto ---
+  const intro = sections.find((s) => s.key === 'johdanto' && s.include);
+  if (intro) {
+    pushNumberedSection(content, { title: intro.label, pageBreak: 'before', tocItem: true });
 
+    const henkilötTable = {
+      table: {
+        widths: [130, 'auto', '*'],
+        body: [
+          ['Koordinaattori:', intro.fields?.koordinaattori || '', intro.fields?.koordinaattori_title || ''],
+          ['Rakennustekniikka:', intro.fields?.rakennustekniikka || '', intro.fields?.rakennustekniikka_title || ''],
+          ['LVIA-järjestelmät:', intro.fields?.lvia || '', intro.fields?.lvia_title || ''],
+          ['Sähköjärjestelmät:', intro.fields?.sahko || '', intro.fields?.sahko_title || ''],
+        ],
+      },
+      layout: {
+        hLineWidth: () => 0,
+        vLineWidth: () => 0,
+        paddingLeft: () => 0,
+        paddingRight: () => 20,
+        paddingTop: () => 2,
+        paddingBottom: () => 2,
+      },
+      fontSize: 11,
+      margin: [0, 5, 0, 10],
+    };
 
-  const lines = (intro.content || '').split('\n');
-  const beforeLines = [];
-  const afterLines = [];
-  let foundBlock = false;
+    const lines = (intro.content || '').split('\n');
+    const beforeLines = [];
+    const afterLines = [];
+    let foundBlock = false;
 
-  for (const line of lines) {
-    if (
-      line.includes('{{koordinaattori}}') ||
-      line.includes('{{rakennustekniikka}}') ||
-      line.includes('{{lvia}}') ||
-      line.includes('{{sahko}}')
-    ) {
-      foundBlock = true;
-      continue; 
+    for (const line of lines) {
+      if (
+        line.includes('{{koordinaattori}}') ||
+        line.includes('{{rakennustekniikka}}') ||
+        line.includes('{{lvia}}') ||
+        line.includes('{{sahko}}')
+      ) {
+        foundBlock = true;
+        continue;
+      }
+      if (!foundBlock) beforeLines.push(line);
+      else afterLines.push(line);
     }
-    if (!foundBlock) beforeLines.push(line);
-    else afterLines.push(line);
-  }
 
-  if (beforeLines.join('\n').trim()) {
-    content.push({ text: fillJohdantoTemplate(beforeLines.join('\n'), intro.fields), style: 'paragraph', margin: [0, 0, 0, 10] });
-  }
-
-  content.push(henkilötTable);
-
-  if (afterLines.join('\n').trim()) {
-    content.push({ text: fillJohdantoTemplate(afterLines.join('\n'), intro.fields), style: 'paragraph', margin: [0, 0, 0, 10] });
-  }
-
- 
-  content.push(
-    { text: 'Käytetyt kuntoluokat:', fontSize: 11, semibold: true, margin: [0, 10, 0, 10] },
-    {
-      text: [
-        { text: 'KL 5', color: '#04aa00', fontSize: 11, semibold: true },
-        { text: '   Uusi, ei toimenpiteitä seuraavan 10 vuoden kuluessa\n', fontSize: 11 },
-        { text: 'KL 4', color: '#04aa00', fontSize: 11, semibold: true },
-        { text: '   Hyvä, kevyt huoltokorjaus 6-10 vuoden kuluessa\n', fontSize: 11 },
-        { text: 'KL 3', color: '#FFC107', fontSize: 11, semibold:true },
-        { text: '   Tyydyttävä, kevyt huoltokorjaus 1-5 vuoden kuluessa tai peruskorjaus 6-10 vuoden kuluessa\n', fontSize: 11 },
-        { text: 'KL 2', color: '#ba3b46', fontSize: 11, semibold: true },
-        { text: '   Välttävä, peruskorjaus 1-5 vuoden kuluessa tai uusiminen 6-10 vuoden kuluessa\n', fontSize: 11 },
-        { text: 'KL 1', color: '#ba3b46', fontSize: 11, semibold:true },
-        { text: '   Heikko, uusitaan 1-5 vuoden kuluessa', fontSize: 11 },
-      ],
-      margin: [0, 0, 0, 10],
+    if (beforeLines.join('\n').trim()) {
+      content.push({
+        text: fillJohdantoTemplate(beforeLines.join('\n'), intro.fields),
+        style: 'paragraph',
+        margin: [0, 0, 0, 10],
+      });
     }
-  );
-}
 
+    content.push(henkilötTable);
+
+    if (afterLines.join('\n').trim()) {
+      content.push({
+        text: fillJohdantoTemplate(afterLines.join('\n'), intro.fields),
+        style: 'paragraph',
+        margin: [0, 0, 0, 10],
+      });
+    }
+
+    content.push(
+      { text: 'Käytetyt kuntoluokat:', fontSize: 11, semibold: true, margin: [0, 10, 0, 10] },
+      {
+        text: [
+          { text: 'KL 5', color: '#04aa00', fontSize: 11, semibold: true },
+          { text: '   Uusi, ei toimenpiteitä seuraavan 10 vuoden kuluessa\n', fontSize: 11 },
+          { text: 'KL 4', color: '#04aa00', fontSize: 11, semibold: true },
+          { text: '   Hyvä, kevyt huoltokorjaus 6-10 vuoden kuluessa\n', fontSize: 11 },
+          { text: 'KL 3', color: '#FFC107', fontSize: 11, semibold: true },
+          { text: '   Tyydyttävä, kevyt huoltokorjaus 1-5 vuoden kuluessa tai peruskorjaus 6-10 vuoden kuluessa\n', fontSize: 11 },
+          { text: 'KL 2', color: '#ba3b46', fontSize: 11, semibold: true },
+          { text: '   Välttävä, peruskorjaus 1-5 vuoden kuluessa tai uusiminen 6-10 vuoden kuluessa\n', fontSize: 11 },
+          { text: 'KL 1', color: '#ba3b46', fontSize: 11, semibold: true },
+          { text: '   Heikko, uusitaan 1-5 vuoden kuluessa', fontSize: 11 },
+        ],
+        margin: [0, 0, 0, 10],
+      }
+    );
+  }
 
   // --- Kohteen tiedot ---
   const rakennukset = rakennusData?.rakennukset_fulls || [];
@@ -315,20 +397,32 @@ if (intro) {
 
     pushNumberedSection(content, { title: s.label, pageBreak: 'before', tocItem: true });
 
-  if (s.content) {
-  pushCleanParagraphs(content, s.content);
-}
+    if (s.content) {
+      pushCleanParagraphs(content, s.content);
+    }
 
-   
+    // Section-level toimenpiteet
+    if (Array.isArray(s.actionItems) && s.actionItems.length) {
+      pushActionsBlock(content, s.actionItems);
+    }
+
+    // Subsections
     if (Array.isArray(s.subsections)) {
       s.subsections.forEach((sub) => {
         pushSubsection(content, { title: sub.label, tocItem: true });
-       if (sub.text) {
-  pushCleanParagraphs(content, sub.text);
-}
+
+        if (sub.text) {
+          pushCleanParagraphs(content, sub.text);
+        }
+
+        // Subsection-level toimenpiteet
+        if (Array.isArray(sub.actionItems) && sub.actionItems.length) {
+          pushActionsBlock(content, sub.actionItems);
+        }
       });
     }
 
+    // Section images
     if (s.images?.length) {
       const rows = [];
       for (let i = 0; i < s.images.length; i += 2) {
@@ -386,7 +480,7 @@ function addHeadingsWithImages(content, ptsHeadings, ptsImages, sectionCounter, 
     currentSub = addHeadingsWithImages(content, ptsHeadings, ptsImages, sectionCounter, currentSub);
   }
 
-
+    // Risk table
     if (s.key === 'jarjestelma') {
       content.push(
         { text: 'Riskiluokitus', fontSize: 14, semibold: true, margin: [0, 10, 0, 10] },
