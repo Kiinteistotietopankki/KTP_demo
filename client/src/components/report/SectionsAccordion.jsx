@@ -71,64 +71,58 @@ function ActionEditor({ items = [], onChange, availablePTSSections }) {
           </div>
 
           <div className="row g-2 mt-2">
-            <div className="col-auto d-flex align-items-center">
-              <input
-                id={`inc-${i}`}
-                type="checkbox"
-                className="form-check-input me-2"
-                checked={row.includeInPTS}
-                onChange={(e) => update(i, { includeInPTS: e.target.checked })}
-              />
-              <label htmlFor={`inc-${i}`} className="form-check-label">
-                Vie PTS:ään
-              </label>
-            </div>
+           <div className="col-auto">
+  <button
+    type="button"
+    className={`btn btn-sm ${row.includeInPTS ? 'btn-success' : 'btn-outline-secondary'}`}
+    onClick={() => update(i, { includeInPTS: !row.includeInPTS })}
+    title={row.includeInPTS ? 'Poista PTS:stä' : 'Vie PTS:ään'}
+  >
+    {row.includeInPTS ? '✓ PTS' : 'Vie PTS'}
+  </button>
+</div>
 
-            <div className="col-auto">
-              <select
-                className="form-select form-select-sm"
-                value={row.ptsCategory}
-                onChange={(e) => update(i, { ptsCategory: e.target.value })}
-                disabled={!row.includeInPTS}
-              >
-                <option>Rakennetekniikka</option>
-                <option>LVI Järjestelmät</option>
-                <option>Sähköjärjestelmät</option>
-                <option>Lisätutkimukset</option>
-              </select>
-            </div>
+           <div className="col-auto" style={{ opacity: row.includeInPTS ? 1 : 0.6 }}>
+    <select
+      className="form-select form-select-sm"
+      value={row.ptsCategory}
+      onChange={(e) => update(i, { ptsCategory: e.target.value })}
+    >
+      <option>Rakennetekniikka</option>
+      <option>LVI Järjestelmät</option>
+      <option>Sähköjärjestelmät</option>
+      <option>Lisätutkimukset</option>
+    </select>
+  </div>
 
-           
-            <div className="col-auto" style={{ minWidth: 220 }}>
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                placeholder="PTS-osio"
-                list={`pts-osio-${i}`}
-                value={row.ptsSection || ''}
-                onChange={(e) => update(i, { ptsSection: e.target.value })}
-                disabled={!row.includeInPTS}
-              />
-              <datalist id={`pts-osio-${i}`}>
-                {(availablePTSSections?.[row.ptsCategory] || []).map((s) => (
-                  <option key={s} value={s} />
-                ))}
-              </datalist>
-            </div>
+  <div className="col-auto" style={{ minWidth: 220, opacity: row.includeInPTS ? 1 : 0.6 }}>
+    <input
+      type="text"
+      className="form-control form-control-sm"
+      placeholder="PTS-osio"
+      list={`pts-osio-${i}`}
+      value={row.ptsSection || ''}
+      onChange={(e) => update(i, { ptsSection: e.target.value })}
+    />
+    <datalist id={`pts-osio-${i}`}>
+      {(availablePTSSections?.[row.ptsCategory] || []).map((s) => (
+        <option key={s} value={s} />
+      ))}
+    </datalist>
+  </div>
 
-            <div className="col-auto">
-              <select
-                className="form-select form-select-sm"
-                value={row.kl}
-                onChange={(e) => update(i, { kl: e.target.value })}
-                disabled={!row.includeInPTS}
-              >
-                {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map((k) => (
-                  <option key={k}>{k}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+  <div className="col-auto" style={{ opacity: row.includeInPTS ? 1 : 0.6 }}>
+    <select
+      className="form-select form-select-sm"
+      value={row.kl}
+      onChange={(e) => update(i, { kl: e.target.value })}
+    >
+      {['KL1', 'KL2', 'KL3', 'KL4', 'KL5'].map((k) => (
+        <option key={k}>{k}</option>
+      ))}
+    </select>
+  </div>
+</div>
         </div>
       ))}
     </div>
@@ -152,155 +146,6 @@ const johdantoDefaultFields = [
   { key: 'sahko_title', label: 'Sähköntekniikan ammattinimike' },
 ];
 
-function RiskMatrixEditor({ riskidata, setRiskidata }) {
-  const [editingLabelId, setEditingLabelId] = React.useState(null);
-  const [tempLabel, setTempLabel] = React.useState('');
-
-  const startEditLabel = (item) => {
-    setEditingLabelId(item.id);
-    setTempLabel(item.label || '');
-  };
-
-  const saveLabel = (itemId) => {
-    const updated = [...riskidata];
-    const idx = updated.findIndex((i) => i.id === itemId);
-    if (idx !== -1) updated[idx].label = tempLabel;
-    setRiskidata(updated);
-    setEditingLabelId(null);
-    setTempLabel('');
-  };
-
-  const cancelEdit = () => {
-    setEditingLabelId(null);
-    setTempLabel('');
-  };
-
-  const grouped = riskidata.reduce((acc, item) => {
-    (acc[item.category] ||= []).push(item);
-    return acc;
-  }, {});
-
-  return (
-    <div className="mt-4 space-y-2">
-      {Object.entries(grouped).map(([category, items]) => (
-        <div key={category} className="mb-4">
-          <h5 className="fw-bold border-bottom border-success pb-1 text-uppercase">{category}</h5>
-
-          {items.map((item) => {
-            const isEditing = editingLabelId === item.id;
-            const riskColor =
-              item.risk === 'low' ? 'green' : item.risk === 'medium' ? 'orange' : 'red';
-
-            return (
-              <div key={item.id} className="row align-items-center mb-3">
-                {/* Label ja edit pencil */}
-                <div className="col-12 col-md-3 d-flex align-items-center">
-                  {isEditing ? (
-                    <>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm me-2"
-                        value={tempLabel}
-                        onChange={(e) => setTempLabel(e.target.value)}
-                        autoFocus
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-success me-1"
-                        onClick={() => saveLabel(item.id)}
-                        title="Tallenna nimi"
-                        aria-label="Tallenna nimi"
-                        style={{ padding: '2px 6px' }}
-                      >
-                        <i className="bi bi-check" />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={cancelEdit}
-                        title="Peruuta"
-                        aria-label="Peruuta"
-                        style={{ padding: '2px 6px' }}
-                      >
-                        <i className="bi bi-x" />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <strong className="text-truncate" title={item.label} style={{ maxWidth: '100%' }}>
-                        {item.label}
-                      </strong>
-                      <button
-                        type="button"
-                        className="btn btn-link btn-sm ms-2 p-0"
-                        onClick={() => startEditLabel(item)}
-                        title="Muokkaa nimeä"
-                        aria-label="Muokkaa nimeä"
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <i className="bi bi-pencil-square" style={{ color: 'gray' }} />
-                      </button>
-                    </>
-                  )}
-                </div>
-
-               
-                <div className="col-2 col-md-1 text-center">
-                  <span style={{ fontSize: '1.2rem', color: riskColor }}>✓</span>
-                </div>
-
-                {/* Risk select */}
-                <div className="col-10 col-md-3 mb-2 mb-md-0">
-                  <select
-                    className="form-select form-select-sm"
-                    value={item.risk}
-                    onChange={(e) => {
-                      const updated = [...riskidata];
-                      updated[riskidata.findIndex((i) => i.id === item.id)].risk = e.target.value;
-                      setRiskidata(updated);
-                    }}
-                  >
-                    <option value="low">Matala riski</option>
-                    <option value="medium">Keskitason riski</option>
-                    <option value="high">Korkea riski</option>
-                  </select>
-                </div>
-
-                
-                <div className="col-10 col-md-4">
-                  <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="Selite"
-                    value={item.description || ''}
-                    onChange={(e) => {
-                      const updated = [...riskidata];
-                      updated[riskidata.findIndex((i) => i.id === item.id)].description = e.target.value;
-                      setRiskidata(updated);
-                    }}
-                  />
-                </div>
-
-                
-                <div className="col-2 col-md-1 text-center">
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => setRiskidata(riskidata.filter((i) => i.id !== item.id))}
-                    title="Poista rivi"
-                    aria-label="Poista rivi"
-                  >
-                    X
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default function SectionsAccordion({
   sections,

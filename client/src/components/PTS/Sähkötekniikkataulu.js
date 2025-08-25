@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useMemo } from 'react';
 export default function SahkotekniikkaTable({data, onYhteensaChange, setData, imports }) {
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth(); // 0 = Tammikuu ja  6 = heinäkuu
@@ -14,12 +14,15 @@ const years = Array.from({ length: 11 }, (_, i) => startYear + i);
     { name: 'Palo- ja turvajärjestelmät', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
     { name: 'Siirtolaitteet', kl: 'KL3', items: [{ label: '', kl: 'KL3', values: Array(11).fill('') }] },
   ];
+const [tableData, setTableData] = useState(
+  () => (Array.isArray(data) && data.length > 0 ? data : initialData)
+);
 
-  const [tableData, setTableData] = useState(() => (Array.isArray(data) && data.length > 0 ? data : initialData));
-
-  useEffect(() => {
-    if (Array.isArray(data) && data.length > 0) setTableData(data);
-  }, [data]);
+useEffect(() => {
+  if (Array.isArray(data) && data.length > 0) {
+    setTableData(data);
+  }
+}, [data]);
 
   const handleValueChange = (sectionIdx, itemIdx, yearIdx, value) => {
     const updated = [...tableData];

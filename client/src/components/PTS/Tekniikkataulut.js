@@ -50,9 +50,16 @@ const Tekniikkataulut = forwardRef(({ data, setData, onYhteensaChange, type }, r
   const [tableData, setTableData] = useState(() => (Array.isArray(data) && data.length > 0 ? data : initialData));
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    if (Array.isArray(data) && data.length > 0) setTableData(data);
-  }, [JSON.stringify(data)]);
+useEffect(() => {
+  if (Array.isArray(data)) {
+    if (data.length > 0) {
+      setTableData(data);
+    } else {
+      
+      setTableData(initialData);
+    }
+  }
+}, [JSON.stringify(data)]);
 
   useEffect(() => {
     if (typeof setData === 'function') setData(tableData);

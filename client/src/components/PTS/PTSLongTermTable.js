@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   BarChart, Bar,
-  PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer
 } from 'recharts';
-
-
 
 import { Tabs, Tab } from 'react-bootstrap';
 import Tekniikkataulut from './Tekniikkataulut';
@@ -16,16 +13,17 @@ import config from '../../devprodConfig';
 import PiechartPTS from './PiechartPTS';
 import html2canvas from 'html2canvas';
 
-export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded,imports, onSectionsChange, setPtsImages=null, onBackground=false}) {
+export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, imports, onSectionsChange, setPtsImages = null, onBackground = false }) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const startYear = currentMonth >= 6 ? currentYear + 1 : currentYear;
   const years = Array.from({ length: 11 }, (_, i) => startYear + i);
 
-  const [tekniikkaData, setTekniikkaData] = useState([]);
-  const [lviData, setLviData] = useState([]);
-  const [sahkoData, setSahkoData] = useState([]);
-  const [tutkimusData, setTutkimusData] = useState([]);
+  
+const [tekniikkaData, setTekniikkaData] = useState([]);
+const [lviData, setLviData] = useState([]);
+const [sahkoData, setSahkoData] = useState([]);
+const [tutkimusData, setTutkimusData] = useState([]);
 
   const [tekniikkaYhteensa, setTekniikkaYhteensa] = useState(Array(11).fill(0));
   const [lviYhteensa, setLviYhteensa] = useState(Array(11).fill(0));
@@ -49,11 +47,10 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded,import
       ],
     },
   ]);
-useEffect(() => {
-  if (!imports || imports.length === 0) return;
 
+ 
   const mergeImports = (prevSections = [], cat) => {
-    const catImports = imports.filter(x => x.category === cat);
+    const catImports = (imports || []).filter(x => x.category === cat);
     if (catImports.length === 0) return prevSections;
 
     const next = prevSections.map(s => ({ ...s, items: [...(s.items || [])] }));
@@ -77,132 +74,93 @@ useEffect(() => {
           values: Array(11).fill(''),
         });
       }
-   });
+    });
 
-   return next;
- };
-  setTekniikkaData(prev => mergeImports(prev, 'Rakennetekniikka'));
-  setLviData(prev => mergeImports(prev, 'LVI Järjestelmät'));
-  setSahkoData(prev => mergeImports(prev, 'Sähköjärjestelmät'));
-setTutkimusData(prev => mergeImports(prev, 'Lisätutkimukset'));
-
-}, [JSON.stringify(imports)]);
-  const handleValueChange = (catIdx, subIdx, itemIdx, yearIdx, value) => {
-    const updated = [...data];
-    updated[catIdx].subcategories[subIdx].items[itemIdx].values[yearIdx] = value;
-    setData(updated);
+    return next;
   };
 
+ 
+  useEffect(() => {
+    if (!imports) return;
+    setTekniikkaData(prev => mergeImports(prev, 'Rakennetekniikka'));
+    setLviData(prev => mergeImports(prev, 'LVI Järjestelmät'));
+    setSahkoData(prev => mergeImports(prev, 'Sähköjärjestelmät'));
+    setTutkimusData(prev => mergeImports(prev, 'Lisätutkimukset'));
+  }, [JSON.stringify(imports)]);
+const handleValueChange = (catIdx, subIdx, itemIdx, yearIdx, value) => {
+  const updated = [...data];
+  updated[catIdx].subcategories[subIdx].items[itemIdx].values[yearIdx] = value;
+  setData(updated);
+};
+  
   useEffect(() => {
     if (!kiinteistotunnus) return;
 
-      const fetchPTS = async () => {
+    const fetchPTS = async () => {
       try {
-        const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`
-        , {
-            credentials: 'include', 
-          });
+        const listRes = await fetch(`${config.apiBaseUrl}/api/pts/by/kiinteistotunnus/${kiinteistotunnus}`, {
+          credentials: 'include',
+        });
         const ptsList = await listRes.json();
 
         if (!ptsList.length) {
-          console.log("ℹ️ Ei PTS-raportteja löytynyt");
-
-          if (onDataLoaded) {
-            onDataLoaded({ hasPTSData: false });
-          }
-
+          if (onDataLoaded) onDataLoaded({ hasPTSData: false });
           return;
         }
 
         const latestPTSId = ptsList[0].id;
-        const fullRes = await fetch(`${config.apiBaseUrl}/api/pts/${latestPTSId}`,
-          { credentials: 'include'
+        const fullRes = await fetch(`${config.apiBaseUrl}/api/pts/${latestPTSId}`, {
+          credentials: 'include',
         });
         const fullPTS = await fullRes.json();
-        console.log(fullPTS)
-
-      
 
         const entries = fullPTS.entries || [];
-        // console.log("📦 Raw fetched entries:", entries);
-
-        
         const filterByCategory = (cat) => entries.filter(e => e.category === cat);
 
         const tekniikka = filterByCategory('Rakennetekniikka');
         const lvi = filterByCategory('LVI Järjestelmät');
         const sahko = filterByCategory('Sähköjärjestelmät');
         const tutkimus = filterByCategory('Lisätutkimukset');
-  //       console.log("🔧 Split entries:", {
-  //   tekniikka, lvi, sahko, tutkimus
-  // });
 
-        
-      const mapToSection = (items) => {
-    const grouped = {};
+       const mapToSection = (items, defaultName) => {
+  if (!items.length) {
+    return [{ name: defaultName, items: [] }];  
+  }
 
-    items.forEach(entry => {
-      const key = entry.section || 'Muu';
-      if (!grouped[key]) grouped[key] = [];
-      let parsedValuesByYear = {};
-      try {
-        parsedValuesByYear = typeof entry.values_by_year === 'string'
-          ? JSON.parse(entry.values_by_year)
-          : entry.values_by_year || {};
-      } catch (err) {
-
-    }
-      // 🔧 Build `values[]` array from values_by_year.y1 to y11
+  const grouped = {};
+  items.forEach(entry => {
+    const key = entry.section || 'Muu';
+    if (!grouped[key]) grouped[key] = [];
+    let parsedValuesByYear = {};
+    try {
+      parsedValuesByYear = typeof entry.values_by_year === 'string'
+        ? JSON.parse(entry.values_by_year)
+        : entry.values_by_year || {};
+    } catch {}
     const values = Array.from({ length: 11 }, (_, i) => {
-    const raw = parsedValuesByYear[`y${i + 1}`];
-    return raw !== undefined && raw !== null ? String(raw) : '0';
+      const raw = parsedValuesByYear[`y${i + 1}`];
+      return raw !== undefined && raw !== null ? String(raw) : '0';
+    });
+    grouped[key].push({
+      label: entry.label || '',
+      kl: entry.kl_rating || '',
+      values
+    });
   });
-  // console.log("values array for:", entry.label, values);
-      grouped[key].push({
-        label: entry.label || '',
-        kl: entry.kl_rating || '',
-        values
-      });
-    });
 
-    return Object.entries(grouped).map(([section, items]) => ({
-      name: section,
-      items
-    }));
-  };
+  return Object.entries(grouped).map(([section, items]) => ({
+    name: section,
+    items
+  }));
+};
 
+        // 👇 merge imports directly after mapping backend
+     setTekniikkaData(mergeImports(mapToSection(tekniikka, "Rakennetekniikka"), "Rakennetekniikka"));
+    setLviData(mergeImports(mapToSection(lvi, "LVI Järjestelmät"), "LVI Järjestelmät"));
+    setSahkoData(mergeImports(mapToSection(sahko, "Sähköjärjestelmät"), "Sähköjärjestelmät"));
+    setTutkimusData(mergeImports(mapToSection(tutkimus, "Lisätutkimukset"), "Lisätutkimukset"));
 
-        setTekniikkaData(mapToSection(tekniikka));
-        setLviData(mapToSection(lvi));
-        // console.log("📋 Mapped LVI Data:", mapToSection(lvi));
-        setSahkoData(mapToSection(sahko));
-        setTutkimusData(mapToSection(tutkimus));
-
-        
-    const getTotals = (entries) => {
-    const sums = Array(11).fill(0);
-    entries.forEach(e => {
-      const source = typeof e.values_by_year === 'string'
-        ? JSON.parse(e.values_by_year)
-        : e.values_by_year || {};
-
-      for (let i = 0; i < 11; i++) {
-        const val = source[`y${i + 1}`];
-        const num = parseFloat(val);
-        if (!isNaN(num)) sums[i] += num;
-      }
-    });
-    return sums;
-  };
-
-        setTekniikkaYhteensa(getTotals(tekniikka));
-        setLviYhteensa(getTotals(lvi));
-        setSahkoYhteensa(getTotals(sahko));
-        setTutkimusYhteensa(getTotals(tutkimus));
-          if (onDataLoaded) {
-          onDataLoaded({ hasPTSData: true });
-        }
-        console.log("✅ onDataLoaded called with: hasPTSData = true");
+        if (onDataLoaded) onDataLoaded({ hasPTSData: true });
 
       } catch (err) {
         console.error("❌ Virhe ladattaessa PTS-tietoja:", err);
@@ -211,7 +169,6 @@ setTutkimusData(prev => mergeImports(prev, 'Lisätutkimukset'));
 
     fetchPTS();
   }, [kiinteistotunnus]);
-
 
   useEffect(() => {
     const updated = [...data];
