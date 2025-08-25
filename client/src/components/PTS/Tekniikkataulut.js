@@ -179,7 +179,7 @@ return (
             <th colSpan={years.length + 2 + (isEditing ? 1 : 0)} className="bg-success text-white p-2">
               <div className="d-flex justify-content-between">
                 <div className="fw-bold"></div>
-                {!isEditing && <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso 2025 sis. Alv 25,5%</div>}
+                {!isEditing && <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso {currentYear} sis. Alv 25,5%</div>}
               </div>
             </th>
           </tr>

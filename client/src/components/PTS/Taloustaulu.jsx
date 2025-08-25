@@ -1,0 +1,122 @@
+import { useEffect } from "react";
+
+const Taloustaulu = ({ years, totalValues, currentYear }) => {
+
+  const huoneistoNeliot = 1200;
+
+  // Calculate €/m² values as an array
+  const perM2Values = totalValues.map(sum =>
+    huoneistoNeliot > 0 ? ((sum * 1000) / huoneistoNeliot).toFixed(2) : "0"
+  );
+
+  useEffect(() => {
+    console.log("Total values:", totalValues);
+    console.log("Per m² values:", perM2Values);
+  }, [totalValues]);
+
+  return (
+    <div className="my-4 ptstaulut">
+      <div className="table-responsive">
+        <table className="table table-sm table-borderless table-striped mb-0">
+          {/* Header */}
+          <thead>
+            <tr>
+              <th colSpan={years.length + 2} className="bg-success text-white p-2">
+                <div className="d-flex justify-content-between">
+                  <div className="fw-bold">Kustannusten jakautuminen</div>
+                  <div className="small text-end">Kustannustaso {currentYear} sis. Alv 25,5%</div>
+                </div>
+              </th>
+            </tr>
+          </thead>
+
+          {/* Column headers */}
+          <thead>
+            <tr>
+              <th className="bg-success text-white text-start"></th>
+              {years.map(year => (
+                <th key={year} className="bg-success text-white text-center px-2 fw-normal">
+                  {year}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {/* Total costs */}
+            <tr className="bg-success text-white">
+                <td className="text-start">
+                    Kustannukset taloyhtiölle yhteensä vuosittain <br /> <div className="text-center">(x 1000€)</div>
+                </td>
+                {totalValues.map((sum, idx) => (
+                    <td key={idx} className="text-center font-monospace align-middle">{sum}</td>
+                ))}
+            </tr>
+
+            {/* Empty spacer row */}
+            <tr>
+              <td colSpan={years.length + 1}>&nbsp;</td>
+            </tr>
+
+            {/* €/m² row */}
+            <tr className="bg-success text-white">
+              <td className="text-start">Kustannukset vuosittain € / huoneistoneliö</td>
+              {perM2Values.map((val, idx) => (
+                <td key={idx} className="text-center font-monospace px-2">{val}</td>
+              ))}
+            </tr>
+
+            <tr>
+              <td colSpan={years.length + 1}>&nbsp;</td>
+            </tr>
+
+            
+            <tr>
+                <td className="text-start">Kustannukset yhteensä 10 vuoden jaksolla</td>
+                <td colSpan={years.length + 1} className="font-monospace px-2">
+                    {(totalValues.reduce((acc, val) => acc + val, 0) * 1000).toLocaleString('fi-FI')} €
+                </td>
+            </tr>
+
+
+            <tr>
+              <td colSpan={years.length + 1}>&nbsp;</td>
+            </tr>
+
+            <tr>
+                <td className="text-start">Kohteen huoneistoala</td>
+                <td className="ps-5" colSpan={years.length + 1}>{huoneistoNeliot} m²</td>
+            </tr>
+
+            <tr>
+            <td className="text-start">Kertakustannus per huoneistoneliö 10v ajanjaksolla</td>
+                <td className="ps-5" colSpan={years.length + 1}>
+                    {((totalValues.reduce((acc, val) => acc + val, 0) * 1000) / huoneistoNeliot).toLocaleString('fi-FI')} € /m²
+                </td>
+            </tr>
+
+          </tbody>
+
+
+
+          {/* Footer */}
+          <tfoot>
+            <tr className="fw-bold">
+              <td colSpan={years.length + 1} className="bg-success text-white text-start p-1">
+                Teoreettinen rahoitusvastike 10v lainalla ja 4% korolla
+              </td>
+            </tr>
+            <tr className="fw-bold">
+              <td colSpan={years.length + 1} className="bg-success text-white text-start p-1">
+                Teoreettinen rahoitusvastike 25v lainalla ja 4% korolla
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+
+export default Taloustaulu;

@@ -1,21 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   BarChart, Bar,
-  PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer
 } from 'recharts';
 
-
-
-import { Tabs, Tab } from 'react-bootstrap';
 import Tekniikkataulut from './Tekniikkataulut';
-import LVITable from './LVItaulu';
-import SahkotekniikkaTable from './Sähkötekniikkataulu';
 import TutkimustarpeetTaulu from './Tutkimustarpeettaulu';
 import config from '../../devprodConfig';
 import PiechartPTS from './PiechartPTS';
 import html2canvas from 'html2canvas';
 import ToastMessage from '../ToastMessage';
+import Taloustaulu from './Taloustaulu';
 
 export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPtsImages=null, onBackground=false}) {
   const currentYear = new Date().getFullYear();
@@ -288,6 +283,7 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
   const lvitekniikkaRef = useRef(null)
   const sahkotekniikkaRef = useRef(null)
 
+  // Kuvaajien ja taulujen "kuvaus" raporttia varten:
   const refs = [yhteensaRef, lisatutkimuksetRef, rakennetekniikkaRef, lvitekniikkaRef, sahkotekniikkaRef];
 
   useEffect(() => {
@@ -335,6 +331,33 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
       if (captureTimeout) clearTimeout(captureTimeout);
     };
   }, [kiinteistotunnus]);
+
+  // Yhteensä-lukujen tallennus, muihin komponentteihin viemiseksi: 
+
+  const [footerTotals, setFooterTotals] = useState([]);
+
+    const getColumnTotals = (subcategory) => {
+    if (!subcategory || !subcategory.items) return [];
+    const numYears = subcategory.items[0]?.values?.length || 0;
+
+    return Array.from({ length: numYears }, (_, yearIdx) => {
+      return subcategory.items
+        .filter(i => i.label !== 'Yhteensä')
+        .reduce((sum, item) => {
+          const num = parseFloat(item.values[yearIdx]);
+          return !isNaN(num) ? sum + num : sum;
+        }, 0);
+    });
+  };
+
+  useEffect(() => {
+    if (!data.length || !data[0].subcategories?.length) return;
+
+    const sub = data[0].subcategories[0];
+    const totals = getColumnTotals(sub);
+    setFooterTotals(totals);
+  }, [data]);
+  
 
 
   return (
@@ -415,7 +438,7 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
                             <th colSpan={years.length + 2} className="bg-success text-white p-2">
                               <div className="d-flex justify-content-between">
                                 <div className="fw-bold">Toimenpide-ehdotukset yhteensä</div>
-                                <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso 2025 sis. Alv 25,5%</div>
+                                <div className="small text-end">Kustannusarvio (x 1000€) Kustannustaso {currentYear} sis. Alv 25,5%</div>
                               </div>
                             </th>
                           </tr>
@@ -484,33 +507,16 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
                         <tfoot>
                           <tr className="fw-bold">
                             <td className="bg-success text-white text-start">YHTEENSÄ</td>
+                            {/* Total of all years combined */}
                             <td className="bg-success text-white text-center font-monospace">
-                              {sub.items
-                                .filter((i) => i.label !== 'Yhteensä')
-                                .reduce(
-                                  (acc, item) =>
-                                    acc +
-                                    item.values.reduce((sum, val) => {
-                                      const num = parseFloat(val);
-                                      return !isNaN(num) ? sum + num : sum;
-                                    }, 0),
-                                  0
-                                )}
+                              {getColumnTotals(sub).reduce((a, b) => a + b, 0)}
                             </td>
-                            {Array.from({ length: years.length }, (_, idx) => {
-                              const colSum = sub.items
-                                .filter((i) => i.label !== 'Yhteensä')
-                                .reduce((sum, item) => {
-                                  const num = parseFloat(item.values[idx]);
-                                  return !isNaN(num) ? sum + num : sum;
-                                }, 0);
-
-                              return (
-                                <td key={idx} className="bg-success text-white text-center font-monospace px-2">
-                                  {colSum}
-                                </td>
-                              );
-                            })}
+                            {/* Column totals per year */}
+                            {getColumnTotals(sub).map((colSum, idx) => (
+                              <td key={idx} className="bg-success text-white text-center font-monospace px-2">
+                                {colSum}
+                              </td>
+                            ))}
                           </tr>
                         </tfoot>
                       </table>
@@ -522,6 +528,12 @@ export default function PTSLongTermTable({ kiinteistotunnus, onDataLoaded, setPt
               ))}
             </React.Fragment>
           ))}
+
+          {years && (
+            <Taloustaulu years={years} totalValues={footerTotals} currentYear={currentYear}></Taloustaulu>
+
+          )}
+          
 
           <TutkimustarpeetTaulu
             data={tutkimusData}
